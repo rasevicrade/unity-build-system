@@ -8,3 +8,4 @@
 6. While scene in focus, click Shift + 1 to move the floor prefab to first floor
 
 That's it for now, still a work in progress.
+![image](https://user-images.githubusercontent.com/20711087/168880370-fac2b594-8f11-43f5-b425-71acc15dac24.png)
