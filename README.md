@@ -1,5 +1,6 @@
 # Unity build system
 ## How to use
+0. Materials in asset are HDRP
 1. Get BuildSystem.unitypackage from release page
 2. In your project select Assets > Import package > Custom package 
 3. From the imported BuildSystem directory drag Blueprint prefab in scene
