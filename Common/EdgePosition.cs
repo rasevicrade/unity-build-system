@@ -7,9 +7,10 @@ public class EdgePosition : MonoBehaviour
     public Edge edge;
     public enum Edge
     {
-        Top,
-        Bottom,
-        Left,
-        Right
+        North,
+        South,
+        West,
+        East,
+        Top
     }
 }

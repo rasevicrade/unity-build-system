@@ -14,7 +14,7 @@ public class Blueprint : MonoBehaviour
         instantiatedGO.transform.parent = transform;
         instantiatedGO.name = instantiatedGO.name.Replace("(Clone)", "") + "-Placed";      
         
-        RemoveSnapper(instantiatedGO);
+        SetStateToPlaced(instantiatedGO);
         SetEdgeLayerToDefault(instantiatedGO);
         return instantiatedGO;
     }
@@ -27,15 +27,8 @@ public class Blueprint : MonoBehaviour
         }
     }
 
-    private void RemoveSnapper(GameObject placedObject)
+    private void SetStateToPlaced(GameObject placedObject)
     {
-        if (Application.isEditor)
-        {
-            DestroyImmediate(placedObject.GetComponent<Snapper>());
-        }
-        else
-        {
-            Destroy(placedObject.GetComponent<Snapper>());
-        }
+        placedObject.GetComponent<Snapper>().SetPlaced();
     }
 }

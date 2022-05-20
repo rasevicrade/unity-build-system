@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static EdgePosition;
 
 [ExecuteInEditMode]
 public class Snapper : MonoBehaviour
@@ -9,6 +10,7 @@ public class Snapper : MonoBehaviour
     public float snapDistance = 1f;
     public PrefabType prefabType;
     private PreviewController previewController;
+    private bool isPlaced;
 
     #region Lifecycle methods
     private void OnEnable()
@@ -18,6 +20,10 @@ public class Snapper : MonoBehaviour
 
     void Update()
     {
+        // If it is a placed object, nothing to do
+        if (isPlaced)
+            return;
+
         var edge = FindPlacedObjectsToSnap();
         if (edge != null)
         {
@@ -25,6 +31,11 @@ public class Snapper : MonoBehaviour
         }
     }
     #endregion
+
+    public void SetPlaced()
+    {
+        isPlaced = true;
+    }
 
     #region Snap to edges
     private void Snap(Transform edge)
@@ -50,10 +61,40 @@ public class Snapper : MonoBehaviour
 
     private Vector3 ShiftPreview(Transform edge)
     {
-        var snapTargetPosition = new Vector3(edge.parent.position.x, edge.transform.position.y, edge.parent.position.z);
-        var targetHalfBound = (Application.isEditor ? edge.parent.GetComponent<MeshFilter>().sharedMesh.bounds.size.x / 2 : edge.parent.GetComponent<MeshFilter>().mesh.bounds.size.x / 2);
-        var currentPreviewHalfBound = (Application.isEditor ? transform.GetComponent<MeshFilter>().sharedMesh.bounds.size.x / 2 : transform.GetComponent<MeshFilter>().mesh.bounds.size.x / 2);
-        return snapTargetPosition + edge.forward * (targetHalfBound + currentPreviewHalfBound);
+        var snapTarget = edge.parent;
+        // Whatever current preview is, we first move it to center of snapped target - snapTargetPosition
+        var snapTargetPosition = new Vector3(snapTarget.position.x, edge.transform.position.y, snapTarget.position.z);
+
+        var targetHalfSize = GetTargetBounds(snapTarget).size.x / 2;
+        var currentPreviewHalfSize = GetTargetBounds(transform).size.x / 2;
+
+        Vector3 shiftedPosition = Vector3.zero;
+        bool isCurrentWall = prefabType == PrefabType.Wall;
+        bool isTargetWall = snapTarget.GetComponent<Snapper>().prefabType == PrefabType.Wall;
+        bool isCurrentFloor = prefabType == PrefabType.Floor;
+        bool isTargetFloor = snapTarget.GetComponent<Snapper>().prefabType == PrefabType.Floor;
+
+        if (isCurrentWall && isTargetFloor) // If I am a wall, snapping to a floor, only shift by half size of the floor
+        {
+            shiftedPosition = snapTargetPosition + edge.forward * targetHalfSize;
+        } 
+        else if (isCurrentFloor && isTargetWall) // If I am a floor, snapping to a wall, don't add target half size, only mine
+        {
+            shiftedPosition = snapTargetPosition + edge.forward * currentPreviewHalfSize;
+        } 
+        else if (isCurrentFloor && isTargetFloor)
+        {
+            shiftedPosition = snapTargetPosition + edge.forward * (currentPreviewHalfSize + targetHalfSize);
+        }
+        var isFloorSnappingToWallTop = edge.GetComponent<EdgePosition>().edge == Edge.Top;
+
+        if (isFloorSnappingToWallTop)
+        {
+            var shiftDownByFloorHeight = shiftedPosition - Vector3.up * transform.GetComponent<BoxCollider>().bounds.size.y / 2; // Edge position is at wall top, we need to push floor down by floor height to have it inside wall
+            var keepFloorAboveWall = shiftDownByFloorHeight + Vector3.up * 0.005f; // Since wall has advantage in z fight, we still want to have floor above it, so we cheat a bit by moving it up slightly
+            return keepFloorAboveWall;
+        }
+        return shiftedPosition;
     }
 
     private Quaternion GetRotationFromEdge(Transform edge)
@@ -66,6 +107,12 @@ public class Snapper : MonoBehaviour
         }
 
     }
+
+    private Bounds GetTargetBounds(Transform target)
+    {
+        return (Application.isEditor ? target.GetComponent<MeshFilter>().sharedMesh.bounds : target.GetComponent<MeshFilter>().mesh.bounds);
+    }
+
     #endregion
 
     #region Find edges to snap to
@@ -88,7 +135,6 @@ public class Snapper : MonoBehaviour
             Debug.DrawRay(ray.origin, ray.direction, Color.red);
             if (Physics.Raycast(ray, out var hitInfo, snapDistance))
             {
-                Debug.Log("Floor snapped");
                 if (hitInfo.transform.GetComponent<EdgePosition>() != null)
                     return hitInfo.transform;
             }
@@ -103,7 +149,6 @@ public class Snapper : MonoBehaviour
         {
             if (hitInfo.transform.GetComponent<EdgePosition>() != null)
             {
-                Debug.Log("Edge: " + hitInfo.transform.name);
                 return hitInfo.transform;
             }
                 

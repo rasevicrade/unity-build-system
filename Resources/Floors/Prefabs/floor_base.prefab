@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 6565233611492078302}
   - component: {fileID: 9005108423496320532}
   - component: {fileID: -457572634213598887}
-  m_Layer: 0
+  - component: {fileID: 8114100336048935288}
+  m_Layer: 2
   m_Name: floor_base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,6 +99,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   snapDistance: 1
   prefabType: 0
+--- !u!65 &8114100336048935288
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7491859022456285121}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 3.9999998, y: 0.6000012, z: 4}
+  m_Center: {x: -0.00000011920929, y: 0, z: 0}
 --- !u!1001 &1498386038818185582
 PrefabInstance:
   m_ObjectHideFlags: 0
