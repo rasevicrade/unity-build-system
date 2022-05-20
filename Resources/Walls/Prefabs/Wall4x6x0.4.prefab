@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 1744798563605503543}
   - component: {fileID: 4598793443416845053}
   - component: {fileID: -730272763483187473}
-  m_Layer: 0
+  - component: {fileID: 8911680531651499550}
+  m_Layer: 2
   m_Name: Wall4x6x0.4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,6 +98,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   snapDistance: 1
   prefabType: 1
+--- !u!65 &8911680531651499550
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2653409858592574248}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.400001, y: 6, z: 4}
+  m_Center: {x: -4.8186434e-17, y: 3, z: -0.00000011920929}
 --- !u!1001 &6872247681876764
 PrefabInstance:
   m_ObjectHideFlags: 0
