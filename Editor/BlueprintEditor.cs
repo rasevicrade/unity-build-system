@@ -47,18 +47,30 @@ public class BlueprintEditor : Editor
     void OnSceneGUI()
     {       
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
-        if (previewController != null && preview != null && GetRayCast(out RaycastHit hitInfo))
+        if (previewController != null && preview != null)
         {
-            SetFloor(hitInfo.point);
-            previewController.UpdatePosition(new Vector3(hitInfo.point.x, activeHeight, hitInfo.point.z));
-            
-
-            if (IsLeftMouseButtonClicked(Event.current))
+            if (GetRayCast(out RaycastHit hitInfo))
             {
-                Event.current.Use();
-                blueprint.PlaceGameObject(prefabs[prefabIndex], previewController.GetPosition(), previewController.GetRotation()); 
+                SetFloor(hitInfo.point);
+                previewController.UpdatePosition(new Vector3(hitInfo.point.x, activeHeight, hitInfo.point.z));
+
+
+                if (IsLeftMouseButtonClicked(Event.current))
+                {
+                    Event.current.Use();
+                    blueprint.PlaceGameObject(prefabs[prefabIndex], previewController.GetPosition(), previewController.GetRotation());
+                }
+            }
+            if (Event.current.keyCode == KeyCode.LeftShift)
+            {
+                if (Input.GetAxis("Mouse ScrollWheel") != 0f) // forward
+                {
+                    Debug.Log(Input.GetAxis("Mouse ScrollWheel"));
+                }
+                
             }
         }
+       
 
         if (Event.current.keyCode == KeyCode.Tab)
         {
@@ -76,7 +88,7 @@ public class BlueprintEditor : Editor
             } 
             else if (Event.current.keyCode == KeyCode.Alpha1)
             {
-                activeHeight = 5;
+                activeHeight = 6;
             }
         }
     }

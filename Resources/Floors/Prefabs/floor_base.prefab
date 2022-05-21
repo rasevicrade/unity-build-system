@@ -119,6 +119,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7832813886330879355}
     m_Modifications:
+    - target: {fileID: 391062236835875114, guid: 7ca610912d4ea5e4cbdefebe8f9c24b4,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 391062236835875114, guid: 7ca610912d4ea5e4cbdefebe8f9c24b4,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 807620873677439984, guid: 7ca610912d4ea5e4cbdefebe8f9c24b4,
         type: 3}
       propertyPath: m_Name
@@ -294,6 +304,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5361160745388722565, guid: 1a7b746b856691c4ba45626b7535418b,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5361160745388722565, guid: 1a7b746b856691c4ba45626b7535418b,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a7b746b856691c4ba45626b7535418b, type: 3}
 --- !u!4 &257883079762264877 stripped
@@ -309,6 +329,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7832813886330879355}
     m_Modifications:
+    - target: {fileID: 2158906744777072459, guid: bed874934dd3e1e4aaed53bf891a7645,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2158906744777072459, guid: bed874934dd3e1e4aaed53bf891a7645,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3544687302490685694, guid: bed874934dd3e1e4aaed53bf891a7645,
         type: 3}
       propertyPath: m_RootOrder
@@ -404,6 +434,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7832813886330879355}
     m_Modifications:
+    - target: {fileID: 202376137605442081, guid: 93a0576eb1bbf004bab2a1fe54ef0d3f,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 202376137605442081, guid: 93a0576eb1bbf004bab2a1fe54ef0d3f,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3730326131706898204, guid: 93a0576eb1bbf004bab2a1fe54ef0d3f,
         type: 3}
       propertyPath: m_Name
