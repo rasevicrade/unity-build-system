@@ -51,12 +51,13 @@ public class Snapper : MonoBehaviour
 
     private Vector3 GetPositionFromEdge(Transform edge)
     {
-        switch (prefabType)
-        {
-            case PrefabType.Floor: return ShiftPreview(edge);
-            case PrefabType.Wall:
-            default: return edge.position;
-        }
+        return ShiftPreview(edge);
+        //switch (prefabType)
+        //{
+        //    case PrefabType.Floor: ;
+        //    case PrefabType.Wall:
+        //    default: return edge.position;
+        //}
     }
 
     private Vector3 ShiftPreview(Transform edge)
@@ -101,7 +102,7 @@ public class Snapper : MonoBehaviour
     {
         switch (prefabType)
         {
-            case PrefabType.Floor: return edge.parent.rotation;
+            case PrefabType.Floor: return transform.rotation;
             case PrefabType.Wall:
             default: return edge.rotation * Quaternion.Euler(0, 90, 0); ;
         }
@@ -120,13 +121,13 @@ public class Snapper : MonoBehaviour
     {
         switch (prefabType)
         {
-            case PrefabType.Floor: return FindFloorEdgeSideways();
-            case PrefabType.Wall: return FindFloorEdgeFromTop();
+            case PrefabType.Floor: return FindEdgeSideways();
+            case PrefabType.Wall: return FindEdgeFromAbove();
             default: return null;
         }
 
     }
-    private Transform FindFloorEdgeSideways()
+    private Transform FindEdgeSideways()
     {
         foreach (Transform t in gameObject.transform)
         {
@@ -141,9 +142,14 @@ public class Snapper : MonoBehaviour
         }
         return null;
     }
-    private Transform FindFloorEdgeFromTop()
+    private Transform FindEdgeFromAbove()
     {
         var ray = new Ray(transform.position + Vector3.up * 10, -transform.up);
+        // Disable raycast on preview so we don't hit our own edge
+        foreach (Transform t in gameObject.transform)
+        {
+            t.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+        }
         Debug.DrawRay(ray.origin, ray.direction, Color.cyan);
         if (Physics.Raycast(ray, out var hitInfo))
         {
