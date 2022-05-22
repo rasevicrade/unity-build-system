@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6513778848734409800}
   - component: {fileID: 9046239285718637846}
   m_Layer: 0
-  m_Name: stone_wall
+  m_Name: wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
