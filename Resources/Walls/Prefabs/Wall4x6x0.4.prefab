@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -730272763483187473}
   - component: {fileID: 8911680531651499550}
   m_Layer: 2
-  m_Name: wall4x6x0
+  m_Name: wall4x6x0.4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -96,8 +96,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f96a3c4e335f204a99f61dc167cb8c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snapDistance: 1
   prefabType: 1
+  snapDistance: 1
+  isPreview: 0
 --- !u!65 &8911680531651499550
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -132,6 +133,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Bottom
+      objectReference: {fileID: 0}
+    - target: {fileID: 807620873677439984, guid: 7ca610912d4ea5e4cbdefebe8f9c24b4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6931956603353792020, guid: 7ca610912d4ea5e4cbdefebe8f9c24b4,
         type: 3}
@@ -256,7 +262,7 @@ PrefabInstance:
     - target: {fileID: 3544687302490685694, guid: bed874934dd3e1e4aaed53bf891a7645,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.13
       objectReference: {fileID: 0}
     - target: {fileID: 3544687302490685694, guid: bed874934dd3e1e4aaed53bf891a7645,
         type: 3}
@@ -266,7 +272,7 @@ PrefabInstance:
     - target: {fileID: 3544687302490685694, guid: bed874934dd3e1e4aaed53bf891a7645,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3544687302490685694, guid: bed874934dd3e1e4aaed53bf891a7645,
         type: 3}
