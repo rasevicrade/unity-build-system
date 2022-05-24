@@ -62,7 +62,7 @@ public class Snapper : MonoBehaviour
     }
     private Transform FindEdgeFromAbove()
     {
-        var ray = new Ray(transform.position + Vector3.up * 10, -transform.up);
+        var ray = new Ray(transform.position + Vector3.up * GetTargetBounds(transform).size.y / 2, -transform.up);
             
         if (Physics.Raycast(ray, out var hitInfo))
         {
