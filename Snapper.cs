@@ -105,12 +105,13 @@ public class Snapper : MonoBehaviour
         {
             if (IsTargetPrefabOfType(PrefabType.Wall))
             {
-                Debug.Log("Hit wall");
+                Debug.Log("Hit wall" + snappedEdge.name);
+                ;
                 return currentPreviewHalfSize;
             }
             else if (IsTargetPrefabOfType(PrefabType.Floor))
             {
-                Debug.Log("Hit floor");
+                Debug.Log("Hit floor" + snappedEdge.name);
                 return currentPreviewHalfSize + targetHalfSize;
             }
         }
@@ -122,13 +123,7 @@ public class Snapper : MonoBehaviour
     }
     private bool IsCurrentPrefabOfType(PrefabType type) => prefabType == type;
     private bool IsTargetPrefabOfType(PrefabType type) => GetTargetSnapper().prefabType == type;
-    private Snapper GetTargetSnapper()
-    {
-        if (targetSnapper == null)
-            targetSnapper = SnapTarget().GetComponent<Snapper>();
-
-        return targetSnapper;
-    }
+    private Snapper GetTargetSnapper() => SnapTarget().GetComponent<Snapper>();
     #endregion
 
     #region Vertical shift
