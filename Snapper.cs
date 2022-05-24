@@ -7,10 +7,11 @@ using static EdgePosition;
 [ExecuteInEditMode]
 public class Snapper : MonoBehaviour
 {
-    public float snapDistance = 1f;
     public PrefabType prefabType;
-    private PreviewController previewController;
+    public float snapDistance = 1f; 
     public bool isPreview;
+
+    private PreviewController previewController;  
 
     #region Lifecycle methods
     private void OnEnable()
@@ -28,36 +29,23 @@ public class Snapper : MonoBehaviour
             {
                 Snap(edge);
             }
-        }
-
-        
+        }     
     }
     #endregion
 
     #region Snap to edges
     private void Snap(Transform edge)
     {
-        var updatedPosition = GetPositionFromEdge(edge);
-        var updatedRotation = GetRotationFromEdge(edge);
+        var position = GetPositionFromEdge(edge);
+        var rotation = GetRotationFromEdge(edge);
         if (previewController != null)
         {
-            previewController.UpdatePosition(updatedPosition, true);
-            previewController.UpdateRotation(updatedRotation, true);
+            previewController.UpdatePosition(position, true);
+            previewController.UpdateRotation(rotation, true);
         }
     }
 
     private Vector3 GetPositionFromEdge(Transform edge)
-    {
-        return ShiftPreview(edge);
-        //switch (prefabType)
-        //{
-        //    case PrefabType.Floor: ;
-        //    case PrefabType.Wall:
-        //    default: return edge.position;
-        //}
-    }
-
-    private Vector3 ShiftPreview(Transform edge)
     {
         var snapTarget = edge.parent;
         // Whatever current preview is, we first move it to center of snapped target - snapTargetPosition
