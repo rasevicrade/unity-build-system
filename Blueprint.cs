@@ -12,6 +12,7 @@ public class Blueprint : MonoBehaviour
 
         var instantiatedGO = Instantiate(activeObject, position, rotation != null ? rotation.Value : Quaternion.Euler(0,0,0));
         instantiatedGO.transform.parent = transform;
+        instantiatedGO.gameObject.layer = LayerMask.NameToLayer("Default");
         instantiatedGO.name = instantiatedGO.name.Replace("(Clone)", "") + "-Placed";      
         
         SetEdgeLayerToDefault(instantiatedGO);

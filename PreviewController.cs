@@ -8,7 +8,7 @@ public class PreviewController : MonoBehaviour
 {
     private GameObject currentPrefabPreview;
     private Vector3 currentRotation;
-    private bool isSnapped;
+    public bool isSnapped;
 
     protected void OnEnable()
     {
@@ -26,6 +26,7 @@ public class PreviewController : MonoBehaviour
             currentPrefabPreview.GetComponent<Snapper>().isPreview = true;
             SceneVisibilityManager.instance.DisablePicking(currentPrefabPreview, true);
 
+            currentPrefabPreview.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
             foreach (Transform t in currentPrefabPreview.transform)
             {
                 t.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");

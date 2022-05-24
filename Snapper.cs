@@ -11,7 +11,9 @@ public class Snapper : MonoBehaviour
     public float snapDistance = 1f; 
     public bool isPreview;
 
-    private PreviewController previewController;  
+    private PreviewController previewController;
+    private Snapper targetSnapper;
+    private Transform snappedEdge;
 
     #region Lifecycle methods
     private void OnEnable()
@@ -22,85 +24,18 @@ public class Snapper : MonoBehaviour
     void Update()
     {
         // If I am a preview, find edges to snap to
-        if (isPreview)
+        if (isPreview && !previewController.isSnapped)
         {
-            var edge = FindPlacedObjectsToSnap();
-            if (edge != null)
+            snappedEdge = FindPlacedObjectsToSnap();
+            if (snappedEdge != null)
             {
-                Snap(edge);
+                Snap(snappedEdge);
             }
         }     
     }
     #endregion
 
-    #region Snap to edges
-    private void Snap(Transform edge)
-    {
-        var position = GetPositionFromEdge(edge);
-        var rotation = GetRotationFromEdge(edge);
-        if (previewController != null)
-        {
-            previewController.UpdatePosition(position, true);
-            previewController.UpdateRotation(rotation, true);
-        }
-    }
-
-    private Vector3 GetPositionFromEdge(Transform edge)
-    {
-        var snapTarget = edge.parent;
-        // Whatever current preview is, we first move it to center of snapped target - snapTargetPosition
-        var snapTargetPosition = new Vector3(snapTarget.position.x, edge.transform.position.y, snapTarget.position.z);
-
-        var targetHalfSize = GetTargetBounds(snapTarget).size.x / 2;
-        var currentPreviewHalfSize = GetTargetBounds(transform).size.x / 2;
-
-        Vector3 shiftedPosition = Vector3.zero;
-        bool isCurrentWall = prefabType == PrefabType.Wall;
-        bool isTargetWall = snapTarget.GetComponent<Snapper>().prefabType == PrefabType.Wall;
-        bool isCurrentFloor = prefabType == PrefabType.Floor;
-        bool isTargetFloor = snapTarget.GetComponent<Snapper>().prefabType == PrefabType.Floor;
-
-        if (isCurrentWall && isTargetFloor) // If I am a wall, snapping to a floor, only shift by half size of the floor
-        {
-            shiftedPosition = snapTargetPosition + edge.forward * targetHalfSize;
-        } 
-        else if (isCurrentFloor && isTargetWall) // If I am a floor, snapping to a wall, don't add target half size, only mine
-        {
-            shiftedPosition = snapTargetPosition + edge.forward * currentPreviewHalfSize;
-        } 
-        else if (isCurrentFloor && isTargetFloor)
-        {
-            shiftedPosition = snapTargetPosition + edge.forward * (currentPreviewHalfSize + targetHalfSize);
-        }
-        var isFloorSnappingToWallTop = edge.GetComponent<EdgePosition>().edge == Edge.Top;
-
-        if (isFloorSnappingToWallTop)
-        {
-            var shiftDownByFloorHeight = shiftedPosition - Vector3.up * transform.GetComponent<BoxCollider>().bounds.size.y / 2; // Edge position is at wall top, we need to push floor down by floor height to have it inside wall
-            var keepFloorAboveWall = shiftDownByFloorHeight + Vector3.up * 0.005f; // Since wall has advantage in z fight, we still want to have floor above it, so we cheat a bit by moving it up slightly
-            return keepFloorAboveWall;
-        }
-        return shiftedPosition;
-    }
-
-    private Quaternion GetRotationFromEdge(Transform edge)
-    {
-        switch (prefabType)
-        {
-            case PrefabType.Floor: return transform.rotation;
-            case PrefabType.Wall:
-            default: return edge.rotation * Quaternion.Euler(0, 90, 0); ;
-        }
-
-    }
-
-    private Bounds GetTargetBounds(Transform target)
-    {
-        return (Application.isEditor ? target.GetComponent<MeshFilter>().sharedMesh.bounds : target.GetComponent<MeshFilter>().mesh.bounds);
-    }
-
-    #endregion
-
+    
     #region Find edges to snap to
     private Transform FindPlacedObjectsToSnap()
     {
@@ -139,6 +74,83 @@ public class Snapper : MonoBehaviour
         }
         return null;
     }
+    #endregion
+
+    #region Snap to edges
+    private void Snap(Transform edge)
+    {
+        if (previewController != null)
+        {
+            previewController.UpdatePosition(GetPositionFromEdge(edge), true);
+            previewController.UpdateRotation(GetRotationFromEdge(edge), true);
+        }
+    }
+    #region Position from edge
+    private Vector3 GetPositionFromEdge(Transform edge) => GetHorizontalShift(edge) + GetVerticalShift();
+    private Vector3 GetHorizontalShift(Transform edge) => GetSnapTargetPosition(edge) + edge.forward * ShiftDistance();
+    private Vector3 GetVerticalShift() => IsGroundFloor() ? Vector3.zero : ShiftDownByHalfHeight() + ShiftUpBySmallDelta();
+
+    #region Horizontal shift
+    private Vector3 GetSnapTargetPosition(Transform edge) => new Vector3(SnapTarget().position.x, edge.transform.position.y, SnapTarget().position.z);
+    private Transform SnapTarget() => snappedEdge.parent;
+    private float ShiftDistance()
+    {
+        var targetHalfSize = GetTargetBounds(SnapTarget()).size.x / 2;
+        var currentPreviewHalfSize = GetTargetBounds(transform).size.x / 2;
+        if (IsCurrentPrefabOfType(PrefabType.Wall) && IsTargetPrefabOfType(PrefabType.Floor))
+        {
+            return targetHalfSize;
+        }
+        else if (IsCurrentPrefabOfType(PrefabType.Floor))
+        {
+            if (IsTargetPrefabOfType(PrefabType.Wall))
+            {
+                Debug.Log("Hit wall");
+                return currentPreviewHalfSize;
+            }
+            else if (IsTargetPrefabOfType(PrefabType.Floor))
+            {
+                Debug.Log("Hit floor");
+                return currentPreviewHalfSize + targetHalfSize;
+            }
+        }
+        return 0f;
+    }
+    private Bounds GetTargetBounds(Transform target)
+    {
+        return (Application.isEditor ? target.GetComponent<MeshFilter>().sharedMesh.bounds : target.GetComponent<MeshFilter>().mesh.bounds);
+    }
+    private bool IsCurrentPrefabOfType(PrefabType type) => prefabType == type;
+    private bool IsTargetPrefabOfType(PrefabType type) => GetTargetSnapper().prefabType == type;
+    private Snapper GetTargetSnapper()
+    {
+        if (targetSnapper == null)
+            targetSnapper = SnapTarget().GetComponent<Snapper>();
+
+        return targetSnapper;
+    }
+    #endregion
+
+    #region Vertical shift
+    private bool IsGroundFloor() => transform.position.y == 0;
+    private Vector3 ShiftDownByHalfHeight() => -Vector3.up * transform.GetComponent<BoxCollider>().bounds.size.y / 2;
+    private Vector3 ShiftUpBySmallDelta() => Vector3.up * 0.005f;// In order to keep floor above wall
+    #endregion
+
+    #endregion
+
+    #region Rotation from edge
+    private Quaternion GetRotationFromEdge(Transform edge)
+    {
+        switch (prefabType)
+        {
+            case PrefabType.Floor: return transform.rotation;
+            case PrefabType.Wall:
+            default: return edge.rotation * Quaternion.Euler(0, 90, 0); ;
+        }
+    }
+    #endregion
+
     #endregion
 
     public enum PrefabType
