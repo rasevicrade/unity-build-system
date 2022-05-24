@@ -10,7 +10,7 @@ public class Snapper : MonoBehaviour
     public float snapDistance = 1f;
     public PrefabType prefabType;
     private PreviewController previewController;
-    private bool isPlaced;
+    public bool isPreview;
 
     #region Lifecycle methods
     private void OnEnable()
@@ -20,22 +20,19 @@ public class Snapper : MonoBehaviour
 
     void Update()
     {
-        // If it is a placed object, nothing to do
-        if (isPlaced)
-            return;
-
-        var edge = FindPlacedObjectsToSnap();
-        if (edge != null)
+        // If I am a preview, find edges to snap to
+        if (isPreview)
         {
-            Snap(edge);
+            var edge = FindPlacedObjectsToSnap();
+            if (edge != null)
+            {
+                Snap(edge);
+            }
         }
+
+        
     }
     #endregion
-
-    public void SetPlaced()
-    {
-        isPlaced = true;
-    }
 
     #region Snap to edges
     private void Snap(Transform edge)
@@ -131,9 +128,7 @@ public class Snapper : MonoBehaviour
     {
         foreach (Transform t in gameObject.transform)
         {
-            t.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
             var ray = new Ray(t.position, t.forward);
-            Debug.DrawRay(ray.origin, ray.direction, Color.red);
             if (Physics.Raycast(ray, out var hitInfo, snapDistance))
             {
                 if (hitInfo.transform.GetComponent<EdgePosition>() != null)
@@ -145,12 +140,7 @@ public class Snapper : MonoBehaviour
     private Transform FindEdgeFromAbove()
     {
         var ray = new Ray(transform.position + Vector3.up * 10, -transform.up);
-        // Disable raycast on preview so we don't hit our own edge
-        foreach (Transform t in gameObject.transform)
-        {
-            t.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
-        }
-        Debug.DrawRay(ray.origin, ray.direction, Color.cyan);
+            
         if (Physics.Raycast(ray, out var hitInfo))
         {
             if (hitInfo.transform.GetComponent<EdgePosition>() != null)

@@ -23,8 +23,13 @@ public class PreviewController : MonoBehaviour
             currentPrefabPreview = Instantiate(currentPrefab, position, Quaternion.identity);
             currentPrefabPreview.name = currentPrefabPreview.name + "-Preview";
             currentPrefabPreview.transform.parent = blueprint.transform;
+            currentPrefabPreview.GetComponent<Snapper>().isPreview = true;
             SceneVisibilityManager.instance.DisablePicking(currentPrefabPreview, true);
 
+            foreach (Transform t in currentPrefabPreview.transform)
+            {
+                t.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+            }
             return currentPrefabPreview;
         }
         return null;

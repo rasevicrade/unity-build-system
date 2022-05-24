@@ -14,7 +14,6 @@ public class Blueprint : MonoBehaviour
         instantiatedGO.transform.parent = transform;
         instantiatedGO.name = instantiatedGO.name.Replace("(Clone)", "") + "-Placed";      
         
-        SetStateToPlaced(instantiatedGO);
         SetEdgeLayerToDefault(instantiatedGO);
         return instantiatedGO;
     }
@@ -25,10 +24,5 @@ public class Blueprint : MonoBehaviour
         {
             t.gameObject.layer = LayerMask.NameToLayer("Default");
         }
-    }
-
-    private void SetStateToPlaced(GameObject placedObject)
-    {
-        placedObject.GetComponent<Snapper>().SetPlaced();
     }
 }
