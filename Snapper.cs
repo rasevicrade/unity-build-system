@@ -34,8 +34,7 @@ public class Snapper : MonoBehaviour
         }     
     }
     #endregion
-
-    
+   
     #region Find edges to snap to
     private Transform FindPlacedObjectsToSnap()
     {
@@ -86,7 +85,7 @@ public class Snapper : MonoBehaviour
         }
     }
     #region Position from edge
-    private Vector3 GetPositionFromEdge(Transform edge) => GetHorizontalShift(edge) + GetVerticalShift();
+    private Vector3 GetPositionFromEdge(Transform edge) => GetHorizontalShift(edge) + (prefabType == PrefabType.Floor ? GetVerticalShift() : Vector3.zero);
     private Vector3 GetHorizontalShift(Transform edge) => GetSnapTargetPosition(edge) + edge.forward * ShiftDistance();
     private Vector3 GetVerticalShift() => IsGroundFloor() ? Vector3.zero : ShiftDownByHalfHeight() + ShiftUpBySmallDelta();
 
