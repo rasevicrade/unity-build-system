@@ -118,7 +118,7 @@ public class Snapper : MonoBehaviour
     }
     private Bounds GetTargetBounds(Transform target)
     {
-        return (Application.isEditor ? target.GetComponent<MeshFilter>().sharedMesh.bounds : target.GetComponent<MeshFilter>().mesh.bounds);
+        return target.GetComponent<MeshRenderer>().bounds;
     }
     private bool IsCurrentPrefabOfType(PrefabType type) => prefabType == type;
     private bool IsTargetPrefabOfType(PrefabType type) => GetTargetSnapper().prefabType == type;
