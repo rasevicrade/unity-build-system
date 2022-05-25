@@ -87,7 +87,7 @@ public class Snapper : MonoBehaviour
     #region Position from edge
     private Vector3 GetPositionFromEdge(Transform edge) => GetHorizontalShift(edge) + (prefabType == PrefabType.Floor ? GetVerticalShift() : Vector3.zero);
     private Vector3 GetHorizontalShift(Transform edge) => GetSnapTargetPosition(edge) + edge.forward * ShiftDistance();
-    private Vector3 GetVerticalShift() => IsGroundFloor() ? Vector3.zero : ShiftDownByHalfHeight() + ShiftUpBySmallDelta();
+    private Vector3 GetVerticalShift() => IsGroundFloor() || !IsTargetPrefabOfType(PrefabType.Wall) ? Vector3.zero : ShiftDownByHalfHeight() + ShiftUpBySmallDelta();
 
     #region Horizontal shift
     private Vector3 GetSnapTargetPosition(Transform edge) => new Vector3(SnapTarget().position.x, edge.transform.position.y, SnapTarget().position.z);
