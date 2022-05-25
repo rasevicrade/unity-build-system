@@ -104,13 +104,10 @@ public class Snapper : MonoBehaviour
         {
             if (IsTargetPrefabOfType(PrefabType.Wall))
             {
-                Debug.Log("Hit wall" + snappedEdge.name);
-                ;
                 return currentPreviewHalfSize;
             }
             else if (IsTargetPrefabOfType(PrefabType.Floor))
             {
-                Debug.Log("Hit floor" + snappedEdge.name);
                 return currentPreviewHalfSize + targetHalfSize;
             }
         }
@@ -118,7 +115,16 @@ public class Snapper : MonoBehaviour
     }
     private Bounds GetTargetBounds(Transform target)
     {
-        return target.GetComponent<MeshRenderer>().bounds;
+        var meshRenderer = target.GetComponent<MeshRenderer>();
+        if (meshRenderer != null)
+        {
+            return meshRenderer.bounds;
+        } 
+        else
+        {
+            return target.GetComponent<BoxCollider>().bounds;
+        }
+        
     }
     private bool IsCurrentPrefabOfType(PrefabType type) => prefabType == type;
     private bool IsTargetPrefabOfType(PrefabType type) => GetTargetSnapper().prefabType == type;
