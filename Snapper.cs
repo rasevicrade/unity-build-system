@@ -12,7 +12,6 @@ public class Snapper : MonoBehaviour
     public bool isPreview;
 
     private PreviewController previewController;
-    private Snapper targetSnapper;
     private Transform snappedEdge;
 
     #region Lifecycle methods
