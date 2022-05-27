@@ -6,6 +6,14 @@ public partial class Snapper : MonoBehaviour
 {
     private Transform FindWall()
     {
+        if (Physics.SphereCast(transform.position, transform.GetComponent<BoxCollider>().bounds.size.z, transform.forward, out var hit))
+        {
+            var snapper = hit.transform.GetComponent<Snapper>();
+            if (snapper != null && snapper.prefabType == PrefabType.Wall)
+            {
+                return hit.transform;
+            }
+        }
         return null;
     }
 }

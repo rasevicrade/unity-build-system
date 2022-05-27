@@ -91,7 +91,7 @@ public partial class Snapper : MonoBehaviour
 
     #region Horizontal shift
     private Vector3 GetSnapTargetPosition(Transform edge) => new Vector3(SnapTarget().position.x, edge.transform.position.y, SnapTarget().position.z);
-    private Transform SnapTarget() => snappedEdge.parent;
+    private Transform SnapTarget() => snappedEdge.GetComponent<Snapper>() != null ? snappedEdge : snappedEdge.parent;
     private float ShiftDistance()
     {
         var targetHalfSize = GetTargetBounds(SnapTarget()).size.x / 2;
@@ -145,6 +145,7 @@ public partial class Snapper : MonoBehaviour
         switch (prefabType)
         {
             case PrefabType.Floor: return transform.rotation;
+            case PrefabType.Window: return edge.rotation;
             case PrefabType.Wall:
             default: return edge.rotation * Quaternion.Euler(0, 90, 0); ;
         }

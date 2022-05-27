@@ -45,7 +45,7 @@ public class PreviewController : MonoBehaviour
 
         if (isSnapped)
         {
-            if (Vector3.Distance(position, currentPrefabPreview.transform.position) > 3f)
+            if (Vector3.Distance(position, currentPrefabPreview.transform.position) > 5f)
             {
                 isSnapped = false;
                 currentPrefabPreview.transform.position = position;
