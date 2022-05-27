@@ -5,7 +5,7 @@ using UnityEngine;
 using static EdgePosition;
 
 [ExecuteInEditMode]
-public class Snapper : MonoBehaviour
+public partial class Snapper : MonoBehaviour
 {
     public PrefabType prefabType;
     public float snapDistance = 1f; 
@@ -41,6 +41,7 @@ public class Snapper : MonoBehaviour
         {
             case PrefabType.Floor: return FindEdgeSideways();
             case PrefabType.Wall: return FindEdgeFromAbove();
+            case PrefabType.Window: return FindWall();
             default: return null;
         }
 
@@ -155,6 +156,7 @@ public class Snapper : MonoBehaviour
     public enum PrefabType
     {
         Floor,
-        Wall
+        Wall,
+        Window
     }
 }
