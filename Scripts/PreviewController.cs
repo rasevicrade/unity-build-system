@@ -38,14 +38,14 @@ public class PreviewController : MonoBehaviour
 
 
 
-    public void UpdatePosition(Vector3 position, bool snap = false)
+    public void UpdatePosition(Vector3 position, bool snap = false, float unsnapDistance = 5f)
     {
         if (currentPrefabPreview == null || (snap && isSnapped)) // Can't snap again if already snapped
             return;
 
         if (isSnapped)
         {
-            if (Vector3.Distance(position, currentPrefabPreview.transform.position) > 5f)
+            if (Vector3.Distance(position, currentPrefabPreview.transform.position) > unsnapDistance)
             {
                 isSnapped = false;
                 currentPrefabPreview.transform.position = position;

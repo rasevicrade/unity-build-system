@@ -39,7 +39,8 @@ public partial class Snapper : MonoBehaviour
     {
         switch (prefabType)
         {
-            case PrefabType.Floor: return FindEdgeSideways();
+            case PrefabType.Floor:
+            case PrefabType.Seam: return FindEdgeSideways();
             case PrefabType.Wall: return FindEdgeFromAbove();
             case PrefabType.Window: return FindWall();
             default: return null;
@@ -53,11 +54,29 @@ public partial class Snapper : MonoBehaviour
             var ray = new Ray(t.position, t.forward);
             if (Physics.Raycast(ray, out var hitInfo, snapDistance))
             {
-                if (hitInfo.transform.GetComponent<EdgePosition>() != null)
+                if (hitInfo.transform.GetComponent<EdgePosition>() != null && CanSnap(prefabType, hitInfo.transform.parent.GetComponent<Snapper>().prefabType))
+                {
                     return hitInfo.transform;
+                }
+                    
             }
         }
         return null;
+    }
+
+    private bool CanSnap(PrefabType activePrefab, PrefabType targetPrefab)
+    {
+        switch (activePrefab)
+        {
+            case PrefabType.Floor:
+                return targetPrefab == PrefabType.Floor || targetPrefab == PrefabType.Wall;
+            case PrefabType.Wall:
+                return targetPrefab == PrefabType.Floor;
+            case PrefabType.Seam:
+                return targetPrefab == PrefabType.Wall;
+            default:
+                return false; 
+        }
     }
     private Transform FindEdgeFromAbove()
     {
@@ -80,7 +99,7 @@ public partial class Snapper : MonoBehaviour
     {
         if (previewController != null)
         {
-            previewController.UpdatePosition(GetPositionFromEdge(edge), true);
+            previewController.UpdatePosition(GetPositionFromEdge(edge), true, snapDistance);
             previewController.UpdateRotation(GetRotationFromEdge(edge), true);
         }
     }
@@ -92,11 +111,17 @@ public partial class Snapper : MonoBehaviour
     #region Horizontal shift
     private Vector3 GetSnapTargetPosition(Transform edge) => new Vector3(SnapTarget().position.x, edge.transform.position.y, SnapTarget().position.z);
     private Transform SnapTarget() => snappedEdge.GetComponent<Snapper>() != null ? snappedEdge : snappedEdge.parent;
+    
+    /// <summary>
+    /// Depending on prefab type, return how much active object needs to move horizontally
+    /// to fit the target object
+    /// </summary>
+    /// <returns></returns>
     private float ShiftDistance()
     {
-        var targetHalfSize = GetTargetBounds(SnapTarget()).size.x / 2;
+        var targetHalfSize = GetTargetBounds(SnapTarget()).size.z / 2;
         var currentPreviewHalfSize = GetTargetBounds(transform).size.x / 2;
-        if (IsCurrentPrefabOfType(PrefabType.Wall) && IsTargetPrefabOfType(PrefabType.Floor))
+        if (IsCurrentPrefabOfType(PrefabType.Wall) && IsTargetPrefabOfType(PrefabType.Floor) || (IsCurrentPrefabOfType(PrefabType.Seam) && IsTargetPrefabOfType(PrefabType.Wall)))
         {
             return targetHalfSize;
         }
@@ -145,6 +170,7 @@ public partial class Snapper : MonoBehaviour
         switch (prefabType)
         {
             case PrefabType.Floor: return transform.rotation;
+            case PrefabType.Seam:
             case PrefabType.Window: return edge.rotation;
             case PrefabType.Wall:
             default: return edge.rotation * Quaternion.Euler(0, 90, 0); ;
@@ -158,6 +184,7 @@ public partial class Snapper : MonoBehaviour
     {
         Floor,
         Wall,
-        Window
+        Window,
+        Seam
     }
 }
