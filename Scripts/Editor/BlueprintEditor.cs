@@ -34,6 +34,7 @@ public class BlueprintEditor : Editor
         {
             if (preview != null)
                 DestroyImmediate(preview);
+
             preview = previewController.CreatePreview(blueprint, Vector3.zero, prefabs[prefabIndex]);
         }
         if (GUILayout.Button("Remove preview"))

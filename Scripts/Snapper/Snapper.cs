@@ -104,10 +104,10 @@ public partial class Snapper : MonoBehaviour
         }
     }
     #region Position from edge
-    private Vector3 GetPositionFromEdge(Transform edge) => GetHorizontalShift(edge) + (prefabType == PrefabType.Floor ? GetVerticalShift() : Vector3.zero);
+    private Vector3 GetPositionFromEdge(Transform edge) => GetHorizontalShift(edge) + GetVerticalShift();
     private Vector3 GetHorizontalShift(Transform edge) => GetSnapTargetPosition(edge) + edge.forward * ShiftDistance();
-    private Vector3 GetVerticalShift() => IsGroundFloor() || !IsTargetPrefabOfType(PrefabType.Wall) ? Vector3.zero : ShiftDownByHalfHeight() + ShiftUpBySmallDelta();
-
+    private Vector3 GetVerticalShift() => RequiresVerticalShift() ? ShiftDownByHalfHeight() + ShiftUpBySmallDelta() : Vector3.zero;
+    private bool RequiresVerticalShift() => (prefabType == PrefabType.Floor || prefabType == PrefabType.Seam) && !IsGroundFloor() && IsTargetPrefabOfType(PrefabType.Wall);
     #region Horizontal shift
     private Vector3 GetSnapTargetPosition(Transform edge) => new Vector3(SnapTarget().position.x, edge.transform.position.y, SnapTarget().position.z);
     private Transform SnapTarget() => snappedEdge.GetComponent<Snapper>() != null ? snappedEdge : snappedEdge.parent;
@@ -138,6 +138,19 @@ public partial class Snapper : MonoBehaviour
         }
         return 0f;
     }
+
+    private Bounds GetCurrentBounds()
+    {
+        var meshRenderer = GetComponent<MeshRenderer>();
+        if (meshRenderer != null)
+        {
+            return meshRenderer.bounds;
+        }
+        else
+        {
+            return GetComponent<BoxCollider>().bounds;
+        }
+    }
     private Bounds GetTargetBounds(Transform target)
     {
         var meshRenderer = target.GetComponent<MeshRenderer>();
@@ -158,7 +171,7 @@ public partial class Snapper : MonoBehaviour
 
     #region Vertical shift
     private bool IsGroundFloor() => transform.position.y == 0;
-    private Vector3 ShiftDownByHalfHeight() => -Vector3.up * transform.GetComponent<BoxCollider>().bounds.size.y / 2;
+    private Vector3 ShiftDownByHalfHeight() => -Vector3.up * GetCurrentBounds().size.y / 2;
     private Vector3 ShiftUpBySmallDelta() => Vector3.up * 0.005f;// In order to keep floor above wall
     #endregion
 
