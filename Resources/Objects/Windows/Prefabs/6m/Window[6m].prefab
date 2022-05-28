@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -9048286754005944633}
   - component: {fileID: 117461880495140917}
   m_Layer: 0
-  m_Name: WindowTwoSided
+  m_Name: Window[6m]
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

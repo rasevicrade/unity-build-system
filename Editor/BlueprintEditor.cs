@@ -20,7 +20,7 @@ public class BlueprintEditor : Editor
     {
         blueprint = (Blueprint)target;
         previewController = FindObjectOfType<PreviewController>();
-        prefabs = Resources.LoadAll<GameObject>("").Where(x => x.GetComponent<Snapper>() != null).ToArray();
+        prefabs = Resources.LoadAll<GameObject>("").Where(x => x.GetComponent<Snapper>() != null).OrderBy(x => x.name).ToArray();
     }
 
     public override void OnInspectorGUI()
@@ -86,9 +86,17 @@ public class BlueprintEditor : Editor
             {
                 activeHeight = 0;
             } 
-            else if (Event.current.keyCode == KeyCode.Alpha1)
+            else if (Event.current.keyCode == KeyCode.Alpha4)
+            {
+                activeHeight = 4;
+            }
+            else if (Event.current.keyCode == KeyCode.Alpha6)
             {
                 activeHeight = 6;
+            }
+            else if (Event.current.keyCode == KeyCode.Alpha8)
+            {
+                activeHeight = 8;
             }
         }
     }

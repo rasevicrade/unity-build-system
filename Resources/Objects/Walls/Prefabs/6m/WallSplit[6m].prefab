@@ -91,7 +91,7 @@ GameObject:
   - component: {fileID: 2228548515783157126}
   - component: {fileID: 1843977506433232450}
   m_Layer: 2
-  m_Name: WallBaseTwoPart
+  m_Name: WallSplit[6m]
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -249,7 +249,7 @@ GameObject:
   - component: {fileID: 2848250340787342482}
   - component: {fileID: 8718863602409419812}
   m_Layer: 2
-  m_Name: WallWindowTwoPart
+  m_Name: WindowFrameSplit[6m]
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
