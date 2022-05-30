@@ -107,6 +107,10 @@ public partial class Snapper : MonoBehaviour
     private Vector3 GetPositionFromEdge(Transform edge) => GetHorizontalShift(edge) + GetVerticalShift();
     private Vector3 GetHorizontalShift(Transform edge) => GetSnapTargetPosition(edge) + edge.forward * ShiftDistance();
     private Vector3 GetVerticalShift() => RequiresVerticalShift() ? ShiftDownByHalfHeight() + ShiftUpBySmallDelta() : Vector3.zero;
+    /// <summary>
+    /// If an object is placed on an upper floor and it's kind of object that needs to snap within walls, we need to pull it down vertically
+    /// </summary>
+    /// <returns></returns>
     private bool RequiresVerticalShift() => (prefabType == PrefabType.Floor || prefabType == PrefabType.Seam) && !IsGroundFloor() && IsTargetPrefabOfType(PrefabType.Wall);
     #region Horizontal shift
     private Vector3 GetSnapTargetPosition(Transform edge) => new Vector3(SnapTarget().position.x, edge.transform.position.y, SnapTarget().position.z);
