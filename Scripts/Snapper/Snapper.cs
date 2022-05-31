@@ -199,10 +199,9 @@ public partial class Snapper : MonoBehaviour
     {
         switch (prefabType)
         {
+            case PrefabType.Beam: return edge.rotation;
             case PrefabType.Floor: return transform.rotation;
-
-            case PrefabType.Seam:
-            case PrefabType.Beam:
+            case PrefabType.Seam:           
             case PrefabType.Window: return edge.rotation;
             case PrefabType.Wall:
             default: return edge.rotation * Quaternion.Euler(0, 90, 0); ;

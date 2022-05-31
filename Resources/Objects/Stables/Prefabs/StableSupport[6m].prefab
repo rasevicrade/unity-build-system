@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4802073024536905664}
   - component: {fileID: 1271645736521134468}
   - component: {fileID: 4243152312173321656}
-  - component: {fileID: 7517175046386587783}
+  - component: {fileID: 8914712947092527731}
   m_Layer: 0
   m_Name: SeamFront.005
   m_TagString: Untagged
@@ -80,7 +80,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &7517175046386587783
+--- !u!65 &8914712947092527731
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -91,8 +91,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.3000003, y: 0.30000028, z: 5.4709024}
-  m_Center: {x: 2.0048962, y: 0.35000017, z: 2.720323}
+  m_Size: {x: 0.30000037, y: 0.30000037, z: 5.4709024}
+  m_Center: {x: 0.061868437, y: -0.35000017, z: 2.720323}
 --- !u!1 &2602362224389376991
 GameObject:
   m_ObjectHideFlags: 0
@@ -228,7 +228,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabType: 4
-  snapDistance: 3
+  snapDistance: 5
   isPreview: 0
 --- !u!1 &3206338818676403440
 GameObject:
@@ -952,7 +952,7 @@ GameObject:
   - component: {fileID: 3108365797263762049}
   - component: {fileID: 2498934325551234728}
   - component: {fileID: 893548282752452256}
-  - component: {fileID: 172900868354378883}
+  - component: {fileID: 9209847939783919297}
   m_Layer: 0
   m_Name: SeamFront
   m_TagString: Untagged
@@ -1021,7 +1021,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &172900868354378883
+--- !u!65 &9209847939783919297
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1032,5 +1032,5 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.3342991, y: 0.33429918, z: 4.219011}
-  m_Center: {x: 2.0431836, y: 3.6379833, z: 2.0943773}
+  m_Size: {x: 0.33429915, y: 0.33429918, z: 4.219011}
+  m_Center: {x: -0.043184116, y: -3.6379833, z: 2.0943773}
