@@ -11,6 +11,7 @@ public class EdgePosition : MonoBehaviour
         South,
         West,
         East,
-        Top
+        Top,
+        VerticalSide
     }
 }

@@ -2,7 +2,61 @@ fileFormatVersion: 2
 guid: 2b119e6a8d3c5a1429f54f915f24da0a
 ModelImporter:
   serializedVersion: 19301
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      74: 3976291446309176958
+    second: SeamFront.006|RoofAction.019
+  - first:
+      74: -2908701030221827446
+    second: Fifth|RoofAction.001
+  - first:
+      74: -7756467122707317390
+    second: First|RoofAction.002
+  - first:
+      74: -7821647401961394107
+    second: Fourth|RoofAction.005
+  - first:
+      74: -4532510053002711222
+    second: Second|RoofAction.003
+  - first:
+      74: 5494826330043567198
+    second: Third|RoofAction.004
+  - first:
+      74: 5605946439504790792
+    second: SeamFront|RoofAction.006
+  - first:
+      74: -1574122653680231293
+    second: SeamFront.001|RoofAction.008
+  - first:
+      74: 6096947453795427465
+    second: SeamFront.002|RoofAction.009
+  - first:
+      74: -3380629355600941895
+    second: SeamFront.003|RoofAction.010
+  - first:
+      74: 88226033210121870
+    second: SeamFront.004|RoofAction.011
+  - first:
+      74: -7385289917840472941
+    second: SeamFront.005|RoofAction.018
+  - first:
+      74: 192748860343712117
+    second: SeamRoofSupport|RoofAction.007
+  - first:
+      74: -102473173950455525
+    second: SmallCrossSeam1|RoofAction.012
+  - first:
+      74: -6344751911416265977
+    second: SmallCrossSeam1.001|RoofAction.016
+  - first:
+      74: -8555931349912674349
+    second: SmallCrossSeam2|RoofAction.015
+  - first:
+      74: -7894891784185399347
+    second: SmallCrossSeam2.001|RoofAction.017
+  - first:
+      74: -5044436662596794712
+    second: SmallCrossSeam2.002|RoofAction.021
   externalObjects: {}
   materials:
     materialImportMode: 1

@@ -13,6 +13,8 @@ public partial class Snapper : MonoBehaviour
 
     private PreviewController previewController;
     private Transform snappedEdge;
+    private float targetHalfSize;
+    private float currentPreviewHalfSize;
 
     #region Lifecycle methods
     private void OnEnable()
@@ -43,6 +45,7 @@ public partial class Snapper : MonoBehaviour
             case PrefabType.Seam: return FindEdgeSideways();
             case PrefabType.Wall: return FindEdgeFromAbove();
             case PrefabType.Window: return FindWall();
+            case PrefabType.Beam: return FindVerticalCorner();
             default: return null;
         }
 
@@ -80,7 +83,7 @@ public partial class Snapper : MonoBehaviour
     }
     private Transform FindEdgeFromAbove()
     {
-        var ray = new Ray(transform.position + Vector3.up * GetTargetBounds(transform).size.y / 2, -transform.up);
+        var ray = new Ray(transform.position + Vector3.up * GetTransformBounds(transform).size.y / 2, -transform.up);
             
         if (Physics.Raycast(ray, out var hitInfo))
         {
@@ -123,8 +126,14 @@ public partial class Snapper : MonoBehaviour
     /// <returns></returns>
     private float ShiftDistance()
     {
-        var targetHalfSize = GetTargetBounds(SnapTarget()).size.z / 2;
-        var currentPreviewHalfSize = GetTargetBounds(transform).size.x / 2;
+        targetHalfSize = GetTransformBounds(SnapTarget()).size.z / 2;
+        currentPreviewHalfSize = GetTransformBounds(transform).size.x / 2;
+        if (IsCurrentPrefabOfType(PrefabType.Beam))
+        {
+            return BeamShiftDistance();
+        }
+        // TODO Move each prefab type to their specific partial class, to clean up this method
+        
         if (IsCurrentPrefabOfType(PrefabType.Wall) && IsTargetPrefabOfType(PrefabType.Floor) || (IsCurrentPrefabOfType(PrefabType.Seam) && IsTargetPrefabOfType(PrefabType.Wall)))
         {
             return targetHalfSize;
@@ -143,31 +152,35 @@ public partial class Snapper : MonoBehaviour
         return 0f;
     }
 
-    private Bounds GetCurrentBounds()
+    private Bounds GetTransformBounds(Transform t)
     {
-        var meshRenderer = GetComponent<MeshRenderer>();
+        var meshRenderer = t.GetComponent<MeshRenderer>();
         if (meshRenderer != null)
         {
             return meshRenderer.bounds;
         }
         else
         {
-            return GetComponent<BoxCollider>().bounds;
+            var boxCollider = t.GetComponent<BoxCollider>();
+            if (boxCollider != null)
+            {
+                return t.GetComponent<BoxCollider>().bounds;
+            }
+            else
+            {
+                var bounds = new Bounds(transform.position, Vector3.one);
+                foreach (Transform childTransform in t.transform)
+                {
+                    var childBounds = childTransform.GetComponent<BoxCollider>();
+                    if (childBounds != null)
+                        bounds.Encapsulate(childTransform.GetComponent<BoxCollider>().bounds);
+                }
+                return bounds;
+            }
+
         }
     }
-    private Bounds GetTargetBounds(Transform target)
-    {
-        var meshRenderer = target.GetComponent<MeshRenderer>();
-        if (meshRenderer != null)
-        {
-            return meshRenderer.bounds;
-        } 
-        else
-        {
-            return target.GetComponent<BoxCollider>().bounds;
-        }
-        
-    }
+
     private bool IsCurrentPrefabOfType(PrefabType type) => prefabType == type;
     private bool IsTargetPrefabOfType(PrefabType type) => GetTargetSnapper().prefabType == type;
     private Snapper GetTargetSnapper() => SnapTarget().GetComponent<Snapper>();
@@ -175,7 +188,7 @@ public partial class Snapper : MonoBehaviour
 
     #region Vertical shift
     private bool IsGroundFloor() => transform.position.y == 0;
-    private Vector3 ShiftDownByHalfHeight() => -Vector3.up * GetCurrentBounds().size.y / 2;
+    private Vector3 ShiftDownByHalfHeight() => -Vector3.up * GetTransformBounds(transform).size.y / 2;
     private Vector3 ShiftUpBySmallDelta() => Vector3.up * 0.005f;// In order to keep floor above wall
     #endregion
 
@@ -187,7 +200,9 @@ public partial class Snapper : MonoBehaviour
         switch (prefabType)
         {
             case PrefabType.Floor: return transform.rotation;
+
             case PrefabType.Seam:
+            case PrefabType.Beam:
             case PrefabType.Window: return edge.rotation;
             case PrefabType.Wall:
             default: return edge.rotation * Quaternion.Euler(0, 90, 0); ;
@@ -202,6 +217,7 @@ public partial class Snapper : MonoBehaviour
         Floor,
         Wall,
         Window,
-        Seam
+        Seam,
+        Beam
     }
 }
