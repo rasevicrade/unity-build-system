@@ -24,6 +24,14 @@ public partial class Snapper : MonoBehaviour
 
     void Update()
     {
+        foreach(Transform transform in transform)
+        {
+            if (transform.GetComponent<EdgePosition>() != null && transform.GetComponent<EdgePosition>().edge == Edge.VerticalSide)
+            {
+                var pos = transform.GetComponent<EdgePosition>();
+                Debug.DrawRay(transform.position, transform.forward, Color.yellow, 10);
+            }
+        }
         // If I am a preview, find edges to snap to
         if (isPreview && !previewController.isSnapped)
         {
@@ -102,6 +110,7 @@ public partial class Snapper : MonoBehaviour
     {
         if (previewController != null)
         {
+            positionBeamSnapper = GetPositionFromEdge(edge);
             previewController.UpdatePosition(GetPositionFromEdge(edge), true, snapDistance);
             previewController.UpdateRotation(GetRotationFromEdge(edge), true);
         }
@@ -199,9 +208,10 @@ public partial class Snapper : MonoBehaviour
     {
         switch (prefabType)
         {
-            case PrefabType.Beam: return edge.rotation;
+            
             case PrefabType.Floor: return transform.rotation;
-            case PrefabType.Seam:           
+            case PrefabType.Seam:
+            case PrefabType.Beam:
             case PrefabType.Window: return edge.rotation;
             case PrefabType.Wall:
             default: return edge.rotation * Quaternion.Euler(0, 90, 0); ;

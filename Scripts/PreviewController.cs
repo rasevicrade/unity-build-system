@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+[ExecuteInEditMode]
 public class PreviewController : MonoBehaviour
 {
     private GameObject currentPrefabPreview;
@@ -36,8 +37,6 @@ public class PreviewController : MonoBehaviour
         return null;
     }
 
-
-
     public void UpdatePosition(Vector3 position, bool snap = false, float unsnapDistance = 5f)
     {
         if (currentPrefabPreview == null || (snap && isSnapped)) // Can't snap again if already snapped
@@ -56,7 +55,9 @@ public class PreviewController : MonoBehaviour
             currentPrefabPreview.transform.position = position;
             currentPrefabPreview.transform.localEulerAngles = currentRotation;
             isSnapped = snap;
-            
+
+                
+
         }
     }
 
