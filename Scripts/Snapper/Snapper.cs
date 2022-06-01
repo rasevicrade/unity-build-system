@@ -24,14 +24,6 @@ public partial class Snapper : MonoBehaviour
 
     void Update()
     {
-        foreach(Transform transform in transform)
-        {
-            if (transform.GetComponent<EdgePosition>() != null && transform.GetComponent<EdgePosition>().edge == Edge.VerticalSide)
-            {
-                var pos = transform.GetComponent<EdgePosition>();
-                Debug.DrawRay(transform.position, transform.forward, Color.yellow, 10);
-            }
-        }
         // If I am a preview, find edges to snap to
         if (isPreview && !previewController.isSnapped)
         {
@@ -43,91 +35,36 @@ public partial class Snapper : MonoBehaviour
         }     
     }
     #endregion
-   
-    #region Find edges to snap to
-    private Transform FindPlacedObjectsToSnap()
-    {
-        switch (prefabType)
-        {
-            case PrefabType.Floor:
-            case PrefabType.Seam: return FindEdgeSideways();
-            case PrefabType.Wall: return FindEdgeFromAbove();
-            case PrefabType.Window: return FindWall();
-            case PrefabType.Beam: return FindVerticalCorner();
-            default: return null;
-        }
 
-    }
-    private Transform FindEdgeSideways()
-    {
-        foreach (Transform t in gameObject.transform)
-        {
-            var ray = new Ray(t.position, t.forward);
-            if (Physics.Raycast(ray, out var hitInfo, snapDistance))
-            {
-                if (hitInfo.transform.GetComponent<EdgePosition>() != null && CanSnap(prefabType, hitInfo.transform.parent.GetComponent<Snapper>().prefabType))
-                {
-                    return hitInfo.transform;
-                }
-                    
-            }
-        }
-        return null;
-    }
-
-    private bool CanSnap(PrefabType activePrefab, PrefabType targetPrefab)
-    {
-        switch (activePrefab)
-        {
-            case PrefabType.Floor:
-                return targetPrefab == PrefabType.Floor || targetPrefab == PrefabType.Wall;
-            case PrefabType.Wall:
-                return targetPrefab == PrefabType.Floor;
-            case PrefabType.Seam:
-                return targetPrefab == PrefabType.Wall;
-            default:
-                return false; 
-        }
-    }
-    private Transform FindEdgeFromAbove()
-    {
-        var ray = new Ray(transform.position + Vector3.up * GetTransformBounds(transform).size.y / 2, -transform.up);
-            
-        if (Physics.Raycast(ray, out var hitInfo))
-        {
-            if (hitInfo.transform.GetComponent<EdgePosition>() != null)
-            {
-                return hitInfo.transform;
-            }
-                
-        }
-        return null;
-    }
-    #endregion
-
-    #region Snap to edges
     private void Snap(Transform edge)
     {
         if (previewController != null)
         {
-            positionBeamSnapper = GetPositionFromEdge(edge);
-            previewController.UpdatePosition(GetPositionFromEdge(edge), true, snapDistance);
+            previewController.UpdatePosition(PositionFromEdge(edge), true, snapDistance);
             previewController.UpdateRotation(GetRotationFromEdge(edge), true);
         }
     }
+
     #region Position from edge
-    private Vector3 GetPositionFromEdge(Transform edge) => GetHorizontalShift(edge) + GetVerticalShift();
-    private Vector3 GetHorizontalShift(Transform edge) => GetSnapTargetPosition(edge) + edge.forward * ShiftDistance();
-    private Vector3 GetVerticalShift() => RequiresVerticalShift() ? ShiftDownByHalfHeight() + ShiftUpBySmallDelta() : Vector3.zero;
     /// <summary>
-    /// If an object is placed on an upper floor and it's kind of object that needs to snap within walls, we need to pull it down vertically
+    /// When we hit an edge of a placed object, depending of target object and current object types
+    /// we will move the preview by first setting it to same location as placed object
+    /// and then shifting it first horizontally to the edge of placed object
+    /// and then vertically if needed (eg. on floor type when above ground, needs to shift down
+    /// to fit within wall)
     /// </summary>
+    /// <param name="edge"></param>
     /// <returns></returns>
-    private bool RequiresVerticalShift() => (prefabType == PrefabType.Floor || prefabType == PrefabType.Seam) && !IsGroundFloor() && IsTargetPrefabOfType(PrefabType.Wall);
+    private Vector3 PositionFromEdge(Transform edge)
+    {
+        return SnapTargetPosition(edge) + HorizontalShift(edge) + VerticalShift();
+    }
+
     #region Horizontal shift
-    private Vector3 GetSnapTargetPosition(Transform edge) => new Vector3(SnapTarget().position.x, edge.transform.position.y, SnapTarget().position.z);
-    private Transform SnapTarget() => snappedEdge.GetComponent<Snapper>() != null ? snappedEdge : snappedEdge.parent;
-    
+    private Vector3 HorizontalShift(Transform edge)
+    {
+        return edge.forward * ShiftDistance();
+    }
     /// <summary>
     /// Depending on prefab type, return how much active object needs to move horizontally
     /// to fit the target object
@@ -142,7 +79,7 @@ public partial class Snapper : MonoBehaviour
             return BeamShiftDistance();
         }
         // TODO Move each prefab type to their specific partial class, to clean up this method
-        
+
         if (IsCurrentPrefabOfType(PrefabType.Wall) && IsTargetPrefabOfType(PrefabType.Floor) || (IsCurrentPrefabOfType(PrefabType.Seam) && IsTargetPrefabOfType(PrefabType.Wall)))
         {
             return targetHalfSize;
@@ -160,7 +97,9 @@ public partial class Snapper : MonoBehaviour
         }
         return 0f;
     }
-
+    private Vector3 SnapTargetPosition(Transform edge) => new Vector3(SnapTarget().position.x, edge.transform.position.y, SnapTarget().position.z);
+    private Transform SnapTarget() => snappedEdge.GetComponent<Snapper>() != null ? snappedEdge : snappedEdge.parent;
+    
     private Bounds GetTransformBounds(Transform t)
     {
         var meshRenderer = t.GetComponent<MeshRenderer>();
@@ -196,11 +135,22 @@ public partial class Snapper : MonoBehaviour
     #endregion
 
     #region Vertical shift
+    private Vector3 VerticalShift()
+    {
+        return RequiresVerticalShift() ? ShiftDownByHalfHeight() + ShiftUpBySmallDelta() : Vector3.zero;
+    }
+
+    /// <summary>
+    /// If an object is placed on an upper floor and it's kind of object that needs to snap within walls, we need to pull it down vertically
+    /// </summary>
+    /// <returns></returns>
+    private bool RequiresVerticalShift()
+    {
+        return (prefabType == PrefabType.Floor || prefabType == PrefabType.Seam) && !IsGroundFloor() && IsTargetPrefabOfType(PrefabType.Wall);
+    }
     private bool IsGroundFloor() => transform.position.y == 0;
     private Vector3 ShiftDownByHalfHeight() => -Vector3.up * GetTransformBounds(transform).size.y / 2;
     private Vector3 ShiftUpBySmallDelta() => Vector3.up * 0.005f;// In order to keep floor above wall
-    #endregion
-
     #endregion
 
     #region Rotation from edge
@@ -219,6 +169,67 @@ public partial class Snapper : MonoBehaviour
     }
     #endregion
 
+    #endregion
+
+    #region Find edges to snap to
+    private Transform FindPlacedObjectsToSnap()
+    {
+        switch (prefabType)
+        {
+            case PrefabType.Floor:
+            case PrefabType.Seam: return FindEdgeSideways();
+            case PrefabType.Wall: return FindEdgeFromAbove();
+            case PrefabType.Window: return FindWall();
+            case PrefabType.Beam: return FindVerticalCorner();
+            default: return null;
+        }
+
+    }
+    private Transform FindEdgeSideways()
+    {
+        foreach (Transform t in gameObject.transform)
+        {
+            var ray = new Ray(t.position, t.forward);
+            if (Physics.Raycast(ray, out var hitInfo, snapDistance))
+            {
+                if (hitInfo.transform.GetComponent<EdgePosition>() != null && CanSnap(prefabType, hitInfo.transform.parent.GetComponent<Snapper>().prefabType))
+                {
+                    return hitInfo.transform;
+                }
+
+            }
+        }
+        return null;
+    }
+
+    private bool CanSnap(PrefabType activePrefab, PrefabType targetPrefab)
+    {
+        switch (activePrefab)
+        {
+            case PrefabType.Floor:
+                return targetPrefab == PrefabType.Floor || targetPrefab == PrefabType.Wall;
+            case PrefabType.Wall:
+                return targetPrefab == PrefabType.Floor;
+            case PrefabType.Seam:
+                return targetPrefab == PrefabType.Wall;
+            default:
+                return false;
+        }
+    }
+    private Transform FindEdgeFromAbove()
+    {
+        var ray = new Ray(transform.position + Vector3.up * GetTransformBounds(transform).size.y / 2, -transform.up);
+
+        if (Physics.Raycast(ray, out var hitInfo))
+        {
+            if (hitInfo.transform.GetComponent<EdgePosition>() != null)
+            {
+                return hitInfo.transform;
+            }
+
+        }
+        return null;
+    }
     #endregion
 
     public enum PrefabType

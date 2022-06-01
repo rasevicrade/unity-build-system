@@ -55,9 +55,6 @@ public class PreviewController : MonoBehaviour
             currentPrefabPreview.transform.position = position;
             currentPrefabPreview.transform.localEulerAngles = currentRotation;
             isSnapped = snap;
-
-                
-
         }
     }
 
