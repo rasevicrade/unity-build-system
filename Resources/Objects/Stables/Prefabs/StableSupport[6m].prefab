@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4802073024536905664}
   - component: {fileID: 1271645736521134468}
   - component: {fileID: 4243152312173321656}
-  - component: {fileID: 1449089604046964496}
+  - component: {fileID: 6406765684449160463}
   m_Layer: 0
   m_Name: SeamFront.005
   m_TagString: Untagged
@@ -80,7 +80,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &1449089604046964496
+--- !u!65 &6406765684449160463
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -91,8 +91,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.3000002, y: 0.30000037, z: 5.4709024}
-  m_Center: {x: -0.35000014, y: 2.0048966, z: 2.720323}
+  m_Size: {x: 0.30000043, y: 0.30000034, z: 5.4709024}
+  m_Center: {x: -0.03430319, y: -0.15018965, z: 2.7236938}
 --- !u!1 &2602362224389376991
 GameObject:
   m_ObjectHideFlags: 0
@@ -196,7 +196,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2688323072346036559}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -214,7 +214,7 @@ Transform:
   - {fileID: 310094915346620547}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!114 &7009005742817628630
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -952,7 +952,7 @@ GameObject:
   - component: {fileID: 3108365797263762049}
   - component: {fileID: 2498934325551234728}
   - component: {fileID: 893548282752452256}
-  - component: {fileID: 4838504134596320185}
+  - component: {fileID: 7430932300563053927}
   m_Layer: 0
   m_Name: SeamFront
   m_TagString: Untagged
@@ -1021,7 +1021,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &4838504134596320185
+--- !u!65 &7430932300563053927
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1032,5 +1032,5 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.3342991, y: 0.33429906, z: 4.219011}
-  m_Center: {x: -3.6379824, y: 2.0431838, z: 2.0943773}
+  m_Size: {x: 0.3342991, y: 0.33429918, z: 4.219011}
+  m_Center: {x: -0.072591685, y: -3.4381726, z: 2.097748}

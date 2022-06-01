@@ -158,7 +158,6 @@ public partial class Snapper : MonoBehaviour
     {
         switch (prefabType)
         {
-            
             case PrefabType.Floor: return transform.rotation;
             case PrefabType.Seam:
             case PrefabType.Beam:
