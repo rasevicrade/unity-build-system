@@ -14,7 +14,7 @@ public partial class Snapper : MonoBehaviour
     public Bounds snapRail;
 
     private PreviewController previewController;
-    private Transform snappedEdge;
+    public Transform snappedEdge;
     private float targetHalfSize;
     private float currentPreviewHalfSize;
 
@@ -43,8 +43,9 @@ public partial class Snapper : MonoBehaviour
     {
         if (previewController != null)
         {
-            previewController.UpdatePosition(PositionFromEdge(edge), true, snapDistance);
             previewController.UpdateRotation(GetRotationFromEdge(edge), true);
+            previewController.UpdatePosition(PositionFromEdge(edge), true, snapDistance);
+            
         }
     }
 

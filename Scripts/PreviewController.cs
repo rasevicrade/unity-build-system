@@ -11,6 +11,7 @@ public class PreviewController : MonoBehaviour
     private Snapper currentPreviewSnapper;
     private Vector3 currentRotation;
     public bool isSnapped;
+    private Vector3 snappedPosition;
 
     protected void OnEnable()
     {
@@ -47,25 +48,34 @@ public class PreviewController : MonoBehaviour
 
         if (isSnapped)
         {
-            if (currentPreviewSnapper.canShiftWhenSnapped)
-            {
-                if (currentPreviewSnapper.snapRail.Contains(position))
-                {
-                    Debug.Log(position);
-                    currentPrefabPreview.transform.position = position;
-                }
-                
-            }
             if (Vector3.Distance(position, currentPrefabPreview.transform.position) > unsnapDistance)
             {
                 isSnapped = false;
                 currentPrefabPreview.transform.position = position;
             }
+            if (currentPreviewSnapper.canShiftWhenSnapped)
+            {     
+                var min = currentPreviewSnapper.snapRail.min;
+                var max = currentPreviewSnapper.snapRail.max;
+
+                if (Vector3.Distance(min, position) < Vector3.Distance(max, position))
+                {
+                    currentPrefabPreview.transform.position = snappedPosition + currentPrefabPreview.transform.right * 2f;
+                }
+                else
+                {
+                    currentPrefabPreview.transform.position = snappedPosition + currentPrefabPreview.transform.right * -2f;
+                }               
+            } 
         }
         else
         {
             currentPrefabPreview.transform.position = position;
             currentPrefabPreview.transform.localEulerAngles = currentRotation;
+            if (snap)
+            {
+                snappedPosition = position;
+            }
             isSnapped = snap;
         }
     }
@@ -75,6 +85,7 @@ public class PreviewController : MonoBehaviour
         if (currentPrefabPreview == null) // Can't snap again if already snapped
             return;
 
+        currentRotation = updatedRotation.eulerAngles;
         currentPrefabPreview.transform.rotation = updatedRotation;
     }
 

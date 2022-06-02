@@ -228,7 +228,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabType: 4
-  snapDistance: 5
+  snapDistance: 8
   isPreview: 0
   canShiftWhenSnapped: 1
   snapRail:
