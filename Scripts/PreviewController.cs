@@ -18,13 +18,14 @@ public class PreviewController : MonoBehaviour
         currentRotation = Quaternion.identity.eulerAngles;
     }
 
-    public GameObject CreatePreview(Blueprint blueprint, Vector3 position, GameObject currentPrefab)
+    public GameObject CreatePreview(Blueprint blueprint, Vector3 position, GameObject currentPrefab, float scale)
     {
         if (currentPrefab != null && currentPrefabPreview == null)
         {
             currentPrefabPreview = Instantiate(currentPrefab, position, Quaternion.identity);
             currentPrefabPreview.name = currentPrefabPreview.name + "-Preview";
             currentPrefabPreview.transform.parent = blueprint.transform;
+            currentPrefabPreview.transform.localScale = new Vector3(scale, scale, scale);
             currentPreviewSnapper = currentPrefabPreview.GetComponent<Snapper>();
             currentPreviewSnapper.isPreview = true;
             SceneVisibilityManager.instance.DisablePicking(currentPrefabPreview, true);

@@ -13,7 +13,6 @@ public class BlueprintEditor : Editor
     private Blueprint blueprint;
     private PreviewController previewController;
     private int activeHeight;
-    
     private GameObject preview;
 
     protected void OnEnable()
@@ -35,7 +34,7 @@ public class BlueprintEditor : Editor
             if (preview != null)
                 DestroyImmediate(preview);
 
-            preview = previewController.CreatePreview(blueprint, Vector3.zero, prefabs[prefabIndex]);
+            preview = previewController.CreatePreview(blueprint, Vector3.zero, prefabs[prefabIndex], blueprint.activeScale);
         }
         if (GUILayout.Button("Remove preview"))
         {
@@ -45,6 +44,9 @@ public class BlueprintEditor : Editor
         {
             RefreshPrefabs();
         }
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
         EditorGUILayout.EndHorizontal();
         Handles.EndGUI();
     }
