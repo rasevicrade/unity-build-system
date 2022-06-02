@@ -10,6 +10,8 @@ public partial class Snapper : MonoBehaviour
     public PrefabType prefabType;
     public float snapDistance = 1f; 
     public bool isPreview;
+    public bool canShiftWhenSnapped;
+    public Bounds snapRail;
 
     private PreviewController previewController;
     private Transform snappedEdge;
@@ -30,6 +32,7 @@ public partial class Snapper : MonoBehaviour
             snappedEdge = FindPlacedObjectsToSnap();
             if (snappedEdge != null)
             {
+                snapRail = GetTransformBounds(snappedEdge);
                 Snap(snappedEdge);
             }
         }     
@@ -177,9 +180,10 @@ public partial class Snapper : MonoBehaviour
         {
             case PrefabType.Floor:
             case PrefabType.Seam: return FindEdgeSideways();
+            case PrefabType.Beam:
             case PrefabType.Wall: return FindEdgeFromAbove();
             case PrefabType.Window: return FindWall();
-            case PrefabType.Beam: return FindVerticalCorner();
+            
             default: return null;
         }
 
@@ -230,6 +234,8 @@ public partial class Snapper : MonoBehaviour
         return null;
     }
     #endregion
+
+    
 
     public enum PrefabType
     {

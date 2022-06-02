@@ -8,6 +8,7 @@ using UnityEngine;
 public class PreviewController : MonoBehaviour
 {
     private GameObject currentPrefabPreview;
+    private Snapper currentPreviewSnapper;
     private Vector3 currentRotation;
     public bool isSnapped;
 
@@ -24,7 +25,8 @@ public class PreviewController : MonoBehaviour
             currentPrefabPreview = Instantiate(currentPrefab, position, Quaternion.identity);
             currentPrefabPreview.name = currentPrefabPreview.name + "-Preview";
             currentPrefabPreview.transform.parent = blueprint.transform;
-            currentPrefabPreview.GetComponent<Snapper>().isPreview = true;
+            currentPreviewSnapper = currentPrefabPreview.GetComponent<Snapper>();
+            currentPreviewSnapper.isPreview = true;
             SceneVisibilityManager.instance.DisablePicking(currentPrefabPreview, true);
 
             currentPrefabPreview.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
@@ -44,6 +46,15 @@ public class PreviewController : MonoBehaviour
 
         if (isSnapped)
         {
+            if (currentPreviewSnapper.canShiftWhenSnapped)
+            {
+                if (currentPreviewSnapper.snapRail.Contains(position))
+                {
+                    Debug.Log(position);
+                    currentPrefabPreview.transform.position = position;
+                }
+                
+            }
             if (Vector3.Distance(position, currentPrefabPreview.transform.position) > unsnapDistance)
             {
                 isSnapped = false;
