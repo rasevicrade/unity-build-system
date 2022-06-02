@@ -20,7 +20,7 @@ public class BlueprintEditor : Editor
     {
         blueprint = (Blueprint)target;
         previewController = FindObjectOfType<PreviewController>();
-        prefabs = Resources.LoadAll<GameObject>("").Where(x => x.GetComponent<Snapper>() != null).OrderBy(x => x.name).ToArray();
+        RefreshPrefabs();
     }
 
     public override void OnInspectorGUI()
@@ -41,8 +41,17 @@ public class BlueprintEditor : Editor
         {
             DestroyImmediate(preview);
         }
+        if (GUILayout.Button("Refresh"))
+        {
+            RefreshPrefabs();
+        }
         EditorGUILayout.EndHorizontal();
         Handles.EndGUI();
+    }
+
+    private void RefreshPrefabs()
+    {
+        prefabs = Resources.LoadAll<GameObject>("").Where(x => x.GetComponent<Snapper>() != null).OrderBy(x => x.name).ToArray();
     }
 
     void OnSceneGUI()

@@ -164,6 +164,7 @@ public partial class Snapper : MonoBehaviour
             case PrefabType.Floor: return transform.rotation;
             case PrefabType.Seam:
             case PrefabType.Beam:
+            case PrefabType.SideRoof:
             case PrefabType.Window: return edge.rotation;
             case PrefabType.Wall:
             default: return edge.rotation * Quaternion.Euler(0, 90, 0); ;
@@ -182,6 +183,7 @@ public partial class Snapper : MonoBehaviour
             case PrefabType.Seam: return FindEdgeSideways();
             case PrefabType.Beam:
             case PrefabType.Wall: return FindEdgeFromAbove();
+            case PrefabType.SideRoof:
             case PrefabType.Window: return FindWall();
             
             default: return null;
@@ -193,6 +195,7 @@ public partial class Snapper : MonoBehaviour
         foreach (Transform t in gameObject.transform)
         {
             var ray = new Ray(t.position, t.forward);
+            Debug.DrawRay(ray.origin, ray.direction);
             if (Physics.Raycast(ray, out var hitInfo, snapDistance))
             {
                 if (hitInfo.transform.GetComponent<EdgePosition>() != null && CanSnap(prefabType, hitInfo.transform.parent.GetComponent<Snapper>().prefabType))
@@ -243,6 +246,7 @@ public partial class Snapper : MonoBehaviour
         Wall,
         Window,
         Seam,
-        Beam
+        Beam,
+        SideRoof
     }
 }
