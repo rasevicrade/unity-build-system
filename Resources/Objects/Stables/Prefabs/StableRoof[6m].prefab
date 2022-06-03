@@ -764,9 +764,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabType: 5
-  snapDistance: 1
+  snapDistance: 5
   isPreview: 0
   canShiftWhenSnapped: 0
   snapRail:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
+  snappedEdge: {fileID: 0}

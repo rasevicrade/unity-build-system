@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7969575984289605006}
   - component: {fileID: 6428401072299043371}
   - component: {fileID: 9138564500579884769}
-  - component: {fileID: 8367365407430891685}
   - component: {fileID: -9048286754005944633}
   - component: {fileID: 117461880495140917}
   m_Layer: 0
@@ -82,19 +81,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &8367365407430891685
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7337014216536145716}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.5500004, y: 3.7500007, z: 3.0000012}
-  m_Center: {x: 0.0000002533198, y: 4.125, z: -0.00000065565126}
 --- !u!114 &-9048286754005944633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -110,6 +96,11 @@ MonoBehaviour:
   prefabType: 2
   snapDistance: 1
   isPreview: 0
+  canShiftWhenSnapped: 0
+  snapRail:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  snappedEdge: {fileID: 0}
 --- !u!54 &117461880495140917
 Rigidbody:
   m_ObjectHideFlags: 0

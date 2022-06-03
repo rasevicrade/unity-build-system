@@ -4,14 +4,21 @@ using UnityEngine;
 
 public partial class Snapper : MonoBehaviour
 {
-    private Transform FindWall()
+    private Transform FindEdgeBottomUp()
     {
-        if (Physics.SphereCast(transform.position, GetTransformBounds(transform).size.z, transform.forward, out var hit))
+        var ray = new Ray(transform.position, transform.up);
+        Debug.DrawRay(ray.origin, ray.direction, Color.black, 10);
+        if (Physics.Raycast(ray, out var hitInfo))
         {
-            var snapper = hit.transform.GetComponent<Snapper>();
-            if (snapper != null && snapper.prefabType == PrefabType.Wall)
+            var edge = hitInfo.transform.GetComponent<EdgePosition>();
+            Debug.Log(hitInfo.transform.name + " " + hitInfo.transform.parent.name);
+            if (edge != null && edge.edge == EdgePosition.Edge.WallHole)
             {
-                return hit.transform;
+                var parentSnapper = edge.transform.parent.GetComponent<Snapper>();
+                if (parentSnapper != null)
+                {
+                    return hitInfo.transform;
+                }
             }
         }
         return null;

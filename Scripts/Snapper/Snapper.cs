@@ -101,7 +101,7 @@ public partial class Snapper : MonoBehaviour
         }
         return 0f;
     }
-    private Vector3 SnapTargetPosition(Transform edge) => new Vector3(SnapTarget().position.x, edge.transform.position.y, SnapTarget().position.z);
+    private Vector3 SnapTargetPosition(Transform edge) => new Vector3(SnapTarget().position.x, transform.position.y, SnapTarget().position.z);
     private Transform SnapTarget() => snappedEdge.GetComponent<Snapper>() != null ? snappedEdge : snappedEdge.parent;
     
     private Bounds GetTransformBounds(Transform t)
@@ -164,9 +164,9 @@ public partial class Snapper : MonoBehaviour
         {
             case PrefabType.Floor: return transform.rotation;
             case PrefabType.Seam:
-            case PrefabType.Beam:
+            case PrefabType.Beam: return edge.rotation;
             case PrefabType.SideRoof:
-            case PrefabType.Window: return edge.rotation;
+            case PrefabType.Window: return edge.parent.rotation;
             case PrefabType.Wall:
             default: return edge.rotation * Quaternion.Euler(0, 90, 0); ;
         }
@@ -185,7 +185,7 @@ public partial class Snapper : MonoBehaviour
             case PrefabType.Beam:
             case PrefabType.Wall: return FindEdgeFromAbove();
             case PrefabType.SideRoof:
-            case PrefabType.Window: return FindWall();
+            case PrefabType.Window: return FindEdgeBottomUp();
             
             default: return null;
         }
@@ -238,8 +238,6 @@ public partial class Snapper : MonoBehaviour
         return null;
     }
     #endregion
-
-    
 
     public enum PrefabType
     {
