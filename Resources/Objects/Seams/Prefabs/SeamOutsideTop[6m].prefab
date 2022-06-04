@@ -95,8 +95,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabType: 3
+  allowedTargets: 01000000
   snapDistance: 1
   isPreview: 0
+  canShiftWhenSnapped: 0
+  snapRail:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  snappedEdge: {fileID: 0}
 --- !u!1001 &2725622305039722511
 PrefabInstance:
   m_ObjectHideFlags: 0

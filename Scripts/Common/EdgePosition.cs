@@ -14,6 +14,7 @@ public class EdgePosition : MonoBehaviour
         East,
         Top,
         VerticalSide,
-        WallHole
+        WallHole,
+        Other
     }
 }

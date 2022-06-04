@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using static BoundExtensions;
+using static Vector3Extensions;
 
 [ExecuteInEditMode]
 public class PreviewController : MonoBehaviour
@@ -24,6 +26,7 @@ public class PreviewController : MonoBehaviour
         if (currentPrefab != null && currentPrefabPreview == null)
         {
             currentPrefabPreview = Instantiate(currentPrefab, position, Quaternion.identity);
+            CheckAllowedPrefabsAreSet(currentPrefabPreview);
             currentPrefabPreview.name = currentPrefabPreview.name + "-Preview";
             currentPrefabPreview.transform.parent = blueprint.transform;
             currentPrefabPreview.transform.localScale = new Vector3(scale, scale, scale);
@@ -41,12 +44,20 @@ public class PreviewController : MonoBehaviour
         return null;
     }
 
+    private void CheckAllowedPrefabsAreSet(GameObject currentPrefabPreview)
+    {
+        if (currentPrefabPreview.transform.GetComponent<Snapper>().allowedTargets == null || currentPrefabPreview.transform.GetComponent<Snapper>().allowedTargets.Count == 0)
+        {
+            Debug.LogError("Allowed target not set for current prefab: " + currentPrefabPreview.name);
+        }
+    }
+
     public void UpdatePosition(Vector3 position, bool snap = false, float unsnapDistance = 5f)
     {
         if (currentPrefabPreview == null || (snap && isSnapped)) // Can't snap again if already snapped
             return;
 
-        if (isSnapped)
+        if (isSnapped)  
         {
             if (Vector3.Distance(position, currentPrefabPreview.transform.position) > unsnapDistance)
             {
@@ -55,17 +66,19 @@ public class PreviewController : MonoBehaviour
             }
             if (currentPreviewSnapper.canShiftWhenSnapped)
             {     
-                var min = currentPreviewSnapper.snapRail.min;
-                var max = currentPreviewSnapper.snapRail.max;
+                var min = currentPreviewSnapper.snapRail.min.HeightIgnored();
+                var max = currentPreviewSnapper.snapRail.max.HeightIgnored();
 
-                if (Vector3.Distance(min, position) < Vector3.Distance(max, position))
+
+                if (Vector3.Distance(min, position) > Vector3.Distance(max, position))
                 {
-                    currentPrefabPreview.transform.position = snappedPosition + currentPrefabPreview.transform.right * (currentPreviewSnapper.snapRail.size.x / 2);
+                    currentPrefabPreview.transform.position = snappedPosition + currentPrefabPreview.transform.right * 2f;
                 }
                 else
                 {
-                    currentPrefabPreview.transform.position = snappedPosition + currentPrefabPreview.transform.right * -(currentPreviewSnapper.snapRail.size.x / 2);
-                }               
+                    currentPrefabPreview.transform.position = snappedPosition + currentPrefabPreview.transform.right * -2f;
+                    
+                }
             } 
         }
         else

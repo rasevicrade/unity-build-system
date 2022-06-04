@@ -764,6 +764,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabType: 5
+  allowedTargets: 04000000
   snapDistance: 5
   isPreview: 0
   canShiftWhenSnapped: 0

@@ -109,8 +109,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f96a3c4e335f204a99f61dc167cb8c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snapDistance: 1
   prefabType: 1
+  allowedTargets: 00000000
+  snapDistance: 1
+  isPreview: 0
+  canShiftWhenSnapped: 0
+  snapRail:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  snappedEdge: {fileID: 0}
 --- !u!1001 &1531357439634277358
 PrefabInstance:
   m_ObjectHideFlags: 0

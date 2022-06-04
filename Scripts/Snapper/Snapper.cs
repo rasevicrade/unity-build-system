@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static EdgePosition;
+using static BoundExtensions;
 
 [ExecuteInEditMode]
 public partial class Snapper : MonoBehaviour
 {
     public PrefabType prefabType;
+    public List<PrefabType> allowedTargets;
     public float snapDistance = 1f; 
     public bool isPreview;
     public bool canShiftWhenSnapped;
@@ -22,6 +24,10 @@ public partial class Snapper : MonoBehaviour
     private void OnEnable()
     {
         previewController = FindObjectOfType<PreviewController>();
+        if (allowedTargets == null)
+        {
+            allowedTargets = new List<PrefabType>();
+        }
     }
 
     void Update()
@@ -35,7 +41,7 @@ public partial class Snapper : MonoBehaviour
                 snapRail = GetTransformBounds(snappedEdge);
                 Snap(snappedEdge);
             }
-        }     
+        }
     }
     #endregion
 
@@ -76,7 +82,8 @@ public partial class Snapper : MonoBehaviour
     /// <returns></returns>
     private float ShiftDistance()
     {
-        targetHalfSize = GetTransformBounds(SnapTarget()).size.z / 2;
+        var targetBounds = GetTransformBounds(SnapTarget());
+        targetHalfSize = targetBounds.ShorterSideLength() / 2; //TODO Temporary solution for walls, to get front facing size
         currentPreviewHalfSize = GetTransformBounds(transform).size.x / 2;
         if (IsCurrentPrefabOfType(PrefabType.Beam))
         {
@@ -181,9 +188,10 @@ public partial class Snapper : MonoBehaviour
         switch (prefabType)
         {
             case PrefabType.Floor:
-            case PrefabType.Seam: return FindEdgeSideways();
+            case PrefabType.Wall:
             case PrefabType.Beam:
-            case PrefabType.Wall: return FindEdgeFromAbove();
+            case PrefabType.Seam: return FindEdgeSideways();
+             //return FindEdgeFromAbove();
             case PrefabType.SideRoof:
             case PrefabType.Window: return FindEdgeBottomUp();
             
@@ -193,13 +201,13 @@ public partial class Snapper : MonoBehaviour
     }
     private Transform FindEdgeSideways()
     {
-        foreach (Transform t in gameObject.transform)
+        foreach (Transform t in gameObject.transform) // Shoot ray from each edge on side
         {
             var ray = new Ray(t.position, t.forward);
             Debug.DrawRay(ray.origin, ray.direction);
             if (Physics.Raycast(ray, out var hitInfo, snapDistance))
             {
-                if (hitInfo.transform.GetComponent<EdgePosition>() != null && CanSnap(prefabType, hitInfo.transform.parent.GetComponent<Snapper>().prefabType))
+                if (hitInfo.transform.GetComponent<EdgePosition>() != null && CanSnap(hitInfo.transform))
                 {
                     return hitInfo.transform;
                 }
@@ -209,19 +217,22 @@ public partial class Snapper : MonoBehaviour
         return null;
     }
 
-    private bool CanSnap(PrefabType activePrefab, PrefabType targetPrefab)
+    private bool CanSnap(Transform targetTransform)
     {
-        switch (activePrefab)
-        {
-            case PrefabType.Floor:
-                return targetPrefab == PrefabType.Floor || targetPrefab == PrefabType.Wall;
-            case PrefabType.Wall:
-                return targetPrefab == PrefabType.Floor;
-            case PrefabType.Seam:
-                return targetPrefab == PrefabType.Wall;
-            default:
-                return false;
-        }
+        return allowedTargets.Contains(targetTransform.parent.GetComponent<Snapper>().prefabType);
+        //var targetSnapper = targetTransform.parent.GetComponent<Snapper>();
+        //var targetPrefab = targetSnapper.prefabType;
+        //switch (activePrefab)
+        //{
+        //    case PrefabType.Floor:
+        //        return targetPrefab == PrefabType.Floor || targetPrefab == PrefabType.Wall;
+        //    case PrefabType.Wall:
+        //        return targetPrefab == PrefabType.Floor;
+        //    case PrefabType.Seam:
+        //        return targetPrefab == PrefabType.Wall;
+        //    default:
+        //        return false;
+        //}
     }
     private Transform FindEdgeFromAbove()
     {
