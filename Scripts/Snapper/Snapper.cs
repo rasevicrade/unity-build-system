@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static EdgePosition;
 using static BoundExtensions;
+using System.Linq;
 
 [ExecuteInEditMode]
 public partial class Snapper : MonoBehaviour
@@ -172,8 +173,8 @@ public partial class Snapper : MonoBehaviour
             case PrefabType.Floor: return transform.rotation;
             case PrefabType.Seam:
             case PrefabType.Beam: return edge.rotation;
-            case PrefabType.SideRoof:
             case PrefabType.Window: return edge.parent.rotation;
+            case PrefabType.SideRoof:
             case PrefabType.Wall:
             default: return edge.rotation * Quaternion.Euler(0, 90, 0); ;
         }
@@ -190,9 +191,10 @@ public partial class Snapper : MonoBehaviour
             case PrefabType.Floor:
             case PrefabType.Wall:
             case PrefabType.Beam:
+            case PrefabType.SideRoof:
             case PrefabType.Seam: return FindEdgeSideways();
              //return FindEdgeFromAbove();
-            case PrefabType.SideRoof:
+            
             case PrefabType.Window: return FindEdgeBottomUp();
             
             default: return null;
@@ -203,8 +205,9 @@ public partial class Snapper : MonoBehaviour
     {
         foreach (Transform t in gameObject.transform) // Shoot ray from each edge on side
         {
+            if (t.GetComponent<EdgePosition>() == null)
+                continue;
             var ray = new Ray(t.position, t.forward);
-            Debug.DrawRay(ray.origin, ray.direction);
             if (Physics.Raycast(ray, out var hitInfo, snapDistance))
             {
                 if (hitInfo.transform.GetComponent<EdgePosition>() != null && CanSnap(hitInfo.transform))
@@ -220,33 +223,6 @@ public partial class Snapper : MonoBehaviour
     private bool CanSnap(Transform targetTransform)
     {
         return allowedTargets.Contains(targetTransform.parent.GetComponent<Snapper>().prefabType);
-        //var targetSnapper = targetTransform.parent.GetComponent<Snapper>();
-        //var targetPrefab = targetSnapper.prefabType;
-        //switch (activePrefab)
-        //{
-        //    case PrefabType.Floor:
-        //        return targetPrefab == PrefabType.Floor || targetPrefab == PrefabType.Wall;
-        //    case PrefabType.Wall:
-        //        return targetPrefab == PrefabType.Floor;
-        //    case PrefabType.Seam:
-        //        return targetPrefab == PrefabType.Wall;
-        //    default:
-        //        return false;
-        //}
-    }
-    private Transform FindEdgeFromAbove()
-    {
-        var ray = new Ray(transform.position + Vector3.up * GetTransformBounds(transform).size.y / 2, -transform.up);
-
-        if (Physics.Raycast(ray, out var hitInfo))
-        {
-            if (hitInfo.transform.GetComponent<EdgePosition>() != null)
-            {
-                return hitInfo.transform;
-            }
-
-        }
-        return null;
     }
     #endregion
 

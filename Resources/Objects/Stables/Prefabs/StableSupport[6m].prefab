@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 153185763946296888}
   - component: {fileID: 4486717840232865861}
   m_Layer: 2
-  m_Name: RoofEdge
+  m_Name: StableSupportRoofEdge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
