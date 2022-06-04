@@ -72,12 +72,11 @@ public class PreviewController : MonoBehaviour
 
                 if (Vector3.Distance(min, position) > Vector3.Distance(max, position))
                 {
-                    currentPrefabPreview.transform.position = snappedPosition + currentPrefabPreview.transform.right * 2f;
+                    currentPrefabPreview.transform.position = snappedPosition + currentPrefabPreview.transform.right * (currentPreviewSnapper.snapRail.LongerSideLength() / 2);
                 }
                 else
                 {
-                    currentPrefabPreview.transform.position = snappedPosition + currentPrefabPreview.transform.right * -2f;
-                    
+                    currentPrefabPreview.transform.position = snappedPosition + currentPrefabPreview.transform.right * -(currentPreviewSnapper.snapRail.LongerSideLength() / 2);
                 }
             } 
         }
