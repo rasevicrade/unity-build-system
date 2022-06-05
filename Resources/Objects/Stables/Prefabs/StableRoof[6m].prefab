@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 549405816318824207}
   - component: {fileID: 1559865079664922078}
-  - component: {fileID: 8287039745377491700}
   m_Layer: 0
   m_Name: RoofEdgeRight
   m_TagString: Untagged
@@ -45,19 +44,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 5, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8287039745377491700
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4343734127262100}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8bed4d9df7294a04eb7dcccc27400b91, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  edge: 0
 --- !u!1 &1586322409654653657
 GameObject:
   m_ObjectHideFlags: 0
@@ -161,7 +147,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2208325949745852066}
   - component: {fileID: 6651200703686125952}
-  - component: {fileID: 453575936368948591}
   m_Layer: 0
   m_Name: RoofEdgeLeft
   m_TagString: Untagged
@@ -196,19 +181,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 5, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &453575936368948591
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2979202845859434133}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8bed4d9df7294a04eb7dcccc27400b91, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  edge: 0
 --- !u!1 &3155118427578673058
 GameObject:
   m_ObjectHideFlags: 0

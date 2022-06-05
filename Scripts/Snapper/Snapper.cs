@@ -1,11 +1,6 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static EdgePosition;
-using static BoundExtensions;
 using System.Linq;
-using UnityEditor;
 
 [ExecuteInEditMode]
 public partial class Snapper : MonoBehaviour
