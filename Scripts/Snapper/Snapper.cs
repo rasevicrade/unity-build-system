@@ -111,7 +111,7 @@ public partial class Snapper : MonoBehaviour
         {
             if (IsTargetPrefabOfType(PrefabType.Beam))
             {
-                return GetTransformBounds(transform).ShorterSideLength() / 2;// - GetTransformBounds(activeSnapTarget).ShorterSideLength() / 2;
+                return GetTransformBounds(transform).ShorterSideLength() / 2 - GetTransformBounds(activeSnapTarget).ShorterSideLength() / 2;
             }
         }
         return 0f;
@@ -135,14 +135,19 @@ public partial class Snapper : MonoBehaviour
             }
             else
             {
-                var bounds = new Bounds(transform.position, Vector3.one);
-                foreach (Transform childTransform in t.transform)
+                var renderers = t.GetComponentsInChildren<Renderer>();
+                if (renderers != null && renderers.Length > 0)
                 {
-                    var childMeshRenderer = childTransform.GetComponent<MeshRenderer>();
-                    if (childMeshRenderer != null)
-                        bounds.Encapsulate(childMeshRenderer.bounds);
+                    var childBounds = renderers[0].bounds;
+                    foreach(Renderer r in renderers)
+                    {
+                        childBounds.Encapsulate(r.bounds);
+                    }
+                    return childBounds;
                 }
-                return bounds;
+                Debug.LogError("Couldn't find bounds for " + t.name);
+                return new Bounds(transform.position, Vector3.zero);
+               
             }
 
         }

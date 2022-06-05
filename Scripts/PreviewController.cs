@@ -70,7 +70,6 @@ public class PreviewController : MonoBehaviour
                 var min = currentPreviewSnapper.snapRail.min.HeightIgnored();
                 var max = currentPreviewSnapper.snapRail.max.HeightIgnored();
 
-
                 if (Vector3.Distance(min, position) > Vector3.Distance(max, position))
                 {
                     currentPrefabPreview.transform.position = snappedPosition + currentPrefabPreview.transform.right * (currentPreviewSnapper.snapRail.LongerSideLength() / 2);
