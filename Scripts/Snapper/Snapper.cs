@@ -5,6 +5,7 @@ using UnityEngine;
 using static EdgePosition;
 using static BoundExtensions;
 using System.Linq;
+using UnityEditor;
 
 [ExecuteInEditMode]
 public partial class Snapper : MonoBehaviour
@@ -18,8 +19,10 @@ public partial class Snapper : MonoBehaviour
 
     private PreviewController previewController;
     public Transform snappedEdge;
+    private Transform activeSnapTarget;
     private float targetHalfSize;
     private float currentPreviewHalfSize;
+    
 
     #region Lifecycle methods
     private void OnEnable()
@@ -36,9 +39,10 @@ public partial class Snapper : MonoBehaviour
         // If I am a preview, find edges to snap to
         if (isPreview && !previewController.isSnapped)
         {
-            snappedEdge = FindPlacedObjectsToSnap();
+            snappedEdge = FindClosestOverlappingEdge();
             if (snappedEdge != null)
             {
+                activeSnapTarget = SnapTarget();
                 snapRail = GetTransformBounds(snappedEdge);
                 Snap(snappedEdge);
             }
@@ -74,6 +78,7 @@ public partial class Snapper : MonoBehaviour
     #region Horizontal shift
     private Vector3 HorizontalShift(Transform edge)
     {
+        Debug.DrawRay(edge.position, edge.forward, Color.red, 100);
         return edge.forward * ShiftDistance();
     }
     /// <summary>
@@ -83,13 +88,10 @@ public partial class Snapper : MonoBehaviour
     /// <returns></returns>
     private float ShiftDistance()
     {
-        var targetBounds = GetTransformBounds(SnapTarget());
+        var targetBounds = GetTransformBounds(activeSnapTarget);
         targetHalfSize = targetBounds.ShorterSideLength() / 2; //TODO Temporary solution for walls, to get front facing size
         currentPreviewHalfSize = GetTransformBounds(transform).size.x / 2;
-        if (IsCurrentPrefabOfType(PrefabType.Beam))
-        {
-            return BeamShiftDistance();
-        }
+
         // TODO Move each prefab type to their specific partial class, to clean up this method
 
         if (IsCurrentPrefabOfType(PrefabType.Wall) && IsTargetPrefabOfType(PrefabType.Floor) || (IsCurrentPrefabOfType(PrefabType.Seam) && IsTargetPrefabOfType(PrefabType.Wall)))
@@ -106,10 +108,18 @@ public partial class Snapper : MonoBehaviour
             {
                 return currentPreviewHalfSize + targetHalfSize;
             }
+        } else if (IsCurrentPrefabOfType(PrefabType.SideRoof))
+        {
+            if (IsTargetPrefabOfType(PrefabType.Beam))
+            {
+                var curr = GetTransformBounds(transform);
+                var tar = GetTransformBounds(activeSnapTarget);
+                return GetTransformBounds(transform).ShorterSideLength() / 2;// - GetTransformBounds(activeSnapTarget).ShorterSideLength() / 2;
+            }
         }
         return 0f;
     }
-    private Vector3 SnapTargetPosition(Transform edge) => new Vector3(SnapTarget().position.x, transform.position.y, SnapTarget().position.z);
+    private Vector3 SnapTargetPosition(Transform edge) => new Vector3(activeSnapTarget.position.x, transform.position.y, activeSnapTarget.position.z);
     private Transform SnapTarget() => snappedEdge.GetComponent<Snapper>() != null ? snappedEdge : snappedEdge.parent;
     
     private Bounds GetTransformBounds(Transform t)
@@ -131,9 +141,9 @@ public partial class Snapper : MonoBehaviour
                 var bounds = new Bounds(transform.position, Vector3.one);
                 foreach (Transform childTransform in t.transform)
                 {
-                    var childBounds = childTransform.GetComponent<BoxCollider>();
-                    if (childBounds != null)
-                        bounds.Encapsulate(childTransform.GetComponent<BoxCollider>().bounds);
+                    var childMeshRenderer = childTransform.GetComponent<MeshRenderer>();
+                    if (childMeshRenderer != null)
+                        bounds.Encapsulate(childMeshRenderer.bounds);
                 }
                 return bounds;
             }
@@ -143,7 +153,7 @@ public partial class Snapper : MonoBehaviour
 
     private bool IsCurrentPrefabOfType(PrefabType type) => prefabType == type;
     private bool IsTargetPrefabOfType(PrefabType type) => GetTargetSnapper().prefabType == type;
-    private Snapper GetTargetSnapper() => SnapTarget().GetComponent<Snapper>();
+    private Snapper GetTargetSnapper() => activeSnapTarget.GetComponent<Snapper>();
     #endregion
 
     #region Vertical shift
@@ -173,10 +183,11 @@ public partial class Snapper : MonoBehaviour
             case PrefabType.Floor: return transform.rotation;
             case PrefabType.Seam:
             case PrefabType.Beam: return edge.rotation;
+            case PrefabType.SideRoof: return edge.parent.rotation * Quaternion.Euler(0, 90, 0); ;
             case PrefabType.Window: return edge.parent.rotation;
-            case PrefabType.SideRoof:
+            
             case PrefabType.Wall:
-            default: return edge.rotation * Quaternion.Euler(0, 90, 0); ;
+            default: return edge.rotation * Quaternion.Euler(0, 90, 0); 
         }
     }
     #endregion
@@ -184,45 +195,22 @@ public partial class Snapper : MonoBehaviour
     #endregion
 
     #region Find edges to snap to
-    private Transform FindPlacedObjectsToSnap()
-    {
-        switch (prefabType)
-        {
-            case PrefabType.Floor:
-            case PrefabType.Wall:
-            case PrefabType.Beam:
-            case PrefabType.SideRoof:
-            case PrefabType.Seam: return FindEdgeSideways();
-             //return FindEdgeFromAbove();
-            
-            case PrefabType.Window: return FindEdgeBottomUp();
-            
-            default: return null;
-        }
 
-    }
-    private Transform FindEdgeSideways()
+    private Transform FindClosestOverlappingEdge()
     {
-        foreach (Transform t in gameObject.transform) // Shoot ray from each edge on side
-        {
-            if (t.GetComponent<EdgePosition>() == null)
-                continue;
-            var ray = new Ray(t.position, t.forward);
-            if (Physics.Raycast(ray, out var hitInfo, snapDistance))
-            {
-                if (hitInfo.transform.GetComponent<EdgePosition>() != null && CanSnap(hitInfo.transform))
-                {
-                    return hitInfo.transform;
-                }
-
-            }
-        }
-        return null;
+        var target = Physics.OverlapBox(transform.position, GetTransformBounds(transform).extents, transform.rotation, LayerMask.GetMask("Snappable"))
+            .Where(x => CanSnap(x.transform))
+            .OrderBy(x => Vector3.Distance(x.transform.position, transform.position))
+            .FirstOrDefault();
+        return target?.transform;
     }
 
     private bool CanSnap(Transform targetTransform)
     {
-        return allowedTargets.Contains(targetTransform.parent.GetComponent<Snapper>().prefabType);
+        if (targetTransform.parent == null) 
+            return false;
+        var parentSnapper = targetTransform.parent.GetComponent<Snapper>();
+        return parentSnapper != null && allowedTargets.Contains(parentSnapper.prefabType);
     }
     #endregion
 

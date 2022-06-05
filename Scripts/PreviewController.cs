@@ -37,7 +37,8 @@ public class PreviewController : MonoBehaviour
             currentPrefabPreview.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
             foreach (Transform t in currentPrefabPreview.transform)
             {
-                t.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+                if (t.gameObject.layer != LayerMask.NameToLayer("Colliders"))
+                    t.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
             }
             return currentPrefabPreview;
         }

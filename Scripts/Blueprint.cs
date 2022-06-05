@@ -17,15 +17,21 @@ public class Blueprint : MonoBehaviour
         instantiatedGO.gameObject.layer = LayerMask.NameToLayer("Default");
         instantiatedGO.name = instantiatedGO.name.Replace("(Clone)", "") + "-Placed";      
         
-        SetEdgeLayerToDefault(instantiatedGO);
+        CheckIfSnappable(instantiatedGO);
         return instantiatedGO;
     }
 
-    private void SetEdgeLayerToDefault(GameObject instantiatedGO)
+    private void CheckIfSnappable(GameObject instantiatedGO)
     {
+        bool isSnappable = false;
         foreach(Transform t in instantiatedGO.transform)
         {
-            t.gameObject.layer = LayerMask.NameToLayer("Default");
+            if (t.gameObject.layer == LayerMask.NameToLayer("Snappable"))
+            {
+                isSnappable = true;
+            }
         }
+        if (!isSnappable)   
+            Debug.LogError("Object cannot be snapped to, because it has no snappable edges: " + instantiatedGO.name);
     }
 }

@@ -44,9 +44,16 @@ public class BlueprintEditor : Editor
         {
             RefreshPrefabs();
         }
+        
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Set layers")) //TODO Cleanup 
+        {
+            var layersSetup = new LayerSetup();
+            if (!LayerSetup.LayerExists("Snappable"))
+                layersSetup.AddNewLayer("Snappable");
+        }
         EditorGUILayout.EndHorizontal();
         Handles.EndGUI();
     }
@@ -127,7 +134,7 @@ public class BlueprintEditor : Editor
         }
 
         Ray ray = HandleUtility.GUIPointToWorldRay(mousePos);
-        return Physics.Raycast(ray, out hitInfo, 10000f);
+        return Physics.Raycast(ray, out hitInfo, 10000f, LayerMask.GetMask("Default"));
     }
 
     private bool IsMouseOverSceneView(out Vector2 mousePos)
