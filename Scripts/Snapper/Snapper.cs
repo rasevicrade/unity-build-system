@@ -55,8 +55,7 @@ public partial class Snapper : MonoBehaviour
         if (previewController != null)
         {
             previewController.UpdateRotation(GetRotationFromEdge(edge), true);
-            previewController.UpdatePosition(PositionFromEdge(edge), true, snapDistance);
-            
+            previewController.UpdatePosition(PositionFromEdge(edge), true, snapDistance);            
         }
     }
 
@@ -78,7 +77,6 @@ public partial class Snapper : MonoBehaviour
     #region Horizontal shift
     private Vector3 HorizontalShift(Transform edge)
     {
-        Debug.DrawRay(edge.position, edge.forward, Color.red, 100);
         return edge.forward * ShiftDistance();
     }
     /// <summary>
@@ -108,12 +106,11 @@ public partial class Snapper : MonoBehaviour
             {
                 return currentPreviewHalfSize + targetHalfSize;
             }
-        } else if (IsCurrentPrefabOfType(PrefabType.SideRoof))
+        }
+        else if (IsCurrentPrefabOfType(PrefabType.SideRoof))
         {
             if (IsTargetPrefabOfType(PrefabType.Beam))
             {
-                var curr = GetTransformBounds(transform);
-                var tar = GetTransformBounds(activeSnapTarget);
                 return GetTransformBounds(transform).ShorterSideLength() / 2;// - GetTransformBounds(activeSnapTarget).ShorterSideLength() / 2;
             }
         }

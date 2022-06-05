@@ -32,6 +32,6 @@ public class Blueprint : MonoBehaviour
             }
         }
         if (!isSnappable)   
-            Debug.LogError("Object cannot be snapped to, because it has no snappable edges: " + instantiatedGO.name);
+            Debug.LogWarning("Object cannot be snapped to, because it has no snappable edges: " + instantiatedGO.name);
     }
 }
