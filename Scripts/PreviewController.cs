@@ -14,6 +14,7 @@ public class PreviewController : MonoBehaviour
     private Vector3 currentRotation;
     public bool isSnapped;
     private Vector3 snappedPosition;
+    private Blueprint blueprint;
 
     protected void OnEnable()
     {
@@ -23,6 +24,7 @@ public class PreviewController : MonoBehaviour
 
     public GameObject CreatePreview(Blueprint blueprint, Vector3 position, GameObject currentPrefab, float scale)
     {
+        this.blueprint = blueprint;
         if (currentPrefab != null && currentPrefabPreview == null)
         {
             currentPrefabPreview = Instantiate(currentPrefab, position, Quaternion.identity);
@@ -58,6 +60,7 @@ public class PreviewController : MonoBehaviour
         if (currentPrefabPreview == null || (snap && isSnapped)) // Can't snap again if already snapped
             return;
 
+        unsnapDistance *= blueprint.activeScale;
         if (isSnapped)  
         {
             if (Vector3.Distance(position, currentPrefabPreview.transform.position) > unsnapDistance)

@@ -12,7 +12,7 @@ public class BlueprintEditor : Editor
     private int prefabIndex;   
     private Blueprint blueprint;
     private PreviewController previewController;
-    private int activeHeight;
+    private float activeHeight;
     private GameObject preview;
 
     protected void OnEnable()
@@ -107,16 +107,16 @@ public class BlueprintEditor : Editor
             } 
             else if (Event.current.keyCode == KeyCode.Alpha4)
             {
-                activeHeight = 4;
+                activeHeight = 4 * blueprint.activeScale;
             }
             else if (Event.current.keyCode == KeyCode.Alpha6)
             {
-                activeHeight = 6;
+                activeHeight = 6 * blueprint.activeScale;
             }
             else if (Event.current.keyCode == KeyCode.Alpha8)
             {
-                activeHeight = 8;
-            }
+                activeHeight = 8 * blueprint.activeScale;
+            } 
         }
     }
 
