@@ -164,7 +164,7 @@ public partial class Snapper : MonoBehaviour
     /// <returns></returns>
     private bool RequiresVerticalShift()
     {
-        return (prefabType == PrefabType.Floor || prefabType == PrefabType.Seam) && !IsGroundFloor() && IsTargetPrefabOfType(PrefabType.Wall);
+        return (prefabType == PrefabType.Floor || prefabType == PrefabType.Seam) && !IsGroundFloor();
     }
     private bool IsGroundFloor() => transform.position.y == 0;
     private Vector3 ShiftDownByHalfHeight() => -Vector3.up * GetTransformBounds(transform).size.y / 2;
