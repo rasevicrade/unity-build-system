@@ -11,22 +11,24 @@ public partial class Snapper : MonoBehaviour
     public bool isPreview;
     public bool canShiftWhenSnapped;
     public Bounds snapRail;
+    public Transform snappedEdge;
 
     private PreviewController previewController;
-    public Transform snappedEdge;
+
+    private float currentPreviewHalfSize;
     private Transform activeSnapTarget;
     private float targetHalfSize;
-    private float currentPreviewHalfSize;
+   
     
 
     #region Lifecycle methods
     private void OnEnable()
     {
         previewController = FindObjectOfType<PreviewController>();
+        if (previewController == null)
+            Debug.LogError("No preview controller available in scene");
         if (allowedTargets == null)
-        {
             allowedTargets = new List<PrefabType>();
-        }
     }
 
     void Update()
@@ -47,11 +49,8 @@ public partial class Snapper : MonoBehaviour
 
     private void Snap(Transform edge)
     {
-        if (previewController != null)
-        {
-            previewController.UpdateRotation(GetRotationFromEdge(edge), true);
-            previewController.UpdatePosition(PositionFromEdge(edge), true, snapDistance);            
-        }
+        previewController.UpdateRotation(GetRotationFromEdge(edge), true);
+        previewController.UpdatePosition(PositionFromEdge(edge), true, snapDistance);            
     }
 
     #region Position from edge
@@ -66,7 +65,7 @@ public partial class Snapper : MonoBehaviour
     /// <returns></returns>
     private Vector3 PositionFromEdge(Transform edge)
     {
-        return SnapTargetPosition(edge) + HorizontalShift(edge) + VerticalShift();
+        return SnapTargetPosition() + HorizontalShift(edge) + VerticalShift();
     }
 
     #region Horizontal shift
@@ -111,7 +110,7 @@ public partial class Snapper : MonoBehaviour
         }
         return 0f;
     }
-    private Vector3 SnapTargetPosition(Transform edge) => new Vector3(activeSnapTarget.position.x, transform.position.y, activeSnapTarget.position.z);
+    private Vector3 SnapTargetPosition() => new Vector3(activeSnapTarget.position.x, transform.position.y, activeSnapTarget.position.z);
     private Transform SnapTarget() => snappedEdge.GetComponent<Snapper>() != null ? snappedEdge : snappedEdge.parent;
     
     private Bounds GetTransformBounds(Transform t)
