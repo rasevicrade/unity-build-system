@@ -14,11 +14,13 @@ public class BlueprintEditor : Editor
     private PreviewController previewController;
     private float activeHeight;
     private GameObject preview;
+    private Quaternion currentRotation;
 
     protected void OnEnable()
     {
         blueprint = (Blueprint)target;
         previewController = FindObjectOfType<PreviewController>();
+        currentRotation = Quaternion.identity;
         RefreshPrefabs();
     }
 
@@ -79,6 +81,12 @@ public class BlueprintEditor : Editor
                     Event.current.Use();
                     blueprint.PlaceGameObject(prefabs[prefabIndex], previewController.GetPosition(), previewController.GetRotation());
                 }
+                if (IsRightMouseButtonClicked(Event.current))
+                {
+                    Event.current.Use();
+                    currentRotation *= Quaternion.Euler(0, 90, 0);
+                    previewController.UpdateRotation(currentRotation);
+                }
             }
             if (Event.current.keyCode == KeyCode.LeftShift)
             {
@@ -123,6 +131,11 @@ public class BlueprintEditor : Editor
     private bool IsLeftMouseButtonClicked(Event current)
     {
         return current.button == 0 && current.type == EventType.MouseDown;
+    }
+
+    private bool IsRightMouseButtonClicked(Event current)
+    {
+        return current.button == 1 && current.type == EventType.MouseDown;
     }
 
     private bool GetRayCast(out RaycastHit hitInfo)

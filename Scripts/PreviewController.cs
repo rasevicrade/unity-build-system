@@ -13,7 +13,6 @@ public class PreviewController : MonoBehaviour
     private Snapper currentPreviewSnapper;
     private Vector3 currentRotation;
     public bool isSnapped;
-    private Vector3 snappedPosition;
     private Blueprint blueprint;
 
     protected void OnEnable()
@@ -55,12 +54,12 @@ public class PreviewController : MonoBehaviour
         }
     }
 
-    public void UpdatePosition(Vector3 position, bool snap = false, float unsnapDistance = 5f)
+    public void UpdatePosition(Vector3 position, bool snap = false)
     {
         if (currentPrefabPreview == null || (snap && isSnapped)) // Can't snap again if already snapped
             return;
 
-        unsnapDistance *= blueprint.activeScale;
+        var unsnapDistance = currentPreviewSnapper.snapDistance * blueprint.activeScale;
         if (isSnapped)  
         {
             if (Vector3.Distance(position, currentPrefabPreview.transform.position) > unsnapDistance)
@@ -73,15 +72,11 @@ public class PreviewController : MonoBehaviour
         {
             currentPrefabPreview.transform.position = position;
             currentPrefabPreview.transform.localEulerAngles = currentRotation;
-            if (snap)
-            {
-                snappedPosition = position;
-            }
             isSnapped = snap;
         }
     }
 
-    internal void UpdateRotation(Quaternion updatedRotation, bool snap = false)
+    public void UpdateRotation(Quaternion updatedRotation, bool snap = false)
     {
         if (currentPrefabPreview == null) // Can't snap again if already snapped
             return;

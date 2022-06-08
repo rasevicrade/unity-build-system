@@ -58,7 +58,7 @@ public partial class Snapper : MonoBehaviour
     {
         snappedPosition = PositionFromEdge(edge);
         previewController.UpdateRotation(GetRotationFromEdge(edge), true);
-        previewController.UpdatePosition(snappedPosition, true, snapDistance);            
+        previewController.UpdatePosition(snappedPosition, true);            
     }
 
     #region Position from edge
@@ -210,13 +210,12 @@ public partial class Snapper : MonoBehaviour
     #region Rotation from edge
     private Quaternion GetRotationFromEdge(Transform edge)
     {
-        Debug.Log(edge.name);
         switch (prefabType)
         {
             case PrefabType.Floor: return transform.rotation;
             case PrefabType.Seam:
             case PrefabType.Beam: return edge.rotation * Quaternion.Euler(0, 90, 0); ;
-            case PrefabType.SideRoof: return edge.parent.rotation * Quaternion.Euler(0, 90, 0); ;
+            case PrefabType.SideRoof: return edge.parent.rotation * Quaternion.Euler(0, 90, 0);
             case PrefabType.Window: return edge.parent.rotation;
             
             case PrefabType.Wall:
@@ -229,9 +228,15 @@ public partial class Snapper : MonoBehaviour
 
     #region Find edges to snap to
 
+    //private void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.red;
+    //    Gizmos.matrix = Matrix4x4.TRS(transform.position + Vector3.up * GetTransformBounds(transform).size.y / 2, transform.rotation, GetTransformBounds(transform).extents * 2);
+    //    Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
+    //}
     private Transform FindClosestOverlappingEdge()
     {
-        var target = Physics.OverlapBox(transform.position, GetTransformBounds(transform).extents, transform.rotation, LayerMask.GetMask("Snappable"))
+        var target = Physics.OverlapBox(transform.position + Vector3.up * GetTransformBounds(transform).size.y / 2, GetTransformBounds(transform).extents, transform.rotation, LayerMask.GetMask("Snappable"))
             .Where(x => CanSnap(x.transform))
             .OrderBy(x => Vector3.Distance(x.transform.position, transform.position))
             .FirstOrDefault();
