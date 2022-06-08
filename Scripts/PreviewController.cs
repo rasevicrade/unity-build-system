@@ -68,20 +68,6 @@ public class PreviewController : MonoBehaviour
                 isSnapped = false;
                 currentPrefabPreview.transform.position = position;
             }
-            if (currentPreviewSnapper.canShiftWhenSnapped)
-            {     
-                var min = currentPreviewSnapper.snapRail.min.HeightIgnored();
-                var max = currentPreviewSnapper.snapRail.max.HeightIgnored();
-
-                if (Vector3.Distance(min, position) > Vector3.Distance(max, position))
-                {
-                    currentPrefabPreview.transform.position = snappedPosition + currentPrefabPreview.transform.right * (currentPreviewSnapper.snapRail.LongerSideLength() / 2);
-                }
-                else
-                {
-                    currentPrefabPreview.transform.position = snappedPosition + currentPrefabPreview.transform.right * -(currentPreviewSnapper.snapRail.LongerSideLength() / 2);
-                }
-            } 
         }
         else
         {

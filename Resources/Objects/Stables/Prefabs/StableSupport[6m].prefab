@@ -50,7 +50,7 @@ MonoBehaviour:
   allowedTargets: 01000000
   snapDistance: 8
   isPreview: 0
-  canShiftWhenSnapped: 1
+  shiftSideways: 1
   snapRail:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}

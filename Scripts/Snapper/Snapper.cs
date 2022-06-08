@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEditor;
 
 [ExecuteInEditMode]
 public partial class Snapper : MonoBehaviour
@@ -9,17 +10,16 @@ public partial class Snapper : MonoBehaviour
     public List<PrefabType> allowedTargets;
     public float snapDistance = 1f; 
     public bool isPreview;
-    public bool canShiftWhenSnapped;
-    public Bounds snapRail;
-    public Transform snappedEdge;
+    public bool shiftSideways;
+    
 
     private PreviewController previewController;
-
+    private Transform snappedEdge;    
+    private Transform snappedTarget;
     private float currentPreviewHalfSize;
-    private Transform activeSnapTarget;
     private float targetHalfSize;
-   
-    
+    private Vector3 originalPrefabPosition;
+    private Vector3 snappedPosition;
 
     #region Lifecycle methods
     private void OnEnable()
@@ -33,24 +33,28 @@ public partial class Snapper : MonoBehaviour
 
     void Update()
     {
+        originalPrefabPosition = transform.position;
         // If I am a preview, find edges to snap to
-        if (isPreview && !previewController.isSnapped)
+        if (isPreview)
         {
-            snappedEdge = FindClosestOverlappingEdge();
-            if (snappedEdge != null)
+            if (!previewController.isSnapped)
             {
-                activeSnapTarget = SnapTarget();
-                snapRail = GetTransformBounds(snappedEdge);
-                Snap(snappedEdge);
-            }
+                snappedEdge = FindClosestOverlappingEdge();
+                if (snappedEdge != null)
+                {
+                    snappedTarget = SnapTarget();
+                    Snap(snappedEdge);
+                }
+            }        
         }
     }
     #endregion
 
     private void Snap(Transform edge)
     {
+        snappedPosition = PositionFromEdge(edge);
         previewController.UpdateRotation(GetRotationFromEdge(edge), true);
-        previewController.UpdatePosition(PositionFromEdge(edge), true, snapDistance);            
+        previewController.UpdatePosition(snappedPosition, true, snapDistance);            
     }
 
     #region Position from edge
@@ -66,21 +70,22 @@ public partial class Snapper : MonoBehaviour
     private Vector3 PositionFromEdge(Transform edge)
     {
         return SnapTargetPosition() + HorizontalShift(edge) + VerticalShift();
+        
     }
 
     #region Horizontal shift
     private Vector3 HorizontalShift(Transform edge)
     {
-        return edge.forward * ShiftDistance();
+        return edge.forward * ForwardShiftDistance() + (shiftSideways ? SideDirection(edge) * SideShitfDistance(edge) : Vector3.zero);
     }
     /// <summary>
     /// Depending on prefab type, return how much active object needs to move horizontally
     /// to fit the target object
     /// </summary>
     /// <returns></returns>
-    private float ShiftDistance()
+    private float ForwardShiftDistance()
     {
-        var targetBounds = GetTransformBounds(activeSnapTarget);
+        var targetBounds = GetTransformBounds(snappedTarget);
         targetHalfSize = targetBounds.ShorterSideLength() / 2; //TODO Temporary solution for walls, to get front facing size
         currentPreviewHalfSize = GetTransformBounds(transform).size.x / 2;
 
@@ -105,12 +110,31 @@ public partial class Snapper : MonoBehaviour
         {
             if (IsTargetPrefabOfType(PrefabType.Beam))
             {
-                return GetTransformBounds(transform).ShorterSideLength() / 2 - GetTransformBounds(activeSnapTarget).ShorterSideLength() / 2;
+                return GetTransformBounds(transform).ShorterSideLength() / 2 - GetTransformBounds(snappedTarget).ShorterSideLength() / 2;
             }
         }
         return 0f;
     }
-    private Vector3 SnapTargetPosition() => new Vector3(activeSnapTarget.position.x, transform.position.y, activeSnapTarget.position.z);
+    
+    private float SideShitfDistance(Transform edge)
+    {
+        return GetTransformBounds(edge).LongerSideLength() / 2;
+    }
+    private Vector3 SideDirection(Transform edge)
+    {
+        var min = GetTransformBounds(edge).min.HeightIgnored();
+        var max = GetTransformBounds(edge).max.HeightIgnored();
+
+        if (Mathf.Abs(min.x - max.x) > Mathf.Abs(max.z - min.z))
+        {
+            return Vector3.Distance(new Vector3(min.x, 0, 0), originalPrefabPosition) < Vector3.Distance(new Vector3(max.x, 0, 0), originalPrefabPosition) ? edge.right : -edge.right;
+        } 
+        else
+        {
+            return Vector3.Distance(new Vector3(0, 0, min.z), originalPrefabPosition) < Vector3.Distance(new Vector3(0, 0, max.z), originalPrefabPosition) ? -edge.right : edge.right;
+        }
+    }
+    private Vector3 SnapTargetPosition() => new Vector3(snappedTarget.position.x, transform.position.y, snappedTarget.position.z);
     private Transform SnapTarget() => snappedEdge.GetComponent<Snapper>() != null ? snappedEdge : snappedEdge.parent;
     
     private Bounds GetTransformBounds(Transform t)
@@ -149,7 +173,7 @@ public partial class Snapper : MonoBehaviour
 
     private bool IsCurrentPrefabOfType(PrefabType type) => prefabType == type;
     private bool IsTargetPrefabOfType(PrefabType type) => GetTargetSnapper().prefabType == type;
-    private Snapper GetTargetSnapper() => activeSnapTarget.GetComponent<Snapper>();
+    private Snapper GetTargetSnapper() => snappedTarget.GetComponent<Snapper>();
     #endregion
 
     #region Vertical shift
