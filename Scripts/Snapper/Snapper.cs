@@ -11,7 +11,8 @@ public partial class Snapper : MonoBehaviour
     public float snapDistance = 1f; 
     public bool isPreview;
     public bool shiftSideways;
-    
+    public bool sidewayShiftByMyHalfSize;
+    public bool sidewayShiftByTargetHalSize;
 
     private PreviewController previewController;
     private Transform snappedEdge;    
@@ -69,8 +70,7 @@ public partial class Snapper : MonoBehaviour
     /// <returns></returns>
     private Vector3 PositionFromEdge(Transform edge)
     {
-        return SnapTargetPosition() + HorizontalShift(edge) + VerticalShift();
-        
+        return SnapTargetPosition() + HorizontalShift(edge) + VerticalShift();  
     }
 
     #region Horizontal shift
@@ -118,7 +118,16 @@ public partial class Snapper : MonoBehaviour
     
     private float SideShitfDistance(Transform edge)
     {
-        return GetTransformBounds(edge).LongerSideLength() / 2;
+        float sidewayShift = 0f;
+        if (sidewayShiftByMyHalfSize)
+        {
+            sidewayShift += GetTransformBounds(transform).ShorterSideLength() / 2;
+        }
+        if (sidewayShiftByTargetHalSize)
+        {
+            sidewayShift += GetTransformBounds(edge).LongerSideLength() / 2;
+        }
+        return sidewayShift;
     }
     private Vector3 SideDirection(Transform edge)
     {

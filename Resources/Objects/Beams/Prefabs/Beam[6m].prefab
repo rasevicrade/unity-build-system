@@ -97,11 +97,9 @@ MonoBehaviour:
   allowedTargets: 01000000
   snapDistance: 1
   isPreview: 0
-  canShiftWhenSnapped: 0
-  snapRail:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
-  snappedEdge: {fileID: 0}
+  shiftSideways: 1
+  sidewayShiftByMyHalfSize: 1
+  sidewayShiftByTargetHalSize: 1
 --- !u!65 &7289777892901426654
 BoxCollider:
   m_ObjectHideFlags: 0

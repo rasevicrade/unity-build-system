@@ -51,10 +51,8 @@ MonoBehaviour:
   snapDistance: 8
   isPreview: 0
   shiftSideways: 1
-  snapRail:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
-  snappedEdge: {fileID: 0}
+  sidewayShiftByMyHalfSize: 0
+  sidewayShiftByTargetHalSize: 1
 --- !u!1 &3570284735359174847
 GameObject:
   m_ObjectHideFlags: 0
