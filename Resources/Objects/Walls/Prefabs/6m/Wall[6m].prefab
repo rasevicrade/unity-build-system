@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 985c5ee5a1389c84588480f5cb35c569, type: 2}
+  - {fileID: 2100000, guid: 6034bad74c24e4f429625358d8b971dc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -101,11 +101,9 @@ MonoBehaviour:
   allowedTargets: 00000000
   snapDistance: 1
   isPreview: 0
-  canShiftWhenSnapped: 0
-  snapRail:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
-  snappedEdge: {fileID: 0}
+  shiftSideways: 0
+  sidewayShiftByMyHalfSize: 0
+  sidewayShiftByTargetHalSize: 0
 --- !u!65 &1514381248992069741
 BoxCollider:
   m_ObjectHideFlags: 0
