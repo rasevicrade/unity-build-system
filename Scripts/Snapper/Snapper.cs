@@ -48,6 +48,8 @@ public class Snapper : MonoBehaviour
                 {
                     snappedTarget = SnapTarget();
                     Snap(snappedEdge);
+                    snappedTarget = null;
+                    snappedEdge = null;
                 }
             }        
         }
@@ -57,7 +59,7 @@ public class Snapper : MonoBehaviour
     private void Snap(Transform edge)
     {
         snappedPosition = PositionFromEdge(edge);
-        previewController.UpdateRotation(GetRotationFromEdge(edge), true);
+        previewController.UpdateRotation(GetRotationFromEdge(edge));
         previewController.UpdatePosition(snappedPosition, true);            
     }
 
@@ -213,11 +215,11 @@ public class Snapper : MonoBehaviour
         switch (prefabType)
         {
             case PrefabType.Floor: return transform.rotation;
-            case PrefabType.Seam:
-            case PrefabType.Beam: return edge.rotation ;
+            
             case PrefabType.SideRoof: return edge.parent.rotation * Quaternion.Euler(0, 90, 0);
             case PrefabType.Window: return edge.parent.rotation;
-            
+            case PrefabType.Seam:
+            case PrefabType.Beam:
             case PrefabType.Wall:
             default: return edge.rotation; 
         }

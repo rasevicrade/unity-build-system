@@ -11,14 +11,12 @@ public class PreviewController : MonoBehaviour
 {
     private GameObject currentPrefabPreview;
     private Snapper currentPreviewSnapper;
-    private Vector3 currentRotation;
     public bool isSnapped;
     private Blueprint blueprint;
 
     protected void OnEnable()
     {
         isSnapped = false;
-        currentRotation = Quaternion.identity.eulerAngles;
     }
 
     public GameObject CreatePreview(Blueprint blueprint, Vector3 position, GameObject currentPrefab, float scale)
@@ -33,7 +31,7 @@ public class PreviewController : MonoBehaviour
             currentPrefabPreview.transform.localScale = new Vector3(scale, scale, scale);
             currentPreviewSnapper = currentPrefabPreview.GetComponent<Snapper>();
             currentPreviewSnapper.isPreview = true;
-            currentPrefabPreview.transform.LookAt(Camera.main.transform.position);
+            //currentPrefabPreview.transform.LookAt(Camera.main.transform.position);
             SceneVisibilityManager.instance.DisablePicking(currentPrefabPreview, true);
 
             currentPrefabPreview.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
@@ -72,7 +70,6 @@ public class PreviewController : MonoBehaviour
         else
         {
             currentPrefabPreview.transform.position = position;
-            currentPrefabPreview.transform.localEulerAngles = currentRotation;
             isSnapped = snap;
         }
     }
@@ -82,7 +79,6 @@ public class PreviewController : MonoBehaviour
         if (currentPrefabPreview == null) // Can't snap again if already snapped
             return;
 
-        currentRotation = updatedRotation.eulerAngles;
         currentPrefabPreview.transform.rotation = updatedRotation;
     }
 

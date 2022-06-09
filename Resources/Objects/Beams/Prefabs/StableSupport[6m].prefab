@@ -48,11 +48,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabType: 4
   allowedTargets: 01000000
-  snapDistance: 8
+  snapDistance: 2
   isPreview: 0
   shiftSideways: 1
   sidewayShiftByMyHalfSize: 0
   sidewayShiftByTargetHalSize: 1
+  shiftDown: 0
 --- !u!1 &3570284735359174847
 GameObject:
   m_ObjectHideFlags: 0

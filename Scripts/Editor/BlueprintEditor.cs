@@ -95,6 +95,11 @@ public class BlueprintEditor : Editor
                     Event.current.Use();
                     blueprint.PlaceGameObject(prefabGroups[activePrefabGroup][prefabIndex], previewController.GetPosition(), previewController.GetRotation());
                 }
+                if (IsRightMouseButtonClicked(Event.current))
+                {
+                    Event.current.Use();
+                    preview.transform.Rotate(0, 90, 0);
+                }
             }
             if (Event.current.keyCode == KeyCode.LeftShift)
             {

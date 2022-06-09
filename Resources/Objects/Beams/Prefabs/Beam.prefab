@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6096496294334996007}
   - component: {fileID: 8322630524141202157}
   - component: {fileID: 3162028054715385725}
-  - component: {fileID: 7289777892901426654}
+  - component: {fileID: 7255611545137311422}
   m_Layer: 0
   m_Name: Beam
   m_TagString: Untagged
@@ -100,7 +100,8 @@ MonoBehaviour:
   shiftSideways: 1
   sidewayShiftByMyHalfSize: 1
   sidewayShiftByTargetHalSize: 1
---- !u!65 &7289777892901426654
+  shiftDown: 0
+--- !u!65 &7255611545137311422
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -111,5 +112,5 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.62500036, y: 6.000001, z: 0.6500013}
-  m_Center: {x: -1.6875002, y: 3.0000005, z: -0.00000040233135}
+  m_Size: {x: 0.65000105, y: 6.000001, z: 0.6250013}
+  m_Center: {x: 0.00000028312206, y: 3.0000005, z: -0.007856086}
