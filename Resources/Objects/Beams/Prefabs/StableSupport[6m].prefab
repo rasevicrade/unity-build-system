@@ -48,7 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabType: 4
   allowedTargets: 01000000
-  snapDistance: 2
+  snapDistance: 4
   isPreview: 0
   shiftSideways: 1
   sidewayShiftByMyHalfSize: 0
