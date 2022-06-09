@@ -14,7 +14,6 @@ public class BlueprintEditor : Editor
     private PreviewController previewController;
     private float activeHeight;
     private GameObject preview;
-    private Quaternion currentRotation;
     private Dictionary<string, GameObject[]> prefabGroups = new Dictionary<string, GameObject[]>();
     private string activePrefabGroup;
 
@@ -22,7 +21,6 @@ public class BlueprintEditor : Editor
     {
         blueprint = (Blueprint)target;
         previewController = FindObjectOfType<PreviewController>();
-        currentRotation = Quaternion.identity;
         RefreshPrefabs();
     }
 
@@ -95,12 +93,6 @@ public class BlueprintEditor : Editor
                 {
                     Event.current.Use();
                     blueprint.PlaceGameObject(prefabGroups[activePrefabGroup][prefabIndex], previewController.GetPosition(), previewController.GetRotation());
-                }
-                if (IsRightMouseButtonClicked(Event.current))
-                {
-                    Event.current.Use();
-                    currentRotation *= Quaternion.Euler(0, 90, 0);
-                    previewController.UpdateRotation(currentRotation);
                 }
             }
             if (Event.current.keyCode == KeyCode.LeftShift)

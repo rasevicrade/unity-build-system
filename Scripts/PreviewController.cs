@@ -33,6 +33,7 @@ public class PreviewController : MonoBehaviour
             currentPrefabPreview.transform.localScale = new Vector3(scale, scale, scale);
             currentPreviewSnapper = currentPrefabPreview.GetComponent<Snapper>();
             currentPreviewSnapper.isPreview = true;
+            currentPrefabPreview.transform.LookAt(Camera.main.transform.position);
             SceneVisibilityManager.instance.DisablePicking(currentPrefabPreview, true);
 
             currentPrefabPreview.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
