@@ -33,8 +33,9 @@ public class BlueprintEditor : Editor
         foreach (var prefabGroup in prefabGroups)
         {
             EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(prefabGroup.Key);
             prefabIndex = EditorGUILayout.Popup(prefabIndex, Array.ConvertAll(prefabGroup.Value, x => x.name));
-            if (GUILayout.Button("Create " + prefabGroup.Key.Substring(0, prefabGroup.Key.Length - 1)))
+            if (GUILayout.Button("+"))
             {
                 if (preview != null)
                     DestroyImmediate(preview);

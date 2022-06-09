@@ -219,7 +219,7 @@ public class Snapper : MonoBehaviour
             case PrefabType.Window: return edge.parent.rotation;
             
             case PrefabType.Wall:
-            default: return edge.rotation * Quaternion.Euler(0, 90, 0); 
+            default: return edge.rotation; 
         }
     }
     #endregion

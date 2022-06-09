@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3162028054715385725}
   - component: {fileID: 7289777892901426654}
   m_Layer: 0
-  m_Name: Beam[6m]
+  m_Name: Beam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
