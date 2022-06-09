@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -8,13 +9,14 @@ using UnityEngine;
 [CustomEditor(typeof(Blueprint))]
 public class BlueprintEditor : Editor
 {
-    private GameObject[] prefabs;
     private int prefabIndex;   
     private Blueprint blueprint;
     private PreviewController previewController;
     private float activeHeight;
     private GameObject preview;
     private Quaternion currentRotation;
+    private Dictionary<string, GameObject[]> prefabGroups = new Dictionary<string, GameObject[]>();
+    private string activePrefabGroup;
 
     protected void OnEnable()
     {
@@ -28,16 +30,23 @@ public class BlueprintEditor : Editor
     {
         base.OnInspectorGUI();
         Handles.BeginGUI();
-        EditorGUILayout.BeginHorizontal();
 
-        prefabIndex = EditorGUILayout.Popup(prefabIndex, Array.ConvertAll(prefabs, x => x.name));
-        if (GUILayout.Button("Create preview"))
+        EditorGUILayout.BeginVertical();
+        foreach (var prefabGroup in prefabGroups)
         {
-            if (preview != null)
-                DestroyImmediate(preview);
+            EditorGUILayout.BeginHorizontal();
+            prefabIndex = EditorGUILayout.Popup(prefabIndex, Array.ConvertAll(prefabGroup.Value, x => x.name));
+            if (GUILayout.Button("Create " + prefabGroup.Key.Substring(0, prefabGroup.Key.Length - 1)))
+            {
+                if (preview != null)
+                    DestroyImmediate(preview);
 
-            preview = previewController.CreatePreview(blueprint, Vector3.zero, prefabs[prefabIndex], blueprint.activeScale);
+                preview = previewController.CreatePreview(blueprint, Vector3.zero, prefabGroup.Value[prefabIndex], blueprint.activeScale);
+                activePrefabGroup = prefabGroup.Key;
+            }
+            EditorGUILayout.EndHorizontal();
         }
+        
         if (GUILayout.Button("Remove preview"))
         {
             DestroyImmediate(preview);
@@ -46,8 +55,8 @@ public class BlueprintEditor : Editor
         {
             RefreshPrefabs();
         }
-        
-        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.EndVertical();
+
 
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Set layers")) //TODO Cleanup 
@@ -62,7 +71,13 @@ public class BlueprintEditor : Editor
 
     private void RefreshPrefabs()
     {
-        prefabs = Resources.LoadAll<GameObject>("").Where(x => x.GetComponent<Snapper>() != null).OrderBy(x => x.name).ToArray();
+        var objectsPath = Application.dataPath + "/BuildSystem/Resources/Objects/";
+        var dirInfo = new DirectoryInfo(objectsPath);
+        prefabGroups = new Dictionary<string, GameObject[]>();
+        foreach (var dir in dirInfo.GetDirectories())
+        {
+            prefabGroups.Add(dir.Name, Resources.LoadAll<GameObject>("Objects/" + dir.Name).Where(x => x.GetComponent<Snapper>() != null).OrderBy(x => x.name).ToArray());
+        }
     }
 
     void OnSceneGUI()
@@ -79,7 +94,7 @@ public class BlueprintEditor : Editor
                 if (IsLeftMouseButtonClicked(Event.current))
                 {
                     Event.current.Use();
-                    blueprint.PlaceGameObject(prefabs[prefabIndex], previewController.GetPosition(), previewController.GetRotation());
+                    blueprint.PlaceGameObject(prefabGroups[activePrefabGroup][prefabIndex], previewController.GetPosition(), previewController.GetRotation());
                 }
                 if (IsRightMouseButtonClicked(Event.current))
                 {

@@ -169,7 +169,7 @@ GameObject:
   - component: {fileID: 7835134616963545220}
   - component: {fileID: 3464161664401615876}
   m_Layer: 0
-  m_Name: BottomWoodSimStone
+  m_Name: BottomStoneWood
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
