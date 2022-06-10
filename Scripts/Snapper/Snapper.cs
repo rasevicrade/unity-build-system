@@ -2,13 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEditor;
+using System;
 
 [ExecuteInEditMode]
 public class Snapper : MonoBehaviour
 {
     public PrefabType prefabType;
     public List<PrefabType> allowedTargets;
-    public float snapDistance = 1f; 
+    public float snapDistance = 2f; 
     public bool isPreview;
     public bool canBeStacked;
 
@@ -84,8 +85,14 @@ public class Snapper : MonoBehaviour
     #region Horizontal shift
     private Vector3 HorizontalShift(Transform edge)
     {
-        return edge.forward * ForwardShiftDistance() + (shiftSideways ? SideDirection(edge) * SideShitfDistance(edge) : Vector3.zero);
+        return edge.forward * ForwardShiftDistance() + (shiftSideways && IsTargetLongerThanCurrent(edge) ? SideDirection(edge) * SideShitfDistance(edge) : Vector3.zero);
     }
+
+    private bool IsTargetLongerThanCurrent(Transform edge)
+    {
+        return GetTransformBounds(edge).LongerSideLength() > GetTransformBounds(transform).ShorterSideLength(); // We use shorterside length for current because we need shorter side of bounrs for sstable support, maybe find a better way to solve this
+    }
+
     /// <summary>
     /// Depending on prefab type, return how much active object needs to move horizontally
     /// to fit the target object
