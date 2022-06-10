@@ -12,7 +12,6 @@ public class BlueprintEditor : Editor
     private int prefabIndex;   
     private Blueprint blueprint;
     private PreviewController previewController;
-    private float activeHeight;
     private GameObject preview;
     private Dictionary<string, GameObject[]> prefabGroups = new Dictionary<string, GameObject[]>();
     private string activePrefabGroup;
@@ -86,8 +85,8 @@ public class BlueprintEditor : Editor
         {
             if (GetRayCast(out RaycastHit hitInfo))
             {
-                SetFloor(hitInfo.point);
-                previewController.UpdatePosition(new Vector3(hitInfo.point.x, activeHeight + hitInfo.point.y, hitInfo.point.z));
+                SetFloor();
+                previewController.UpdatePosition(new Vector3(hitInfo.point.x, hitInfo.point.y, hitInfo.point.z));
 
 
                 if (IsLeftMouseButtonClicked(Event.current))
@@ -118,25 +117,25 @@ public class BlueprintEditor : Editor
         }
     }
 
-    private void SetFloor(Vector3 position)
+    private void SetFloor()
     {
         if (Event.current.shift)
         {
             if (Event.current.keyCode == KeyCode.Alpha0)
             {
-                activeHeight = 0;
+                previewController.baseHeight = 0;
             } 
             else if (Event.current.keyCode == KeyCode.Alpha4)
             {
-                activeHeight = 4 * blueprint.activeScale;
+                previewController.baseHeight = 4 * blueprint.activeScale;
             }
             else if (Event.current.keyCode == KeyCode.Alpha6)
             {
-                activeHeight = 6 * blueprint.activeScale;
+                previewController.baseHeight = 6 * blueprint.activeScale;
             }
             else if (Event.current.keyCode == KeyCode.Alpha8)
             {
-                activeHeight = 8 * blueprint.activeScale;
+                previewController.baseHeight = 8 * blueprint.activeScale;
             } 
         }
     }

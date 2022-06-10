@@ -101,6 +101,7 @@ MonoBehaviour:
   allowedTargets: 0000000001000000
   snapDistance: 1
   isPreview: 0
+  canBeStacked: 1
   shiftSideways: 0
   sidewayShiftByMyHalfSize: 0
   sidewayShiftByTargetHalSize: 0

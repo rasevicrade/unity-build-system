@@ -10,6 +10,7 @@ public class Snapper : MonoBehaviour
     public List<PrefabType> allowedTargets;
     public float snapDistance = 1f; 
     public bool isPreview;
+    public bool canBeStacked;
 
     public bool shiftSideways;
     public bool sidewayShiftByMyHalfSize;
@@ -60,7 +61,7 @@ public class Snapper : MonoBehaviour
     {
         snappedPosition = PositionFromEdge(edge);
         previewController.UpdateRotation(GetRotationFromEdge(edge));
-        previewController.UpdatePosition(snappedPosition, true);            
+        previewController.UpdatePosition(snappedPosition, snap: true);            
     }
 
     #region Position from edge

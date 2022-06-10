@@ -9,10 +9,12 @@ using static Vector3Extensions;
 [ExecuteInEditMode]
 public class PreviewController : MonoBehaviour
 {
-    private GameObject currentPrefabPreview;
-    private Snapper currentPreviewSnapper;
+    public float baseHeight;
     public bool isSnapped;
+
     private Blueprint blueprint;
+    private GameObject currentPrefabPreview;
+    private Snapper currentPreviewSnapper;  
 
     protected void OnEnable()
     {
@@ -57,6 +59,8 @@ public class PreviewController : MonoBehaviour
     {
         if (currentPrefabPreview == null || (snap && isSnapped)) // Can't snap again if already snapped
             return;
+
+        position = new Vector3(position.x, (currentPreviewSnapper.canBeStacked ? baseHeight + position.y : baseHeight), position.z);
 
         var unsnapDistance = currentPreviewSnapper.snapDistance * blueprint.activeScale;
         if (isSnapped)  
