@@ -9,18 +9,20 @@ using UnityEngine;
 [CustomEditor(typeof(Blueprint))]
 public class BlueprintEditor : Editor
 {
-    private int prefabIndex;   
+    private List<PrefabGroup> prefabGroups = new List<PrefabGroup>();
+    private int activePrefabGroupIndex = 0;
     private Blueprint blueprint;
     private PreviewController previewController;
     private GameObject preview;
-    private Dictionary<string, GameObject[]> prefabGroups = new Dictionary<string, GameObject[]>();
-    private string activePrefabGroup;
+    
+    private GUIStyle labelStyle;
 
     protected void OnEnable()
     {
         blueprint = (Blueprint)target;
         previewController = FindObjectOfType<PreviewController>();
-        RefreshPrefabs();
+        
+        RefreshPrefabs();  
     }
 
     public override void OnInspectorGUI()
@@ -29,26 +31,28 @@ public class BlueprintEditor : Editor
         Handles.BeginGUI();
 
         EditorGUILayout.BeginVertical();
-        foreach (var prefabGroup in prefabGroups)
+        labelStyle = new GUIStyle(EditorStyles.label);
+        for (int i = 0; i < prefabGroups.Count; i++)
         {
+            var prefabGroup = prefabGroups[i];
+            labelStyle.normal.textColor = i == activePrefabGroupIndex ? Color.green : Color.white;
+            
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(prefabGroup.Key);
-            prefabIndex = EditorGUILayout.Popup(prefabIndex, Array.ConvertAll(prefabGroup.Value, x => x.name));
+
+            EditorGUILayout.LabelField(prefabGroup.Name, labelStyle);
+            prefabGroup.activePrefabIndex = EditorGUILayout.Popup(prefabGroup.activePrefabIndex, Array.ConvertAll(prefabGroup.Prefabs, x => x.name));
             if (GUILayout.Button("+"))
             {
-                if (preview != null)
-                    DestroyImmediate(preview);
-
-                preview = previewController.CreatePreview(blueprint, Vector3.zero, prefabGroup.Value[prefabIndex], blueprint.activeScale);
-                activePrefabGroup = prefabGroup.Key;
+                activePrefabGroupIndex = i;
+                SetActivePreview();
             }
             if (GUILayout.Button("*"))
             {
-                AssetDatabase.OpenAsset(AssetDatabase.LoadAssetAtPath<GameObject>(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(prefabGroup.Value[prefabIndex])));
+                AssetDatabase.OpenAsset(AssetDatabase.LoadAssetAtPath<GameObject>(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(prefabGroup.Prefabs[i])));
             }
             EditorGUILayout.EndHorizontal();
         }
-        
+
         if (GUILayout.Button("Remove preview"))
         {
             DestroyImmediate(preview);
@@ -67,40 +71,48 @@ public class BlueprintEditor : Editor
             if (!LayerSetup.LayerExists("Snappable"))
                 layersSetup.AddNewLayer("Snappable");
         }
-        
+
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.BeginVertical();
         EditorGUILayout.LabelField("Press TAB to clear current preview");
+        EditorGUILayout.LabelField("Press Shift + TAB to reactivate last preview");
+        EditorGUILayout.LabelField("--------------------------------------------");
         EditorGUILayout.LabelField("Hold shift to stack stackable objects (eg. floors)");
+        EditorGUILayout.LabelField("--------------------------------------------");
         EditorGUILayout.LabelField("Right click to rotate object");
+        EditorGUILayout.LabelField("--------------------------------------------");
+        EditorGUILayout.LabelField("Ctrl + Scroll to change active object group");
+        EditorGUILayout.LabelField("Shift + Scroll to change active prefab within group");
         EditorGUILayout.EndVertical();
         Handles.EndGUI();
     }
 
-    private void RefreshPrefabs()
-    {
-        var objectsPath = Application.dataPath + "/BuildSystem/Resources/Objects/";
-        var dirInfo = new DirectoryInfo(objectsPath);
-        prefabGroups = new Dictionary<string, GameObject[]>();
-        foreach (var dir in dirInfo.GetDirectories())
-        {
-            prefabGroups.Add(dir.Name, Resources.LoadAll<GameObject>("Objects/" + dir.Name).Where(x => x.GetComponent<Snapper>() != null).OrderBy(x => x.name).ToArray());
-        }
-    }
 
     void OnSceneGUI()
-    {       
+    {
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
-        if (IsShiftClicked(Event.current))
+        blueprint.stackingActivated = Event.current.shift;
+        if (GetRayCast(out RaycastHit hitInfo))
         {
-            blueprint.stackingActivated = true;
-        } else
-        {
-            blueprint.stackingActivated = false;
-        }
-        if (previewController != null && preview != null)
-        {
-            if (GetRayCast(out RaycastHit hitInfo))
+            if (Event.current.control)
+            {
+                if (Event.current.isScrollWheel)
+                {
+                    Event.current.Use();
+                    ChangeActiveGroupIndex();
+                } 
+            } 
+            else if (Event.current.shift)
+            {
+                if (Event.current.isScrollWheel)
+                {
+                    Event.current.Use();
+                    ChangeActivePrefabIndex();
+                }
+            }
+
+
+            if (previewController != null && preview != null)
             {
                 SetFloor();
                 previewController.UpdatePosition(new Vector3(hitInfo.point.x, blueprint.stackingActivated && previewController.currentPreviewSnapper.canBeStacked ? hitInfo.point.y : blueprint.activeBaseHeight, hitInfo.point.z));
@@ -109,23 +121,84 @@ public class BlueprintEditor : Editor
                 if (IsLeftMouseButtonClicked(Event.current))
                 {
                     Event.current.Use();
-                    blueprint.PlaceGameObject(prefabGroups[activePrefabGroup][prefabIndex], previewController.GetPosition(), previewController.GetRotation());
+                    var activeGroup = prefabGroups[activePrefabGroupIndex];
+                    if (activeGroup != null)
+                        blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], previewController.GetPosition(), previewController.GetRotation());
                 }
                 if (IsRightMouseButtonClicked(Event.current))
                 {
                     Event.current.Use();
                     preview.transform.Rotate(0, 90, 0);
                 }
-                
+
             }
         }
-       
+
 
         if (Event.current.keyCode == KeyCode.Tab)
         {
-            DestroyImmediate(preview);
+            if (!Event.current.shift) 
+                DestroyImmediate(preview);
+            else
+                SetActivePreview();
         }
     }
+
+
+    private void ChangeActiveGroupIndex()
+    {
+        if (Event.current.delta.y < 0)
+            activePrefabGroupIndex -= 1;
+        else if (Event.current.delta.y > 0)
+            activePrefabGroupIndex += 1;
+        if (activePrefabGroupIndex < 0)
+            activePrefabGroupIndex = 0;
+        if (activePrefabGroupIndex >= prefabGroups.Count)
+            activePrefabGroupIndex = 0;
+
+        SetActivePreview();
+    }
+
+
+    private void ChangeActivePrefabIndex()
+    {
+        if (Event.current.delta.y < 0)
+            prefabGroups[activePrefabGroupIndex].activePrefabIndex -= 1;
+        else if (Event.current.delta.y > 0)
+            prefabGroups[activePrefabGroupIndex].activePrefabIndex += 1;
+        if (prefabGroups[activePrefabGroupIndex].activePrefabIndex < 0)
+            prefabGroups[activePrefabGroupIndex].activePrefabIndex = 0;
+        if (prefabGroups[activePrefabGroupIndex].activePrefabIndex >= prefabGroups[activePrefabGroupIndex].Prefabs.Length)
+            prefabGroups[activePrefabGroupIndex].activePrefabIndex = 0;
+
+        SetActivePreview();
+    }
+
+    private void SetActivePreview()
+    {
+        if (preview != null)
+            DestroyImmediate(preview);
+
+        preview = previewController.CreatePreview(blueprint, Vector3.zero, prefabGroups[activePrefabGroupIndex].Prefabs[prefabGroups[activePrefabGroupIndex].activePrefabIndex], blueprint.activeScale);
+    }
+
+    private void RefreshPrefabs()
+    {
+        var objectsPath = Application.dataPath + "/BuildSystem/Resources/Objects/";
+        var dirInfo = new DirectoryInfo(objectsPath);
+        prefabGroups = new List<PrefabGroup>();
+        int i = 0;
+        foreach (var dir in dirInfo.GetDirectories())
+        {
+            prefabGroups.Add(new PrefabGroup
+            {
+                Name = dir.Name,
+                Prefabs = Resources.LoadAll<GameObject>("Objects/" + dir.Name).Where(x => x.GetComponent<Snapper>() != null).OrderBy(x => x.name).ToArray()
+            });
+            i++;
+        }
+    }
+
 
     private void SetFloor()
     {
@@ -134,7 +207,7 @@ public class BlueprintEditor : Editor
             if (Event.current.keyCode == KeyCode.Alpha0)
             {
                 blueprint.activeBaseHeight = 0;
-            } 
+            }
             else if (Event.current.keyCode == KeyCode.Alpha4)
             {
                 blueprint.activeBaseHeight = 4 * blueprint.activeScale;
@@ -146,7 +219,7 @@ public class BlueprintEditor : Editor
             else if (Event.current.keyCode == KeyCode.Alpha8)
             {
                 blueprint.activeBaseHeight = 8 * blueprint.activeScale;
-            } 
+            }
         }
     }
 
@@ -158,10 +231,6 @@ public class BlueprintEditor : Editor
     private bool IsRightMouseButtonClicked(Event current)
     {
         return current.button == 1 && current.type == EventType.MouseDown;
-    }
-    private bool IsShiftClicked(Event current)
-    {
-        return current.shift;
     }
 
     private bool GetRayCast(out RaycastHit hitInfo)
@@ -184,5 +253,12 @@ public class BlueprintEditor : Editor
         Rect swPos = SceneView.lastActiveSceneView.position;
         return !(mousePos.x > swPos.width) &&
                !(mousePos.y > swPos.height);
+    }
+
+    class PrefabGroup
+    {
+        public string Name { get; set; }
+        public GameObject[] Prefabs { get; set; }
+        public int activePrefabIndex { get; set; } = 0;       
     }
 }
