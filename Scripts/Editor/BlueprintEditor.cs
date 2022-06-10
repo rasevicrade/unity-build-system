@@ -42,6 +42,10 @@ public class BlueprintEditor : Editor
                 preview = previewController.CreatePreview(blueprint, Vector3.zero, prefabGroup.Value[prefabIndex], blueprint.activeScale);
                 activePrefabGroup = prefabGroup.Key;
             }
+            if (GUILayout.Button("*"))
+            {
+                AssetDatabase.OpenAsset(AssetDatabase.LoadAssetAtPath<GameObject>(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(prefabGroup.Value[prefabIndex])));
+            }
             EditorGUILayout.EndHorizontal();
         }
         
