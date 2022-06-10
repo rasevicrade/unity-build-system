@@ -67,7 +67,13 @@ public class BlueprintEditor : Editor
             if (!LayerSetup.LayerExists("Snappable"))
                 layersSetup.AddNewLayer("Snappable");
         }
+        
         EditorGUILayout.EndHorizontal();
+        EditorGUILayout.BeginVertical();
+        EditorGUILayout.LabelField("Press TAB to clear current preview");
+        EditorGUILayout.LabelField("Hold shift to stack stackable objects (eg. floors)");
+        EditorGUILayout.LabelField("Right click to rotate object");
+        EditorGUILayout.EndVertical();
         Handles.EndGUI();
     }
 
@@ -85,6 +91,13 @@ public class BlueprintEditor : Editor
     void OnSceneGUI()
     {       
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+        if (IsShiftClicked(Event.current))
+        {
+            blueprint.stackingActivated = true;
+        } else
+        {
+            blueprint.stackingActivated = false;
+        }
         if (previewController != null && preview != null)
         {
             if (GetRayCast(out RaycastHit hitInfo))
@@ -102,13 +115,6 @@ public class BlueprintEditor : Editor
                 {
                     Event.current.Use();
                     preview.transform.Rotate(0, 90, 0);
-                }
-            }
-            if (Event.current.keyCode == KeyCode.LeftShift)
-            {
-                if (Input.GetAxis("Mouse ScrollWheel") != 0f) // forward
-                {
-                    Debug.Log(Input.GetAxis("Mouse ScrollWheel"));
                 }
                 
             }
@@ -152,6 +158,10 @@ public class BlueprintEditor : Editor
     private bool IsRightMouseButtonClicked(Event current)
     {
         return current.button == 1 && current.type == EventType.MouseDown;
+    }
+    private bool IsShiftClicked(Event current)
+    {
+        return current.shift;
     }
 
     private bool GetRayCast(out RaycastHit hitInfo)

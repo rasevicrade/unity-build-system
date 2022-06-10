@@ -11,6 +11,7 @@ public class PreviewController : MonoBehaviour
 {
     public float baseHeight;
     public bool isSnapped;
+    public bool stack;
 
     private Blueprint blueprint;
     private GameObject currentPrefabPreview;

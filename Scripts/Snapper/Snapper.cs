@@ -18,13 +18,13 @@ public class Snapper : MonoBehaviour
 
     public bool shiftDown;
 
+    private Blueprint blueprint;
     private PreviewController previewController;
     private Transform snappedEdge;    
     private Transform snappedTarget;
     private float currentPreviewHalfSize;
     private float targetHalfSize;
     private Vector3 originalPrefabPosition;
-    private Vector3 snappedPosition;
 
     #region Lifecycle methods
     private void OnEnable()
@@ -32,6 +32,9 @@ public class Snapper : MonoBehaviour
         previewController = FindObjectOfType<PreviewController>();
         if (previewController == null)
             Debug.LogError("No preview controller available in scene");
+        blueprint = FindObjectOfType<Blueprint>();
+        if (blueprint == null)
+            Debug.LogError("No blueprint available in scene");
         if (allowedTargets == null)
             allowedTargets = new List<PrefabType>();
     }
@@ -59,9 +62,8 @@ public class Snapper : MonoBehaviour
 
     private void Snap(Transform edge)
     {
-        snappedPosition = PositionFromEdge(edge);
         previewController.UpdateRotation(GetRotationFromEdge(edge));
-        previewController.UpdatePosition(snappedPosition, snap: true);            
+        previewController.UpdatePosition(PositionFromEdge(edge), snap: true);            
     }
 
     #region Position from edge
@@ -203,7 +205,7 @@ public class Snapper : MonoBehaviour
     /// <returns></returns>
     private bool RequiresVerticalShift()
     {
-        return !IsGroundFloor() && shiftDown;
+        return !blueprint.stackingActivated && !IsGroundFloor() && shiftDown;
     }
     private bool IsGroundFloor() => transform.position.y == 0;
     private Vector3 ShiftDownByHalfHeight() => -Vector3.up * GetTransformBounds(transform).size.y / 2;
