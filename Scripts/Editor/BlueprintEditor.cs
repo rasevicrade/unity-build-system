@@ -87,7 +87,7 @@ public class BlueprintEditor : Editor
             if (GetRayCast(out RaycastHit hitInfo))
             {
                 SetFloor(hitInfo.point);
-                previewController.UpdatePosition(new Vector3(hitInfo.point.x, activeHeight, hitInfo.point.z));
+                previewController.UpdatePosition(new Vector3(hitInfo.point.x, activeHeight + hitInfo.point.y, hitInfo.point.z));
 
 
                 if (IsLeftMouseButtonClicked(Event.current))

@@ -74,9 +74,9 @@ public class PreviewController : MonoBehaviour
         }
     }
 
-    public void UpdateRotation(Quaternion updatedRotation, bool snap = false)
+    public void UpdateRotation(Quaternion updatedRotation)
     {
-        if (currentPrefabPreview == null) // Can't snap again if already snapped
+        if (currentPrefabPreview == null) 
             return;
 
         currentPrefabPreview.transform.rotation = updatedRotation;
