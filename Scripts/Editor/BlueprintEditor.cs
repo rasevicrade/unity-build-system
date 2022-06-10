@@ -103,7 +103,7 @@ public class BlueprintEditor : Editor
             if (GetRayCast(out RaycastHit hitInfo))
             {
                 SetFloor();
-                previewController.UpdatePosition(new Vector3(hitInfo.point.x, hitInfo.point.y, hitInfo.point.z));
+                previewController.UpdatePosition(new Vector3(hitInfo.point.x, blueprint.stackingActivated && previewController.currentPreviewSnapper.canBeStacked ? hitInfo.point.y : blueprint.activeBaseHeight, hitInfo.point.z));
 
 
                 if (IsLeftMouseButtonClicked(Event.current))
@@ -133,19 +133,19 @@ public class BlueprintEditor : Editor
         {
             if (Event.current.keyCode == KeyCode.Alpha0)
             {
-                previewController.baseHeight = 0;
+                blueprint.activeBaseHeight = 0;
             } 
             else if (Event.current.keyCode == KeyCode.Alpha4)
             {
-                previewController.baseHeight = 4 * blueprint.activeScale;
+                blueprint.activeBaseHeight = 4 * blueprint.activeScale;
             }
             else if (Event.current.keyCode == KeyCode.Alpha6)
             {
-                previewController.baseHeight = 6 * blueprint.activeScale;
+                blueprint.activeBaseHeight = 6 * blueprint.activeScale;
             }
             else if (Event.current.keyCode == KeyCode.Alpha8)
             {
-                previewController.baseHeight = 8 * blueprint.activeScale;
+                blueprint.activeBaseHeight = 8 * blueprint.activeScale;
             } 
         }
     }

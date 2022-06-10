@@ -196,7 +196,7 @@ public class Snapper : MonoBehaviour
     #region Vertical shift
     private Vector3 VerticalShift()
     {
-        return RequiresVerticalShift() ? ShiftDownByHalfHeight() + ShiftUpBySmallDelta() : Vector3.zero;
+        return RequiresVerticalShift() ? ShiftDownByHeight() + ShiftUpBySmallDelta() : Vector3.zero;
     }
 
     /// <summary>
@@ -208,7 +208,7 @@ public class Snapper : MonoBehaviour
         return !blueprint.stackingActivated && !IsGroundFloor() && shiftDown;
     }
     private bool IsGroundFloor() => transform.position.y == 0;
-    private Vector3 ShiftDownByHalfHeight() => -Vector3.up * GetTransformBounds(transform).size.y / 2;
+    private Vector3 ShiftDownByHeight() => -Vector3.up * GetTransformBounds(transform).size.y;
     private Vector3 ShiftUpBySmallDelta() => Vector3.up * 0.005f;// In order to keep floor above wall
     #endregion
 

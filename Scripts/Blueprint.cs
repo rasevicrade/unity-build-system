@@ -6,6 +6,7 @@ using UnityEngine;
 public class Blueprint : MonoBehaviour
 {
     public float activeScale = 1;
+    public float activeBaseHeight = 0;
     [Tooltip("Press shift to activate/deactivate")]
     public bool stackingActivated;
     public GameObject PlaceGameObject(GameObject activeObject, Vector3 position, Quaternion? rotation)
