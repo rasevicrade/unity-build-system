@@ -90,7 +90,14 @@ public class Snapper : MonoBehaviour
 
     private bool IsTargetLongerThanCurrent(Transform edge)
     {
-        return GetTransformBounds(edge).LongerSideLength() > GetTransformBounds(transform).ShorterSideLength(); // We use shorterside length for current because we need shorter side of bounrs for sstable support, maybe find a better way to solve this
+        var isTargetLonger =  GetTransformBounds(edge.parent).LongerSideLength() - GetTransformBounds(transform).ShorterSideLength() > 0.5f; // We use shorterside length for current because we need shorter side of bounrs for sstable support, maybe find a better way to solve this
+
+        if (isTargetLonger)
+        {
+            Debug.Log("Current" + GetTransformBounds(transform).ShorterSideLength());
+            Debug.Log("Target" + GetTransformBounds(edge.parent).LongerSideLength());
+        }
+        return isTargetLonger;
     }
 
     /// <summary>
@@ -163,17 +170,18 @@ public class Snapper : MonoBehaviour
     
     private Bounds GetTransformBounds(Transform t)
     {
-        var meshRenderer = t.GetComponent<MeshRenderer>();
-        if (meshRenderer != null)
+        var boxCollider = t.GetComponent<BoxCollider>();
+        if (boxCollider != null)
         {
-            return meshRenderer.bounds;
+            return t.GetComponent<BoxCollider>().bounds;
         }
+        
         else
         {
-            var boxCollider = t.GetComponent<BoxCollider>();
-            if (boxCollider != null)
+            var meshRenderer = t.GetComponent<MeshRenderer>();
+            if (meshRenderer != null)
             {
-                return t.GetComponent<BoxCollider>().bounds;
+                return meshRenderer.bounds;
             }
             else
             {

@@ -112,13 +112,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabType: 0
   allowedTargets: 0100000000000000
-  snapDistance: 2
+  snapDistance: 3
   isPreview: 0
   canBeStacked: 1
   shiftSideways: 1
   sidewayShiftByMyHalfSize: 1
   sidewayShiftByTargetHalSize: 0
-  shiftDown: 0
+  shiftDown: 1
 --- !u!1001 &492826063800424923
 PrefabInstance:
   m_ObjectHideFlags: 0

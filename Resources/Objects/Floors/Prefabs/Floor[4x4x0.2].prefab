@@ -118,7 +118,7 @@ MonoBehaviour:
   shiftSideways: 0
   sidewayShiftByMyHalfSize: 0
   sidewayShiftByTargetHalSize: 0
-  shiftDown: 0
+  shiftDown: 1
 --- !u!1001 &673630140852004180
 PrefabInstance:
   m_ObjectHideFlags: 0

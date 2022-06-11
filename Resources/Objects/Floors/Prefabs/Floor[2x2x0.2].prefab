@@ -105,7 +105,7 @@ MonoBehaviour:
   shiftSideways: 1
   sidewayShiftByMyHalfSize: 1
   sidewayShiftByTargetHalSize: 0
-  shiftDown: 0
+  shiftDown: 1
 --- !u!65 &3790567907421828126
 BoxCollider:
   m_ObjectHideFlags: 0
