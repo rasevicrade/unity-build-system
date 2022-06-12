@@ -208,13 +208,13 @@ public class BlueprintEditor : Editor
             {
                 blueprint.activeBaseHeight = 0;
             }
-            else if (Event.current.keyCode == KeyCode.Alpha4)
-            {
-                blueprint.activeBaseHeight = 4 * blueprint.activeScale;
-            }
-            else if (Event.current.keyCode == KeyCode.Alpha6)
+            else if (Event.current.keyCode == KeyCode.Alpha1)
             {
                 blueprint.activeBaseHeight = 6 * blueprint.activeScale;
+            }
+            else if (Event.current.keyCode == KeyCode.Alpha2)
+            {
+                blueprint.activeBaseHeight = 12 * blueprint.activeScale;
             }
             else if (Event.current.keyCode == KeyCode.Alpha8)
             {
