@@ -85,7 +85,17 @@ public class Snapper : MonoBehaviour
     #region Horizontal shift
     private Vector3 HorizontalShift(Transform edge)
     {
-        return edge.forward * ForwardShiftDistance() + (shiftSideways && IsTargetLongerThanCurrent(edge) ? SideDirection(edge) * SideShitfDistance(edge) : Vector3.zero);
+        return edge.forward * ForwardShiftDistance() + SideWaysShift(edge);
+    }
+
+    private Vector3 SideWaysShift(Transform edge)
+    {
+        if (IsCurrentPrefabOfType(PrefabType.Door))
+        {
+            Debug.Log(GetTransformBounds(transform).LongerSideLength());
+            return -edge.right * GetTransformBounds(transform).LongerSideLength() / 2;
+        }
+        return (shiftSideways && IsTargetLongerThanCurrent(edge)) ? SideDirection(edge) * SideShitfDistance(edge) : Vector3.zero;
     }
 
     private bool IsTargetLongerThanCurrent(Transform edge)
@@ -272,6 +282,7 @@ public class Snapper : MonoBehaviour
         Window,
         Seam,
         Beam,
-        SideRoof
+        SideRoof,
+        Door
     }
 }
