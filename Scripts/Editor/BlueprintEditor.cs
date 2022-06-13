@@ -93,7 +93,7 @@ public class BlueprintEditor : Editor
         EditorGUILayout.LabelField("--------------------------------------------");
         EditorGUILayout.LabelField("Hold shift to stack stackable objects (eg. floors)");
         EditorGUILayout.LabelField("--------------------------------------------");
-        EditorGUILayout.LabelField("Right click to rotate object");
+        EditorGUILayout.LabelField("Shift + Right click to rotate object");
         EditorGUILayout.LabelField("--------------------------------------------");
         EditorGUILayout.LabelField("Ctrl + Scroll to change active object group");
         EditorGUILayout.LabelField("Shift + Scroll to change active prefab within group");
@@ -145,9 +145,8 @@ public class BlueprintEditor : Editor
                     }
                        
                 }
-                if (IsRightMouseButtonClicked(Event.current))
+                if (Event.current.shift && IsRightMouseButtonClicked(Event.current))
                 {
-                    Event.current.Use();
                     preview.transform.Rotate(0, 90, 0);
                 }
 
