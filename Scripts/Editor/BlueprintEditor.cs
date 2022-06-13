@@ -137,7 +137,13 @@ public class BlueprintEditor : Editor
                     Event.current.Use();
                     var activeGroup = prefabGroups[activePrefabGroupIndex];
                     if (activeGroup != null)
-                        blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], previewController.GetPosition(), previewController.GetRotation());
+                    {
+                        Undo.IncrementCurrentGroup();
+                        var placedGO = blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], previewController.GetPosition(), previewController.GetRotation());
+                        Undo.RegisterCreatedObjectUndo(placedGO, placedGO.name);
+                        Undo.SetCurrentGroupName("Place blueprint GO");
+                    }
+                       
                 }
                 if (IsRightMouseButtonClicked(Event.current))
                 {
