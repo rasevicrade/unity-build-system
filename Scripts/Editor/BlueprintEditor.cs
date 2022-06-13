@@ -72,6 +72,20 @@ public class BlueprintEditor : Editor
                 layersSetup.AddNewLayer("Snappable");
         }
 
+        if (GUILayout.Button("Delete snappables")) //TODO Cleanup 
+        {
+            foreach(Transform child in blueprint.transform)
+            {
+                foreach(Transform subCHild in child.transform)
+                {
+                    if (subCHild.gameObject.layer == LayerMask.NameToLayer("Snappable"))
+                    {
+                        DestroyImmediate(subCHild.gameObject);
+                    }
+                }
+            }
+        }
+
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.BeginVertical();
         EditorGUILayout.LabelField("Press TAB to clear current preview");
@@ -219,6 +233,10 @@ public class BlueprintEditor : Editor
             else if (Event.current.keyCode == KeyCode.Alpha3)
             {
                 blueprint.activeBaseHeight = 18 * blueprint.activeScale;
+            }
+            else if (Event.current.keyCode == KeyCode.Alpha4)
+            {
+                blueprint.activeBaseHeight = 24 * blueprint.activeScale;
             }
         }
     }
