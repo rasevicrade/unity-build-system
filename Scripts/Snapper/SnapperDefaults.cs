@@ -34,6 +34,8 @@ public partial class Snapper
             case PrefabType.Wall:
                 targetsWithShift.Add(
                     new TargetPrefabShiftDistancePair(PrefabType.Floor, HorizontalShiftDistance.Half));
+                targetsWithShift.Add(
+                    new TargetPrefabShiftDistancePair(PrefabType.Wall));
                 break;
             case PrefabType.Window:
             case PrefabType.Door:
