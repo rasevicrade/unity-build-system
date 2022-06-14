@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5655019674987485918}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 177.66968, y: 0.00000047683716, z: 76.40443}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -92,11 +92,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f96a3c4e335f204a99f61dc167cb8c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabType: 3
-  allowedTargets: 01000000
+  prefabType: 8
   snapDistance: 1
-  isPreview: 0
+  horizontalFrontShiftDirection: 0
+  myFrontShiftDistance: 0
+  targetsWithShift:
+  - prefabType: 1
+    targetsShiftDistance: 0
+  rotationType: 1
   shiftSideways: 0
-  sidewayShiftByMyHalfSize: 0
-  sidewayShiftByTargetHalSize: 0
+  mySideWaysShiftDistance: 0
+  targetSideWaysShiftDistance: 0
   shiftDown: 0
+  isPreview: 0

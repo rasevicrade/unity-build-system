@@ -156,6 +156,8 @@ public partial class Snapper : MonoBehaviour
             shiftDistance += targetHalfSize;
         else if (targetShiftDistance == HorizontalShiftDistance.Full)
             shiftDistance += targetHalfSize * 2;
+        else if (targetShiftDistance == HorizontalShiftDistance.ShorterHalf)
+            shiftDistance += GetTransformBounds(snappedTarget).ShorterSideLength() / 2;
         else if (targetShiftDistance == HorizontalShiftDistance.NegativeShorterHalf)
             shiftDistance -= GetTransformBounds(snappedTarget).ShorterSideLength() / 2;
 
@@ -300,7 +302,8 @@ public partial class Snapper : MonoBehaviour
         Beam,
         SideRoof,
         Door,
-        Stairs
+        Stairs,
+        WallDecoration
     }
 
     public enum HorizontalFrontShiftDirection

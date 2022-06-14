@@ -49,6 +49,11 @@ public partial class Snapper
             case PrefabType.SideRoof:
                 targetsWithShift.Add(new TargetPrefabShiftDistancePair(PrefabType.Beam, HorizontalShiftDistance.NegativeShorterHalf));
                 break;
+            case PrefabType.WallDecoration:
+                targetsWithShift.Add(
+                    new TargetPrefabShiftDistancePair(PrefabType.Wall, HorizontalShiftDistance.ShorterHalf));
+                break;
+
         }
     }
 
