@@ -1,32 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &7532974656553348384
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3991134854416533958}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f96a3c4e335f204a99f61dc167cb8c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefabType: 0
-  allowedTargets: 00000000
-  snapDistance: 2
-  isPreview: 0
-  canBeStacked: 0
-  useCustomShift: 0
-  horizontalShiftDirection: 0
-  myShiftDistance: 0
-  targetShiftDistance: 0
-  useCustomRotation: 0
-  rotationType: 0
-  shiftSideways: 0
-  sidewayShiftByMyHalfSize: 0
-  sidewayShiftByTargetHalSize: 0
-  shiftDown: 0
 --- !u!1 &6680131025764952802
 GameObject:
   m_ObjectHideFlags: 0
@@ -40,6 +13,7 @@ GameObject:
   - component: {fileID: 5166873103496022839}
   - component: {fileID: 5552861765792273167}
   - component: {fileID: -307610994977052414}
+  - component: {fileID: 8003766643086020714}
   m_Layer: 0
   m_Name: Stairs
   m_TagString: Untagged
@@ -122,21 +96,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f96a3c4e335f204a99f61dc167cb8c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabType: 0
-  allowedTargets: 00000000
+  prefabType: 7
   snapDistance: 5
-  isPreview: 0
-  canBeStacked: 0
-  useCustomShift: 1
-  horizontalShiftDirection: 0
-  myShiftDistance: 0
-  targetShiftDistance: 0
-  useCustomRotation: 1
+  horizontalFrontShiftDirection: 0
+  myFrontShiftDistance: 1
+  targetsWithShift:
+  - prefabType: 0
+    targetsShiftDistance: 1
+  - prefabType: 1
+    targetsShiftDistance: 0
+  - prefabType: 7
+    targetsShiftDistance: 1
   rotationType: 2
   shiftSideways: 0
-  sidewayShiftByMyHalfSize: 0
-  sidewayShiftByTargetHalSize: 0
+  mySideWaysShiftDistance: 0
+  targetSideWaysShiftDistance: 0
   shiftDown: 0
+  isPreview: 0
 --- !u!64 &-307610994977052414
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -151,6 +127,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4104380202958562290, guid: 1cbdec2c437ba5b4d8a6734cd8857f30, type: 3}
+--- !u!65 &8003766643086020714
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6680131025764952802}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 3.9999998, y: 3.4550495, z: 4.0226316}
+  m_Center: {x: 0.00000059604645, y: 1.7276382, z: 0.011883378}
 --- !u!1001 &335408063648542426
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -255,12 +244,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 93a0576eb1bbf004bab2a1fe54ef0d3f, type: 3}
---- !u!1 &3991134854416533958 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3730326131706898204, guid: 93a0576eb1bbf004bab2a1fe54ef0d3f,
-    type: 3}
-  m_PrefabInstance: {fileID: 335408063648542426}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6010086036963763434 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6327424105881537072, guid: 93a0576eb1bbf004bab2a1fe54ef0d3f,

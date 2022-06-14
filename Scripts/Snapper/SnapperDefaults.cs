@@ -23,17 +23,20 @@ public partial class Snapper
         switch (prefabType)
         {
             case PrefabType.Floor:
+            case PrefabType.Stairs:
                 targetsWithShift.Add(
                     new TargetPrefabShiftDistancePair(PrefabType.Floor, HorizontalShiftDistance.Half));
                 targetsWithShift.Add(
                     new TargetPrefabShiftDistancePair(PrefabType.Wall));
+                targetsWithShift.Add(
+                    new TargetPrefabShiftDistancePair(PrefabType.Stairs, HorizontalShiftDistance.Half));
                 break;
             case PrefabType.Wall:
                 targetsWithShift.Add(
                     new TargetPrefabShiftDistancePair(PrefabType.Floor, HorizontalShiftDistance.Half));
                 break;
             case PrefabType.Window:
-                case PrefabType.Door:
+            case PrefabType.Door:
                 targetsWithShift.Add(
                     new TargetPrefabShiftDistancePair(PrefabType.Wall));
                 break;
@@ -51,7 +54,6 @@ public partial class Snapper
     {
         switch (prefabType)
         {
-            case PrefabType.Stairs: horizontalFrontShiftDirection = HorizontalFrontShiftDirection.Backward; break;
             default:
                 horizontalFrontShiftDirection = HorizontalFrontShiftDirection.Forward; break;
         }
@@ -62,6 +64,7 @@ public partial class Snapper
         switch (prefabType)
         {
             case PrefabType.Floor:
+            case PrefabType.Stairs:
                 myFrontShiftDistance = HorizontalShiftDistance.Half;
                 break;
             case PrefabType.SideRoof:
@@ -77,6 +80,7 @@ public partial class Snapper
     {
         switch (prefabType)
         {
+
             case PrefabType.Floor: rotationType = RotationType.None; break;
             case PrefabType.Window: rotationType = RotationType.TargetRoot; break;
             default: rotationType = RotationType.TargetEdge; break;

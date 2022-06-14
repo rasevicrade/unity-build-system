@@ -231,7 +231,6 @@ public partial class Snapper : MonoBehaviour
     }
 
     private bool IsCurrentPrefabOfType(PrefabType type) => prefabType == type;
-    private Snapper GetTargetSnapper() => snappedTarget.GetComponent<Snapper>();
     #endregion
 
     #region Vertical shift
@@ -246,9 +245,9 @@ public partial class Snapper : MonoBehaviour
     /// <returns></returns>
     private bool RequiresVerticalShift()
     {
-        return !blueprint.stackingActivated && !IsGroundFloor() && shiftDown;
+        return !IsGroundFloor() && shiftDown;
     }
-    private bool IsGroundFloor() => transform.position.y == 0;
+    private bool IsGroundFloor() => transform.position.y < 6 * blueprint.activeScale;
     private Vector3 ShiftDownByHeight() => -Vector3.up * GetTransformBounds(transform).size.y;
     private Vector3 ShiftUpBySmallDelta() => Vector3.up * 0.005f;// In order to keep floor above wall
     #endregion
