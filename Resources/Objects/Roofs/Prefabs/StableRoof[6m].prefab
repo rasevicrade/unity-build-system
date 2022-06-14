@@ -548,11 +548,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabType: 5
-  allowedTargets: 04000000
   snapDistance: 5
+  horizontalFrontShiftDirection: 0
+  myFrontShiftDistance: 3
+  targetsWithShift:
+  - prefabType: 4
+    targetsShiftDistance: 4
+  rotationType: 2
+  shiftSideways: 0
+  mySideWaysShiftDistance: 0
+  targetSideWaysShiftDistance: 0
+  shiftDown: 0
   isPreview: 0
-  canShiftWhenSnapped: 0
-  snapRail:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
-  snappedEdge: {fileID: 0}

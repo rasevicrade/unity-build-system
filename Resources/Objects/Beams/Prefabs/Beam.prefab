@@ -94,13 +94,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabType: 4
-  allowedTargets: 01000000
-  snapDistance: 1
-  isPreview: 0
+  snapDistance: 3
+  horizontalFrontShiftDirection: 0
+  myFrontShiftDistance: 0
+  targetsWithShift:
+  - prefabType: 1
+    targetsShiftDistance: 1
+  - prefabType: 0
+    targetsShiftDistance: 1
+  rotationType: 2
   shiftSideways: 1
-  sidewayShiftByMyHalfSize: 1
-  sidewayShiftByTargetHalSize: 1
+  mySideWaysShiftDistance: 0
+  targetSideWaysShiftDistance: 1
   shiftDown: 0
+  isPreview: 0
 --- !u!65 &7255611545137311422
 BoxCollider:
   m_ObjectHideFlags: 0

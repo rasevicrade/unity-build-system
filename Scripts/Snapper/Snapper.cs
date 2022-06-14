@@ -5,37 +5,42 @@ using UnityEditor;
 using System;
 
 [ExecuteInEditMode]
-public class Snapper : MonoBehaviour
+public partial class Snapper : MonoBehaviour
 {
     public PrefabType prefabType;
-    public List<PrefabType> allowedTargets;
-    public float snapDistance = 2f; 
-    public bool isPreview;
-    public bool canBeStacked;
+    public float snapDistance = 2f;
 
-    public bool useCustomShift;
-    public HorizontalFrontShiftDirection horizontalShiftDirection;
-    public HorizontalShiftDistance myShiftDistance;
-    public HorizontalShiftDistance targetShiftDistance;
+    public HorizontalFrontShiftDirection horizontalFrontShiftDirection;
+    public HorizontalShiftDistance myFrontShiftDistance;
+    public List<TargetPrefabShiftDistancePair> targetsWithShift;
 
-    public bool useCustomRotation;
     public RotationType rotationType;
 
     public bool shiftSideways;
-    public bool sidewayShiftByMyHalfSize;
-    public bool sidewayShiftByTargetHalSize;
-
-   
+    public HorizontalShiftDistance mySideWaysShiftDistance;
+    public HorizontalShiftDistance targetSideWaysShiftDistance;
 
     public bool shiftDown;
+    public bool isPreview;
 
     private Blueprint blueprint;
     private PreviewController previewController;
-    private Transform snappedEdge;    
+    private Transform snappedEdge;
     private Transform snappedTarget;
+    private Snapper snappedTargetSnapper;
     private float currentPreviewHalfSize;
     private float targetHalfSize;
     private Vector3 originalPrefabPosition;
+
+    #region Debug
+    private Vector3 textLocation;
+    private string text;
+    private void OnDrawGizmos()
+    {
+        textLocation = transform.position;
+        Handles.Label(textLocation, text);
+    }
+    #endregion
 
     #region Lifecycle methods
     private void OnEnable()
@@ -46,12 +51,13 @@ public class Snapper : MonoBehaviour
         blueprint = FindObjectOfType<Blueprint>();
         if (blueprint == null)
             Debug.LogError("No blueprint available in scene");
-        if (allowedTargets == null)
-            allowedTargets = new List<PrefabType>();
+        if (targetsWithShift == null)
+            targetsWithShift = new List<TargetPrefabShiftDistancePair>();
     }
 
     void Update()
     {
+        text = "";
         originalPrefabPosition = transform.position;
         // If I am a preview, find edges to snap to
         if (isPreview)
@@ -61,12 +67,14 @@ public class Snapper : MonoBehaviour
                 snappedEdge = FindClosestOverlappingEdge();
                 if (snappedEdge != null)
                 {
+                    text = snappedEdge.name + " - " + snappedEdge.parent.name;
                     snappedTarget = SnapTarget();
+                    snappedTargetSnapper = snappedTarget.GetComponent<Snapper>();
                     Snap(snappedEdge);
                     snappedTarget = null;
                     snappedEdge = null;
                 }
-            }        
+            }
         }
     }
     #endregion
@@ -74,7 +82,7 @@ public class Snapper : MonoBehaviour
     private void Snap(Transform edge)
     {
         previewController.UpdateRotation(GetRotationFromEdge(edge));
-        previewController.UpdatePosition(PositionFromEdge(edge), snap: true);            
+        previewController.UpdatePosition(PositionFromEdge(edge), snap: true);
     }
 
     #region Position from edge
@@ -89,29 +97,19 @@ public class Snapper : MonoBehaviour
     /// <returns></returns>
     private Vector3 PositionFromEdge(Transform edge)
     {
-        return SnapTargetPosition() + HorizontalShift(edge) + VerticalShift();  
+        return SnapTargetPosition() + HorizontalShift(edge) + VerticalShift();
     }
 
     #region Horizontal shift
     private Vector3 HorizontalShift(Transform edge)
     {
-        Vector3 direction = Vector3.zero;
-        if (horizontalShiftDirection == HorizontalFrontShiftDirection.Forward)
-        {
-            direction = edge.forward;
-        } else if (horizontalShiftDirection == HorizontalFrontShiftDirection.Backward)
-        {
-            direction = -edge.forward;
-        }
-        Debug.Log(edge.name);
-        return direction * ForwardShiftDistance() + SideWaysShift(edge);
+        return FrontShift(edge) + SideWaysShift(edge);
     }
 
     private Vector3 SideWaysShift(Transform edge)
     {
         if (IsCurrentPrefabOfType(PrefabType.Door))
         {
-            Debug.Log(GetTransformBounds(transform).LongerSideLength());
             return -edge.right * GetTransformBounds(transform).LongerSideLength() / 2;
         }
         return (shiftSideways && IsTargetLongerThanCurrent(edge)) ? SideDirection(edge) * SideShitfDistance(edge) : Vector3.zero;
@@ -119,7 +117,7 @@ public class Snapper : MonoBehaviour
 
     private bool IsTargetLongerThanCurrent(Transform edge)
     {
-        var isTargetLonger =  GetTransformBounds(edge.parent).LongerSideLength() - GetTransformBounds(transform).ShorterSideLength() > 0.5f; // We use shorterside length for current because we need shorter side of bounrs for sstable support, maybe find a better way to solve this
+        var isTargetLonger = GetTransformBounds(edge.parent).LongerSideLength() - GetTransformBounds(transform).ShorterSideLength() > 0.5f; // We use shorterside length for current because we need shorter side of bounrs for sstable support, maybe find a better way to solve this
 
         if (isTargetLonger)
         {
@@ -134,70 +132,50 @@ public class Snapper : MonoBehaviour
     /// to fit the target object
     /// </summary>
     /// <returns></returns>
-    private float ForwardShiftDistance()
+    private Vector3 FrontShift(Transform edge)
     {
+        Vector3 direction = Vector3.zero;
+        if (horizontalFrontShiftDirection == HorizontalFrontShiftDirection.Forward)
+            direction = edge.forward;
+        else if (horizontalFrontShiftDirection == HorizontalFrontShiftDirection.Backward)
+            direction = -edge.forward;
+
         targetHalfSize = GetTransformBounds(snappedTarget).ShorterSideLength() / 2; //TODO Temporary solution for walls, to get front facing size
         currentPreviewHalfSize = GetTransformBounds(transform).size.x / 2;
 
+        var shiftDistance = 0f;
+        if (myFrontShiftDistance == HorizontalShiftDistance.Half)
+            shiftDistance += currentPreviewHalfSize;
+        else if (myFrontShiftDistance == HorizontalShiftDistance.Full)
+            shiftDistance += currentPreviewHalfSize * 2;
+        else if (myFrontShiftDistance == HorizontalShiftDistance.ShorterHalf)
+            shiftDistance += GetTransformBounds(transform).ShorterSideLength() / 2;
 
-        if (useCustomShift)
-        {
-            var shiftDistance = 0f;
-            if (myShiftDistance == HorizontalShiftDistance.Half)
-            {
-                shiftDistance += currentPreviewHalfSize;
-            } else if(myShiftDistance == HorizontalShiftDistance.Full)
-            {
-                shiftDistance += currentPreviewHalfSize * 2;
-            }
-            if (targetShiftDistance == HorizontalShiftDistance.Half)
-            {
-                shiftDistance += targetHalfSize;
-            } else if (targetShiftDistance == HorizontalShiftDistance.Full)
-            {
-                shiftDistance += targetHalfSize * 2;
-            }
-            return shiftDistance;
-        }
+        var targetShiftDistance = targetsWithShift.First(x => x.prefabType == snappedTargetSnapper.prefabType).targetsShiftDistance;
+        if (targetShiftDistance == HorizontalShiftDistance.Half)
+            shiftDistance += targetHalfSize;
+        else if (targetShiftDistance == HorizontalShiftDistance.Full)
+            shiftDistance += targetHalfSize * 2;
+        else if (targetShiftDistance == HorizontalShiftDistance.NegativeShorterHalf)
+            shiftDistance -= GetTransformBounds(snappedTarget).ShorterSideLength() / 2;
 
-        // TODO Move each prefab type to their specific partial class, to clean up this method
-
-        if (IsCurrentPrefabOfType(PrefabType.Wall) && IsTargetPrefabOfType(PrefabType.Floor) || (IsCurrentPrefabOfType(PrefabType.Seam) && IsTargetPrefabOfType(PrefabType.Wall)))
-        {
-            return targetHalfSize;
-        }
-        else if (IsCurrentPrefabOfType(PrefabType.Floor))
-        {
-            if (IsTargetPrefabOfType(PrefabType.Wall))
-            {
-                return currentPreviewHalfSize;
-            }
-            else if (IsTargetPrefabOfType(PrefabType.Floor))
-            {
-                return currentPreviewHalfSize + targetHalfSize;
-            }
-        }
-        else if (IsCurrentPrefabOfType(PrefabType.SideRoof))
-        {
-            if (IsTargetPrefabOfType(PrefabType.Beam))
-            {
-                return GetTransformBounds(transform).ShorterSideLength() / 2 - GetTransformBounds(snappedTarget).ShorterSideLength() / 2;
-            }
-        }
-        return 0f;
+        return direction * shiftDistance;
     }
-    
+
     private float SideShitfDistance(Transform edge)
     {
         float sidewayShift = 0f;
-        if (sidewayShiftByMyHalfSize)
-        {
+        if (mySideWaysShiftDistance == HorizontalShiftDistance.Half)
             sidewayShift += GetTransformBounds(transform).ShorterSideLength() / 2;
-        }
-        if (sidewayShiftByTargetHalSize)
-        {
+        else if (mySideWaysShiftDistance == HorizontalShiftDistance.Full)
+            sidewayShift += GetTransformBounds(transform).ShorterSideLength();
+
+
+        if (targetSideWaysShiftDistance == HorizontalShiftDistance.Half)
             sidewayShift += GetTransformBounds(edge).LongerSideLength() / 2;
-        }
+        else if (targetSideWaysShiftDistance == HorizontalShiftDistance.Full)
+            sidewayShift += GetTransformBounds(edge).LongerSideLength();
+
         return sidewayShift;
     }
     private Vector3 SideDirection(Transform edge)
@@ -208,7 +186,7 @@ public class Snapper : MonoBehaviour
         if (Mathf.Abs(min.x - max.x) > Mathf.Abs(max.z - min.z))
         {
             return Vector3.Distance(new Vector3(min.x, 0, 0), originalPrefabPosition) < Vector3.Distance(new Vector3(max.x, 0, 0), originalPrefabPosition) ? edge.right : -edge.right;
-        } 
+        }
         else
         {
             return Vector3.Distance(new Vector3(0, 0, min.z), originalPrefabPosition) < Vector3.Distance(new Vector3(0, 0, max.z), originalPrefabPosition) ? -edge.right : edge.right;
@@ -216,7 +194,7 @@ public class Snapper : MonoBehaviour
     }
     private Vector3 SnapTargetPosition() => new Vector3(snappedTarget.position.x, transform.position.y, snappedTarget.position.z);
     private Transform SnapTarget() => snappedEdge.GetComponent<Snapper>() != null ? snappedEdge : snappedEdge.parent;
-    
+
     private Bounds GetTransformBounds(Transform t)
     {
         var boxCollider = t.GetComponent<BoxCollider>();
@@ -224,7 +202,7 @@ public class Snapper : MonoBehaviour
         {
             return t.GetComponent<BoxCollider>().bounds;
         }
-        
+
         else
         {
             var meshRenderer = t.GetComponent<MeshRenderer>();
@@ -238,7 +216,7 @@ public class Snapper : MonoBehaviour
                 if (renderers != null && renderers.Length > 0)
                 {
                     var childBounds = renderers[0].bounds;
-                    foreach(Renderer r in renderers)
+                    foreach (Renderer r in renderers)
                     {
                         childBounds.Encapsulate(r.bounds);
                     }
@@ -246,14 +224,13 @@ public class Snapper : MonoBehaviour
                 }
                 Debug.LogError("Couldn't find bounds for " + t.name);
                 return new Bounds(transform.position, Vector3.zero);
-               
+
             }
 
         }
     }
 
     private bool IsCurrentPrefabOfType(PrefabType type) => prefabType == type;
-    private bool IsTargetPrefabOfType(PrefabType type) => GetTargetSnapper().prefabType == type;
     private Snapper GetTargetSnapper() => snappedTarget.GetComponent<Snapper>();
     #endregion
 
@@ -279,24 +256,12 @@ public class Snapper : MonoBehaviour
     #region Rotation from edge
     private Quaternion GetRotationFromEdge(Transform edge)
     {
-        if (useCustomRotation)
-        {
-            if (rotationType == RotationType.TargetEdge)
-                return edge.rotation;
-            else if (rotationType == RotationType.TargetRoot)
-                return edge.parent.rotation;
-        }
-        switch (prefabType)
-        {
-            case PrefabType.Floor: return transform.rotation;
-            
-            case PrefabType.SideRoof: return edge.parent.rotation * Quaternion.Euler(0, 90, 0);
-            case PrefabType.Window: return edge.parent.rotation;
-            case PrefabType.Seam:
-            case PrefabType.Beam:
-            case PrefabType.Wall:
-            default: return edge.rotation; 
-        }
+        if (rotationType == RotationType.TargetEdge)
+            return edge.rotation;
+        else if (rotationType == RotationType.TargetRoot)
+            return edge.parent.rotation;
+        else
+            return transform.rotation;
     }
     public enum RotationType
     {
@@ -320,10 +285,10 @@ public class Snapper : MonoBehaviour
 
     private bool CanSnap(Transform targetTransform)
     {
-        if (targetTransform.parent == null) 
+        if (targetTransform.parent == null)
             return false;
         var parentSnapper = targetTransform.parent.GetComponent<Snapper>();
-        return parentSnapper != null && allowedTargets.Contains(parentSnapper.prefabType);
+        return parentSnapper != null && targetsWithShift.Any(x => x.prefabType == parentSnapper.prefabType);
     }
     #endregion
 
@@ -350,6 +315,22 @@ public class Snapper : MonoBehaviour
     {
         None,
         Half,
-        Full
+        Full,
+        ShorterHalf,
+        NegativeShorterHalf
+    }
+
+    [System.Serializable]
+    public class TargetPrefabShiftDistancePair
+    {
+        public PrefabType prefabType;
+        public HorizontalShiftDistance targetsShiftDistance;
+
+        public TargetPrefabShiftDistancePair(PrefabType prefabType, HorizontalShiftDistance targetsShiftDistance = HorizontalShiftDistance.None)
+        {
+            this.prefabType = prefabType;
+            this.targetsShiftDistance = targetsShiftDistance;
+        }
+
     }
 }

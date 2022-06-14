@@ -27,7 +27,6 @@ public class PreviewController : MonoBehaviour
         if (currentPrefab != null && currentPrefabPreview == null)
         {
             currentPrefabPreview = Instantiate(currentPrefab, position, Quaternion.identity);
-            CheckAllowedPrefabsAreSet(currentPrefabPreview);
             currentPrefabPreview.name = currentPrefabPreview.name + "-Preview";
             currentPrefabPreview.transform.parent = blueprint.transform;
             currentPrefabPreview.transform.localScale = new Vector3(scale, scale, scale);
@@ -44,14 +43,6 @@ public class PreviewController : MonoBehaviour
             return currentPrefabPreview;
         }
         return null;
-    }
-
-    private void CheckAllowedPrefabsAreSet(GameObject currentPrefabPreview)
-    {
-        if (currentPrefabPreview.transform.GetComponent<Snapper>().allowedTargets == null || currentPrefabPreview.transform.GetComponent<Snapper>().allowedTargets.Count == 0)
-        {
-            Debug.LogError("Allowed target not set for current prefab: " + currentPrefabPreview.name);
-        }
     }
 
     public void UpdatePosition(Vector3 position, bool snap = false)

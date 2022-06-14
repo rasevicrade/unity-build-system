@@ -61,6 +61,34 @@ public class BlueprintEditor : Editor
         {
             RefreshPrefabs();
         }
+        if (GUILayout.Button("Delete snappables")) //TODO Cleanup 
+        {
+            foreach (Transform child in blueprint.transform)
+            {
+                foreach (Transform subCHild in child.transform)
+                {
+                    if (subCHild.gameObject.layer == LayerMask.NameToLayer("Snappable"))
+                    {
+                        DestroyImmediate(subCHild.gameObject);
+                    }
+                }
+            }
+        }
+        if (GUILayout.Button("Set all prefab defaults")) //TODO Cleanup 
+        {
+            foreach(var group in prefabGroups)
+            {
+                foreach(var prefab in group.Prefabs)
+                {
+                    var snapper = prefab.transform.GetComponent<Snapper>();
+                    if (snapper != null)
+                    {
+                        snapper.SetDefaults();
+                    }
+                }
+            }
+            
+        }
         EditorGUILayout.EndVertical();
 
 
@@ -71,22 +99,8 @@ public class BlueprintEditor : Editor
             if (!LayerSetup.LayerExists("Snappable"))
                 layersSetup.AddNewLayer("Snappable");
         }
-
-        if (GUILayout.Button("Delete snappables")) //TODO Cleanup 
-        {
-            foreach(Transform child in blueprint.transform)
-            {
-                foreach(Transform subCHild in child.transform)
-                {
-                    if (subCHild.gameObject.layer == LayerMask.NameToLayer("Snappable"))
-                    {
-                        DestroyImmediate(subCHild.gameObject);
-                    }
-                }
-            }
-        }
-
         EditorGUILayout.EndHorizontal();
+
         EditorGUILayout.BeginVertical();
         EditorGUILayout.LabelField("Press TAB to clear current preview");
         EditorGUILayout.LabelField("Press Shift + TAB to reactivate last preview");
@@ -129,7 +143,7 @@ public class BlueprintEditor : Editor
             if (previewController != null && preview != null)
             {
                 SetFloor();
-                previewController.UpdatePosition(new Vector3(hitInfo.point.x, blueprint.stackingActivated && previewController.currentPreviewSnapper.canBeStacked ? hitInfo.point.y : blueprint.activeBaseHeight, hitInfo.point.z));
+                previewController.UpdatePosition(new Vector3(hitInfo.point.x, blueprint.activeBaseHeight, hitInfo.point.z));
 
 
                 if (IsLeftMouseButtonClicked(Event.current))
