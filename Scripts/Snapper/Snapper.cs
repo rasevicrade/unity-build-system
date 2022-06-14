@@ -13,9 +13,19 @@ public class Snapper : MonoBehaviour
     public bool isPreview;
     public bool canBeStacked;
 
+    public bool useCustomShift;
+    public HorizontalFrontShiftDirection horizontalShiftDirection;
+    public HorizontalShiftDistance myShiftDistance;
+    public HorizontalShiftDistance targetShiftDistance;
+
+    public bool useCustomRotation;
+    public RotationType rotationType;
+
     public bool shiftSideways;
     public bool sidewayShiftByMyHalfSize;
     public bool sidewayShiftByTargetHalSize;
+
+   
 
     public bool shiftDown;
 
@@ -85,7 +95,16 @@ public class Snapper : MonoBehaviour
     #region Horizontal shift
     private Vector3 HorizontalShift(Transform edge)
     {
-        return edge.forward * ForwardShiftDistance() + SideWaysShift(edge);
+        Vector3 direction = Vector3.zero;
+        if (horizontalShiftDirection == HorizontalFrontShiftDirection.Forward)
+        {
+            direction = edge.forward;
+        } else if (horizontalShiftDirection == HorizontalFrontShiftDirection.Backward)
+        {
+            direction = -edge.forward;
+        }
+        Debug.Log(edge.name);
+        return direction * ForwardShiftDistance() + SideWaysShift(edge);
     }
 
     private Vector3 SideWaysShift(Transform edge)
@@ -117,9 +136,29 @@ public class Snapper : MonoBehaviour
     /// <returns></returns>
     private float ForwardShiftDistance()
     {
-        var targetBounds = GetTransformBounds(snappedTarget);
-        targetHalfSize = targetBounds.ShorterSideLength() / 2; //TODO Temporary solution for walls, to get front facing size
+        targetHalfSize = GetTransformBounds(snappedTarget).ShorterSideLength() / 2; //TODO Temporary solution for walls, to get front facing size
         currentPreviewHalfSize = GetTransformBounds(transform).size.x / 2;
+
+
+        if (useCustomShift)
+        {
+            var shiftDistance = 0f;
+            if (myShiftDistance == HorizontalShiftDistance.Half)
+            {
+                shiftDistance += currentPreviewHalfSize;
+            } else if(myShiftDistance == HorizontalShiftDistance.Full)
+            {
+                shiftDistance += currentPreviewHalfSize * 2;
+            }
+            if (targetShiftDistance == HorizontalShiftDistance.Half)
+            {
+                shiftDistance += targetHalfSize;
+            } else if (targetShiftDistance == HorizontalShiftDistance.Full)
+            {
+                shiftDistance += targetHalfSize * 2;
+            }
+            return shiftDistance;
+        }
 
         // TODO Move each prefab type to their specific partial class, to clean up this method
 
@@ -240,6 +279,13 @@ public class Snapper : MonoBehaviour
     #region Rotation from edge
     private Quaternion GetRotationFromEdge(Transform edge)
     {
+        if (useCustomRotation)
+        {
+            if (rotationType == RotationType.TargetEdge)
+                return edge.rotation;
+            else if (rotationType == RotationType.TargetRoot)
+                return edge.parent.rotation;
+        }
         switch (prefabType)
         {
             case PrefabType.Floor: return transform.rotation;
@@ -251,6 +297,12 @@ public class Snapper : MonoBehaviour
             case PrefabType.Wall:
             default: return edge.rotation; 
         }
+    }
+    public enum RotationType
+    {
+        None,
+        TargetRoot,
+        TargetEdge
     }
     #endregion
 
@@ -283,6 +335,21 @@ public class Snapper : MonoBehaviour
         Seam,
         Beam,
         SideRoof,
-        Door
+        Door,
+        Stairs
+    }
+
+    public enum HorizontalFrontShiftDirection
+    {
+        Forward,
+        Backward,
+        None
+    }
+
+    public enum HorizontalShiftDistance
+    {
+        None,
+        Half,
+        Full
     }
 }
