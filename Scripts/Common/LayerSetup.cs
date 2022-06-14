@@ -37,7 +37,7 @@ public class LayerSetup
         {
             SerializedProperty sp;
             // Start at layer 9th index -> 8 (zero based) => first 8 reserved for unity / greyed out
-            for (int i = 8, j = maxLayers; i < j; i++)
+            for (int i = 11, j = maxLayers; i < j; i++)
             {
                 sp = layersProp.GetArrayElementAtIndex(i);
                 if (sp.stringValue == "")
