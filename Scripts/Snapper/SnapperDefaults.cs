@@ -7,12 +7,10 @@ public partial class Snapper
     public void SetDefaults()
     {
         SetAllowedTargets();
-        SetSnapDistance();
         SetHorizontalFrontShiftDirection();
         SetMyFrontShiftDistance();
         SetRotationType();
         SetShiftSideways();
-        SetMySideWaysShiftDistance();
         SetTargetSideWaysShiftDistance();
         SetShiftDown();
     }
@@ -103,11 +101,6 @@ public partial class Snapper
         }
     }
 
-    private void SetMySideWaysShiftDistance()
-    {
-
-    }
-
     private void SetTargetSideWaysShiftDistance()
     {
         switch (prefabType)
@@ -131,9 +124,5 @@ public partial class Snapper
         }
     }
 
-    private void SetSnapDistance()
-    {
-
-    }
 
 }
