@@ -105,8 +105,6 @@ public class BlueprintEditor : Editor
         EditorGUILayout.LabelField("Press TAB to clear current preview");
         EditorGUILayout.LabelField("Press Shift + TAB to reactivate last preview");
         EditorGUILayout.LabelField("--------------------------------------------");
-        EditorGUILayout.LabelField("Hold shift to stack stackable objects (eg. floors)");
-        EditorGUILayout.LabelField("--------------------------------------------");
         EditorGUILayout.LabelField("Shift + Right click to rotate object");
         EditorGUILayout.LabelField("--------------------------------------------");
         EditorGUILayout.LabelField("Ctrl + Scroll to change active object group");
@@ -119,7 +117,6 @@ public class BlueprintEditor : Editor
     void OnSceneGUI()
     {
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
-        blueprint.stackingActivated = Event.current.shift;
         if (GetRayCast(out RaycastHit hitInfo))
         {
             if (Event.current.control)
