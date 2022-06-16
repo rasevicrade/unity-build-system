@@ -117,14 +117,7 @@ public partial class Snapper : MonoBehaviour
 
     private bool IsTargetLongerThanCurrent(Transform edge)
     {
-        var isTargetLonger = GetTransformBounds(edge.parent).LongerSideLength() - GetTransformBounds(transform).ShorterSideLength() > 0.5f; // We use shorterside length for current because we need shorter side of bounrs for sstable support, maybe find a better way to solve this
-
-        if (isTargetLonger)
-        {
-            Debug.Log("Current" + GetTransformBounds(transform).ShorterSideLength());
-            Debug.Log("Target" + GetTransformBounds(edge.parent).LongerSideLength());
-        }
-        return isTargetLonger;
+        return GetTransformBounds(edge.parent).LongerSideLength() - GetTransformBounds(transform).ShorterSideLength() > 0.5f; // We use shorterside length for current because we need shorter side of bounrs for sstable support, maybe find a better way to solve this
     }
 
     /// <summary>
