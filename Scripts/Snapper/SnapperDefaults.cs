@@ -17,38 +17,38 @@ public partial class Snapper
 
     private void SetAllowedTargets()
     {
-        targetsWithShift = new List<TargetPrefabShiftDistancePair>();
-        switch (prefabType)
+        defaults.targetsWithShift = new List<TargetPrefabShiftDistancePair>();
+        switch (defaults.prefabType)
         {
             case PrefabType.Floor:
             case PrefabType.Stairs:
-                targetsWithShift.Add(
+                defaults.targetsWithShift.Add(
                     new TargetPrefabShiftDistancePair(PrefabType.Floor, HorizontalShiftDistance.Half));
-                targetsWithShift.Add(
+                defaults.targetsWithShift.Add(
                     new TargetPrefabShiftDistancePair(PrefabType.Wall));
-                targetsWithShift.Add(
+                defaults.targetsWithShift.Add(
                     new TargetPrefabShiftDistancePair(PrefabType.Stairs, HorizontalShiftDistance.Half));
                 break;
             case PrefabType.Wall:
-                targetsWithShift.Add(
+                defaults.targetsWithShift.Add(
                     new TargetPrefabShiftDistancePair(PrefabType.Floor, HorizontalShiftDistance.Half));
-                targetsWithShift.Add(
+                defaults.targetsWithShift.Add(
                     new TargetPrefabShiftDistancePair(PrefabType.Wall));
                 break;
             case PrefabType.Window:
             case PrefabType.Door:
-                targetsWithShift.Add(
+                defaults.targetsWithShift.Add(
                     new TargetPrefabShiftDistancePair(PrefabType.Wall));
                 break;
             case PrefabType.Beam:
-                targetsWithShift.Add(new TargetPrefabShiftDistancePair(PrefabType.Wall, HorizontalShiftDistance.Half));
-                targetsWithShift.Add(new TargetPrefabShiftDistancePair(PrefabType.Floor, HorizontalShiftDistance.Half));
+                defaults.targetsWithShift.Add(new TargetPrefabShiftDistancePair(PrefabType.Wall, HorizontalShiftDistance.Half));
+                defaults.targetsWithShift.Add(new TargetPrefabShiftDistancePair(PrefabType.Floor, HorizontalShiftDistance.Half));
                 break;
             case PrefabType.SideRoof:
-                targetsWithShift.Add(new TargetPrefabShiftDistancePair(PrefabType.Beam, HorizontalShiftDistance.NegativeShorterHalf));
+                defaults.targetsWithShift.Add(new TargetPrefabShiftDistancePair(PrefabType.Beam, HorizontalShiftDistance.NegativeShorterHalf));
                 break;
             case PrefabType.WallDecoration:
-                targetsWithShift.Add(
+                defaults.targetsWithShift.Add(
                     new TargetPrefabShiftDistancePair(PrefabType.Wall, HorizontalShiftDistance.ShorterHalf));
                 break;
 
@@ -57,25 +57,25 @@ public partial class Snapper
 
     private void SetHorizontalFrontShiftDirection()
     {
-        switch (prefabType)
+        switch (defaults.prefabType)
         {
             default:
-                horizontalFrontShiftDirection = HorizontalFrontShiftDirection.Forward; break;
+                defaults.horizontalFrontShiftDirection = HorizontalFrontShiftDirection.Forward; break;
         }
     }
 
     private void SetMyFrontShiftDistance()
     {
-        switch (prefabType)
+        switch (defaults.prefabType)
         {
             case PrefabType.Floor:
             case PrefabType.Stairs:
-                myFrontShiftDistance = HorizontalShiftDistance.Half;
+                defaults.myFrontShiftDistance = HorizontalShiftDistance.Half;
                 break;
             case PrefabType.SideRoof:
-                myFrontShiftDistance = HorizontalShiftDistance.ShorterHalf; break;
+                defaults.myFrontShiftDistance = HorizontalShiftDistance.ShorterHalf; break;
             default:
-                myFrontShiftDistance = HorizontalShiftDistance.None;
+                defaults.myFrontShiftDistance = HorizontalShiftDistance.None;
                 break;
         }
     }
@@ -83,43 +83,43 @@ public partial class Snapper
 
     private void SetRotationType()
     {
-        switch (prefabType)
+        switch (defaults.prefabType)
         {
 
-            case PrefabType.Floor: rotationType = RotationType.None; break;
-            case PrefabType.Window: rotationType = RotationType.TargetRoot; break;
-            default: rotationType = RotationType.TargetEdge; break;
+            case PrefabType.Floor: defaults.rotationType = RotationType.None; break;
+            case PrefabType.Window: defaults.rotationType = RotationType.TargetRoot; break;
+            default: defaults.rotationType = RotationType.TargetEdge; break;
         }
     }
 
     private void SetShiftSideways()
     {
-        switch (prefabType)
+        switch (defaults.prefabType)
         {
             case PrefabType.Beam:
-                shiftSideways = true; break;
+                defaults.shiftSideways = true; break;
         }
     }
 
     private void SetTargetSideWaysShiftDistance()
     {
-        switch (prefabType)
+        switch (defaults.prefabType)
         {
             case PrefabType.Beam:
-                targetSideWaysShiftDistance = HorizontalShiftDistance.Half; break;
+                defaults.targetSideWaysShiftDistance = HorizontalShiftDistance.Half; break;
         }
     }
 
     private void SetShiftDown()
     {
-        switch (prefabType)
+        switch (defaults.prefabType)
         {
             case PrefabType.Floor:
             case PrefabType.Seam:
-                shiftDown = true;
+                defaults.shiftDown = true;
                 break;
             default:
-                shiftDown = false;
+                defaults.shiftDown = false;
                 break;
         }
     }

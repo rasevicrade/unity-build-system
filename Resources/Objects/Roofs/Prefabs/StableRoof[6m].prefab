@@ -547,16 +547,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f96a3c4e335f204a99f61dc167cb8c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabType: 5
-  snapDistance: 5
-  horizontalFrontShiftDirection: 0
-  myFrontShiftDistance: 3
-  targetsWithShift:
-  - prefabType: 4
-    targetsShiftDistance: 4
-  rotationType: 2
-  shiftSideways: 0
-  mySideWaysShiftDistance: 0
-  targetSideWaysShiftDistance: 0
-  shiftDown: 0
+  defaults: {fileID: 11400000, guid: 859feb8f0199bec428b4759f3e2a8d8a, type: 2}
   isPreview: 0

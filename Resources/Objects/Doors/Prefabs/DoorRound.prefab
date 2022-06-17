@@ -178,21 +178,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f96a3c4e335f204a99f61dc167cb8c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabType: 6
-  allowedTargets: 01000000
-  snapDistance: 2
+  defaults: {fileID: 11400000, guid: c1f5a3d77ac36e149a32875266847b00, type: 2}
   isPreview: 0
-  canBeStacked: 0
-  useCustomShift: 1
-  horizontalFrontShiftDirection: 0
-  myFrontShiftDistance: 0
-  targetFrontShiftDistance: 1
-  useCustomRotation: 1
-  rotationType: 2
-  shiftSideways: 0
-  mySideWaysShiftDistance: 1
-  targetSideWaysShiftDistance: 0
-  shiftDown: 0
 --- !u!65 &-2432084050398779020
 BoxCollider:
   m_ObjectHideFlags: 0

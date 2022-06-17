@@ -98,15 +98,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f96a3c4e335f204a99f61dc167cb8c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabType: 0
-  allowedTargets: 00000000
-  snapDistance: 1
+  defaults: {fileID: 11400000, guid: 6d1b21d8966e6564ea03821a54a66040, type: 2}
   isPreview: 0
-  canBeStacked: 0
-  shiftSideways: 0
-  sidewayShiftByMyHalfSize: 0
-  sidewayShiftByTargetHalSize: 0
-  shiftDown: 0
 --- !u!64 &8675073276838261909
 MeshCollider:
   m_ObjectHideFlags: 0

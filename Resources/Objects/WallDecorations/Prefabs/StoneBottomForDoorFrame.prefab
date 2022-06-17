@@ -45,16 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f96a3c4e335f204a99f61dc167cb8c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabType: 8
-  snapDistance: 2
-  horizontalFrontShiftDirection: 0
-  myFrontShiftDistance: 0
-  targetsWithShift: []
-  rotationType: 0
-  shiftSideways: 0
-  mySideWaysShiftDistance: 0
-  targetSideWaysShiftDistance: 0
-  shiftDown: 0
+  defaults: {fileID: 11400000, guid: b8e53310dc40eb84ab65902593eb8acb, type: 2}
   isPreview: 0
 --- !u!1 &7080254779664071217
 GameObject:
