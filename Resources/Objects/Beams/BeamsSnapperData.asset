@@ -12,13 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6b8c42680d0642458a65088cdc89a54, type: 3}
   m_Name: BeamsSnapperData
   m_EditorClassIdentifier: 
-  prefabType: 0
+  prefabType: 4
   snapDistance: 2
   horizontalFrontShiftDirection: 0
   myFrontShiftDistance: 0
-  targetsWithShift: []
-  rotationType: 0
-  shiftSideways: 0
+  targetsWithShift:
+  - prefabType: 1
+    targetsShiftDistance: 1
+  - prefabType: 0
+    targetsShiftDistance: 1
+  rotationType: 2
+  shiftSideways: 1
   mySideWaysShiftDistance: 0
-  targetSideWaysShiftDistance: 0
+  targetSideWaysShiftDistance: 1
   shiftDown: 0

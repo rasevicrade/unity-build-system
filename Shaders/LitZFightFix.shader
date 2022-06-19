@@ -338,7 +338,7 @@
     {
         // This tags allow to use the shader replacement features
         Tags{ "RenderPipeline"="HDRenderPipeline" "RenderType" = "HDLitShader" }
-        Offset 0.09,1
+        Offset 0.01,1
 
         Pass
         {

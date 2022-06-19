@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6b8c42680d0642458a65088cdc89a54, type: 3}
   m_Name: SideRoofSnapperData
   m_EditorClassIdentifier: 
-  prefabType: 0
+  prefabType: 5
   snapDistance: 2
   horizontalFrontShiftDirection: 0
-  myFrontShiftDistance: 0
-  targetsWithShift: []
-  rotationType: 0
+  myFrontShiftDistance: 3
+  targetsWithShift:
+  - prefabType: 4
+    targetsShiftDistance: 4
+  rotationType: 2
   shiftSideways: 0
   mySideWaysShiftDistance: 0
   targetSideWaysShiftDistance: 0
