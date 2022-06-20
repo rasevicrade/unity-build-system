@@ -48,7 +48,7 @@ public class BlueprintEditor : Editor
             }
             if (GUILayout.Button("*"))
             {
-                AssetDatabase.OpenAsset(AssetDatabase.LoadAssetAtPath<GameObject>(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(prefabGroup.Prefabs[i])));
+                AssetDatabase.OpenAsset(AssetDatabase.LoadAssetAtPath<GameObject>(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(prefabGroup.Prefabs[prefabGroup.activePrefabIndex])));
             }
             EditorGUILayout.EndHorizontal();
         }
