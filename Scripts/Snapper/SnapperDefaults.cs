@@ -115,6 +115,7 @@ public partial class Snapper
         switch (defaults.prefabType)
         {
             case PrefabType.Floor:
+            case PrefabType.Stairs:
             case PrefabType.Seam:
                 defaults.shiftDown = true;
                 break;

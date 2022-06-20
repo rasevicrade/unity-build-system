@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6b8c42680d0642458a65088cdc89a54, type: 3}
   m_Name: CastleWallSnapperData
   m_EditorClassIdentifier: 
-  prefabType: 9
+  prefabType: 1
   snapDistance: 2
   horizontalFrontShiftDirection: 0
   myFrontShiftDistance: 0
@@ -26,3 +26,4 @@ MonoBehaviour:
   mySideWaysShiftDistance: 0
   targetSideWaysShiftDistance: 0
   shiftDown: 0
+  shiftDownDistance: 0

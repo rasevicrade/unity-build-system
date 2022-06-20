@@ -230,7 +230,7 @@ public partial class Snapper : MonoBehaviour
         return !IsGroundFloor() && defaults.shiftDown;
     }
     private bool IsGroundFloor() => transform.position.y == 0;
-    private Vector3 ShiftDownByHeight() => -Vector3.up * GetTransformBounds(transform).size.y;
+    private Vector3 ShiftDownByHeight() => -Vector3.up * (defaults.shiftDownDistance != 0f ? defaults.shiftDownDistance : GetTransformBounds(transform).size.y) ;
     private Vector3 ShiftUpBySmallDelta() => Vector3.up * 0.005f;// In order to keep floor above wall
     #endregion
 

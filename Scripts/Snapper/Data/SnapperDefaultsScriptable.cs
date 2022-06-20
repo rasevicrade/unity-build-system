@@ -19,5 +19,5 @@ public class SnapperDefaultsScriptable : ScriptableObject
     public HorizontalShiftDistance targetSideWaysShiftDistance;
 
     public bool shiftDown;
-    
+    public float shiftDownDistance;
 }

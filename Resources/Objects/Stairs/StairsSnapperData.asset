@@ -27,4 +27,5 @@ MonoBehaviour:
   shiftSideways: 0
   mySideWaysShiftDistance: 0
   targetSideWaysShiftDistance: 0
-  shiftDown: 0
+  shiftDown: 1
+  shiftDownDistance: 0.133
