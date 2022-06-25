@@ -14,6 +14,8 @@ public class BlueprintEditor : Editor
     private Blueprint blueprint;
     private PreviewController previewController;
     private GameObject preview;
+    private Vector3 floorStartPosition;
+    private Vector3 floorEndPosition;
     
     private GUIStyle labelStyle;
 
@@ -125,7 +127,8 @@ public class BlueprintEditor : Editor
                 {
                     Event.current.Use();
                     ChangeActiveGroupIndex();
-                } 
+                }
+                
             } 
             else if (Event.current.shift)
             {
@@ -133,6 +136,17 @@ public class BlueprintEditor : Editor
                 {
                     Event.current.Use();
                     ChangeActivePrefabIndex();
+                }
+                if (IsLeftMouseButtonClicked(Event.current))
+                {
+                    Event.current.Use();
+                    floorStartPosition = previewController.isSnapped ? previewController.GetPosition() : hitInfo.point;
+                }
+                else if (Event.current.button == 0 && Event.current.type == EventType.MouseUp)
+                {
+                    Event.current.Use();
+                    floorEndPosition = hitInfo.point;
+                    PlaceGrid();
                 }
             }
 
@@ -174,6 +188,35 @@ public class BlueprintEditor : Editor
         }
     }
 
+    private void PlaceGrid()
+    {
+        var activeGroup = prefabGroups[activePrefabGroupIndex];
+        if (activeGroup != null)
+        {
+            Undo.IncrementCurrentGroup();
+
+            
+            var currentPosition = floorStartPosition;
+            var direction = (floorEndPosition - floorStartPosition).normalized;
+            var totalX = Math.Abs(floorStartPosition.x - floorEndPosition.x) / 4;
+            var totalZ = Math.Abs(floorStartPosition.z - floorEndPosition.z) / 4;
+
+            for (int x = 0; x < totalX; x++)
+            {
+                for (int z = 0; z < totalZ; z++)
+                {
+                    blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], new Vector3(currentPosition.x, 0, currentPosition.z), previewController.GetRotation());
+                    var fz = (float)Math.Round(direction.z, 0);
+                    currentPosition = new Vector3(currentPosition.x, 0, currentPosition.z + 4 * fz);
+                }
+                var fx = (float)Math.Round(direction.x, 0);
+                currentPosition = new Vector3(currentPosition.x + 4 * fx, 0, floorStartPosition.z);
+            }
+            //var placedGO = blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], previewController.GetPosition(), previewController.GetRotation());
+            //Undo.RegisterCreatedObjectUndo(placedGO, placedGO.name);
+            Undo.SetCurrentGroupName("Place blueprint GO");
+        }
+    }
 
     private void ChangeActiveGroupIndex()
     {
@@ -240,27 +283,27 @@ public class BlueprintEditor : Editor
             }
             else if (Event.current.keyCode == KeyCode.Alpha1)
             {
-                blueprint.activeBaseHeight = 4 * blueprint.activeScale;
+                blueprint.activeBaseHeight = blueprint.floorHeight * blueprint.activeScale;
             }
             else if (Event.current.keyCode == KeyCode.Alpha2)
             {
-                blueprint.activeBaseHeight = 12 * blueprint.activeScale;
+                blueprint.activeBaseHeight = blueprint.floorHeight * 2 * blueprint.activeScale;
             }
             else if (Event.current.keyCode == KeyCode.Alpha3)
             {
-                blueprint.activeBaseHeight = 18 * blueprint.activeScale;
+                blueprint.activeBaseHeight = blueprint.floorHeight * 3 * blueprint.activeScale;
             }
             else if (Event.current.keyCode == KeyCode.Alpha4)
             {
-                blueprint.activeBaseHeight = 24 * blueprint.activeScale;
+                blueprint.activeBaseHeight = blueprint.floorHeight * 4 * blueprint.activeScale;
             }
             else if (Event.current.keyCode == KeyCode.Alpha5)
             {
-                blueprint.activeBaseHeight = 3 * blueprint.activeScale;
+                blueprint.activeBaseHeight = (blueprint.floorHeight / 2) * blueprint.activeScale;
             }
             else if (Event.current.keyCode == KeyCode.Alpha6)
             {
-                blueprint.activeBaseHeight = 9 * blueprint.activeScale;
+                blueprint.activeBaseHeight = (blueprint.floorHeight + (blueprint.floorHeight / 2)) * blueprint.activeScale;
             }
         }
     }

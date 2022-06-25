@@ -7,6 +7,7 @@ public class Blueprint : MonoBehaviour
 {
     public float activeScale = 1;
     public float activeBaseHeight = 0;
+    public float floorHeight = 6;
     public GameObject PlaceGameObject(GameObject activeObject, Vector3 position, Quaternion? rotation)
     {
         if (position == Vector3.zero)

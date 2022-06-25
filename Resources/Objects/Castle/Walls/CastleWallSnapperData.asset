@@ -16,11 +16,7 @@ MonoBehaviour:
   snapDistance: 2
   horizontalFrontShiftDirection: 0
   myFrontShiftDistance: 0
-  targetsWithShift:
-  - prefabType: 0
-    targetsShiftDistance: 1
-  - prefabType: 1
-    targetsShiftDistance: 0
+  targetsWithShift: []
   rotationType: 2
   shiftSideways: 0
   mySideWaysShiftDistance: 0
