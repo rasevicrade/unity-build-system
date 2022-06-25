@@ -38,7 +38,7 @@ public partial class Snapper : MonoBehaviour
         blueprint = FindObjectOfType<Blueprint>();
         if (blueprint == null)
             Debug.LogError("No blueprint available in scene");
-        if (defaults.targetsWithShift == null)
+        if (defaults != null && defaults.targetsWithShift == null)
             defaults.targetsWithShift = new List<TargetPrefabShiftDistancePair>();
     }
 
