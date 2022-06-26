@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ using UnityEngine;
 public partial class BlueprintEditor : Editor
 {
     private PreviewController previewController;
+    private bool isDrag;
+    private bool isGridPlacement;
 
     void OnSceneGUI()
     {
@@ -34,14 +37,22 @@ public partial class BlueprintEditor : Editor
                 if (IsLeftMouseButtonClicked(Event.current))
                 {
                     BeginGridPlacement(hitInfo);
+                    isDrag = false;
                     Event.current.Use();
                 }    
-                else if (IsLeftMouseButtonReleased(Event.current))
+                else if (IsLeftMouseButtonReleased(Event.current) && isDrag)
                 {
                     FinishGridPlacement(hitInfo);
+                    isDrag = false;
+                    Event.current.Use();   
+                }
+                if (Event.current.type == EventType.MouseDrag)
+                {
+                    isDrag = true;
                     Event.current.Use();
-                }     
+                }
             }
+            blueprint.showGridPreview = isGridPlacement && isDrag;
            
             if (previewController != null && preview != null)
             {
@@ -80,10 +91,12 @@ public partial class BlueprintEditor : Editor
         }
     }
 
+  
+
     private void BeginGridPlacement(RaycastHit hitInfo)
     {
         blueprint.floorStartPosition = previewController.isSnapped ? previewController.GetPosition() : hitInfo.point;
-        blueprint.showGridPreview = true;
+        isGridPlacement = true;
     }
 
     private void FinishGridPlacement(RaycastHit hitInfo)
@@ -118,6 +131,24 @@ public partial class BlueprintEditor : Editor
             activePrefabGroupIndex = 0;
 
         SetActivePreview();
+    }
+
+    private void ReplaceTargetSnappedObject(Snapper snapper)
+    {
+        //var targetGroup = prefabGroups.FirstOrDefault(x => x.Prefabs.FirstOrDefault(p => p.name + "-Placed" == snapper.transform.name) != null);
+
+        //if (targetGroup != null)
+        //{
+        //    activePrefabGroupIndex = prefabGroups.IndexOf(targetGroup);
+        //    ChangeActivePrefabIndex();
+
+        //    var placedGO = blueprint.PlaceGameObject(targetGroup.Prefabs[prefabGroups[activePrefabGroupIndex].activePrefabIndex], snapper.transform.position, snapper.transform.rotation);
+        //    DestroyImmediate(snapper.gameObject);
+        //}
+
+        ChangeActivePrefabIndex();
+        var placedGO = blueprint.PlaceGameObject(prefabGroups[activePrefabGroupIndex].Prefabs[prefabGroups[activePrefabGroupIndex].activePrefabIndex], snapper.transform.position, snapper.transform.rotation);
+        DestroyImmediate(snapper.gameObject);
     }
 
     private void ChangeActivePrefabIndex()

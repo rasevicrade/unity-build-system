@@ -19,6 +19,7 @@ public class Blueprint : MonoBehaviour
     private void OnEnable()
     {
         lineRenderer = GetComponent<LineRenderer>();
+        lineRenderer.sharedMaterial.SetColor("_Color", Color.green);
     }
 
     private void Update()
