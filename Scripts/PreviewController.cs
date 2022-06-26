@@ -11,10 +11,11 @@ public class PreviewController : MonoBehaviour
 {
     public bool isSnapped;
     public bool stack;
+    public GameObject currentPrefabPreview;
+    public Snapper currentPreviewSnapper;
 
     private Blueprint blueprint;
-    private GameObject currentPrefabPreview;
-    public Snapper currentPreviewSnapper;  
+    
 
     protected void OnEnable()
     {

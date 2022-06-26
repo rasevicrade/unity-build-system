@@ -10,6 +10,7 @@ public class Blueprint : MonoBehaviour
     public float activeBaseHeight = 0;
     public float floorHeight = 6;
     public bool showGridPreview;
+    public bool addWallsToRooms = true;
     public Vector3 floorStartPosition;
     public Vector3 floorEndPosition;
     public Vector3 activeMousePosition;
@@ -43,7 +44,7 @@ public class Blueprint : MonoBehaviour
             return null;
 
         var instantiatedGO = Instantiate(activeObject, position, rotation != null ? rotation.Value : Quaternion.Euler(0,0,0));
-        instantiatedGO.transform.parent = transform;
+        //instantiatedGO.transform.parent = transform;
         instantiatedGO.transform.localScale = new Vector3(activeScale, activeScale, activeScale);
         instantiatedGO.gameObject.layer = LayerMask.NameToLayer("Default");
         instantiatedGO.name = instantiatedGO.name.Replace("(Clone)", "") + "-Placed";      

@@ -25,7 +25,7 @@ public partial class Snapper : MonoBehaviour
     private void OnDrawGizmos()
     {
         textLocation = transform.position;
-        Handles.Label(textLocation, text);
+        //Handles.Label(textLocation, text);
     }
     #endregion
 

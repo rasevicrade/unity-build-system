@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -19,22 +15,32 @@ public partial class BlueprintEditor : Editor
         if (GetMousePosition(out RaycastHit hitInfo))
         {
             blueprint.activeMousePosition = hitInfo.point;
-            if (Event.current.control && Event.current.isScrollWheel)
+            if (Event.current.isScrollWheel)
             {
-                ChangeActiveGroupIndex();
-                Event.current.Use();
-            }
-            else if (Event.current.shift)
-            {
-                if (Event.current.isScrollWheel)
+                if (Event.current.control)
+                {
+                    ChangeActiveGroupIndex();
+                    Event.current.Use();
+                }
+                else if (Event.current.shift)
+                {
                     ChangeActivePrefabIndex();
+                    Event.current.Use();
+                }
+            }
 
+            if (Event.current.shift)
+            {
                 if (IsLeftMouseButtonClicked(Event.current))
+                {
                     BeginGridPlacement(hitInfo);
-                else if (Event.current.button == 0 && Event.current.type == EventType.MouseUp)
+                    Event.current.Use();
+                }    
+                else if (IsLeftMouseButtonReleased(Event.current))
+                {
                     FinishGridPlacement(hitInfo);
-
-                Event.current.Use();
+                    Event.current.Use();
+                }     
             }
            
             if (previewController != null && preview != null)
@@ -74,79 +80,29 @@ public partial class BlueprintEditor : Editor
         }
     }
 
-    private void FinishGridPlacement(RaycastHit hitInfo)
-    {
-        blueprint.floorEndPosition = hitInfo.point;
-        PlaceGrid();
-        blueprint.showGridPreview = false;
-    }
-
     private void BeginGridPlacement(RaycastHit hitInfo)
     {
         blueprint.floorStartPosition = previewController.isSnapped ? previewController.GetPosition() : hitInfo.point;
         blueprint.showGridPreview = true;
     }
 
-    private void PlaceGrid()
-    { 
-        var roomGO = new GameObject("Room");
-        roomGO.transform.parent = blueprint.transform;
-        Undo.IncrementCurrentGroup();
-        Undo.RegisterCreatedObjectUndo(roomGO, roomGO.name);
-        Undo.SetCurrentGroupName("Room placed");
-        
-        var floorsGO = new GameObject("Floors");
-        floorsGO.transform.parent = roomGO.transform;
-        var wallsGO = new GameObject("Walls");
-        wallsGO.transform.parent = roomGO.transform;
-        var activeGroup = prefabGroups[activePrefabGroupIndex];
-        if (activeGroup != null)
+    private void FinishGridPlacement(RaycastHit hitInfo)
+    {
+        blueprint.floorEndPosition = hitInfo.point;
+        if (previewController.currentPrefabPreview != null)
         {
-            var currentPosition = blueprint.floorStartPosition;
-            var direction = (blueprint.floorEndPosition - blueprint.floorStartPosition).normalized;
-            var totalX = Math.Round(Math.Abs(blueprint.floorStartPosition.x - blueprint.floorEndPosition.x) / 4);
-            var totalZ = Math.Round(Math.Abs(blueprint.floorStartPosition.z - blueprint.floorEndPosition.z) / 4);
-            var fx = (float)Math.Round(direction.x, 0);
-            var fz = (float)Math.Round(direction.z, 0);
+            GameObject wallPrefab = null;
+            if (blueprint.addWallsToRooms)
+                wallPrefab = prefabGroups.FirstOrDefault(x => x.Name == "Walls").Prefabs.FirstOrDefault(x => x.name == "Wall");
 
-            var wallPrefab = prefabGroups.FirstOrDefault(x => x.Name == "Walls").Prefabs.FirstOrDefault(x => x.name == "Wall");
-            for (int x = 0; x <= totalX; x++)
-            {
-                for (int z = 0; z <= totalZ; z++)
-                {
-                    var floor = blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], new Vector3(currentPosition.x, blueprint.activeBaseHeight * blueprint.activeScale, currentPosition.z), previewController.GetRotation());
-                    floor.transform.parent = floorsGO.transform;
-                    if (x == 0)
-                    {
-                        var wall = blueprint.PlaceGameObject(wallPrefab, new Vector3(currentPosition.x - fx * 2, blueprint.activeBaseHeight * blueprint.activeScale, currentPosition.z), previewController.GetRotation() * Quaternion.Euler(0, -90, 0));
-                        wall.transform.parent = wallsGO.transform;
-                    }
-                    if (x == totalX)
-                    {
-                        var wall = blueprint.PlaceGameObject(wallPrefab, new Vector3(currentPosition.x + fx * 2, blueprint.activeBaseHeight * blueprint.activeScale, currentPosition.z), previewController.GetRotation() * Quaternion.Euler(0, -90, 0));
-                        wall.transform.parent = wallsGO.transform;
-                    }
-
-                    if (z == 0)
-                    {
-                        var wall = blueprint.PlaceGameObject(wallPrefab, new Vector3(currentPosition.x, blueprint.activeBaseHeight * blueprint.activeScale, currentPosition.z - fz * 2), previewController.GetRotation());
-                        wall.transform.parent = wallsGO.transform;
-                    }
-
-                    if (z == totalZ)
-                    {
-                        var wall = blueprint.PlaceGameObject(wallPrefab, new Vector3(currentPosition.x, blueprint.activeBaseHeight * blueprint.activeScale, currentPosition.z + fz * 2), previewController.GetRotation());
-                        wall.transform.parent = wallsGO.transform;
-                    }
-
-
-                    currentPosition = new Vector3(currentPosition.x, blueprint.activeBaseHeight * blueprint.activeScale, currentPosition.z + 4 * fz);
-                }
-
-                currentPosition = new Vector3(currentPosition.x + 4 * fx, blueprint.activeBaseHeight * blueprint.activeScale, blueprint.floorStartPosition.z);
-            }
-
+            var roomGO = GridPlacer.Instance.PlaceGrid(blueprint, previewController.currentPrefabPreview, wallPrefab);
+            roomGO.transform.parent = blueprint.transform;
+            Undo.IncrementCurrentGroup();
+            Undo.RegisterCreatedObjectUndo(roomGO, roomGO.name);
+            Undo.SetCurrentGroupName("Room placed");
+           
         }
+        blueprint.showGridPreview = false;
     }
 
     #region Prefab selection
@@ -224,6 +180,7 @@ public partial class BlueprintEditor : Editor
 
     #region Mouse handling
     private bool IsLeftMouseButtonClicked(Event current) => current.button == 0 && current.type == EventType.MouseDown;
+    private bool IsLeftMouseButtonReleased(Event current) => current.button == 0 && current.type == EventType.MouseUp;
 
     private bool IsRightMouseButtonClicked(Event current) => current.button == 1 && current.type == EventType.MouseDown;
 

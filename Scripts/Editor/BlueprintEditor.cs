@@ -111,6 +111,8 @@ public partial class BlueprintEditor : Editor
         EditorGUILayout.LabelField("--------------------------------------------");
         EditorGUILayout.LabelField("Ctrl + Scroll to change active object group");
         EditorGUILayout.LabelField("Shift + Scroll to change active prefab within group");
+        EditorGUILayout.LabelField("--------------------------------------------");
+        EditorGUILayout.LabelField("Hold Shift and right click to place a room");
         EditorGUILayout.EndVertical();
         Handles.EndGUI();
     }
