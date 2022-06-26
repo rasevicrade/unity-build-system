@@ -13,10 +13,7 @@ public class BlueprintEditor : Editor
     private int activePrefabGroupIndex = 0;
     private Blueprint blueprint;
     private PreviewController previewController;
-    private GameObject preview;
-    private Vector3 floorStartPosition;
-    private Vector3 floorEndPosition;
-    
+    private GameObject preview;    
     private GUIStyle labelStyle;
 
     protected void OnEnable()
@@ -115,12 +112,12 @@ public class BlueprintEditor : Editor
         Handles.EndGUI();
     }
 
-
     void OnSceneGUI()
     {
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
         if (GetRayCast(out RaycastHit hitInfo))
         {
+            blueprint.activeMousePosition = hitInfo.point;
             if (Event.current.control)
             {
                 if (Event.current.isScrollWheel)
@@ -140,13 +137,15 @@ public class BlueprintEditor : Editor
                 if (IsLeftMouseButtonClicked(Event.current))
                 {
                     Event.current.Use();
-                    floorStartPosition = previewController.isSnapped ? previewController.GetPosition() : hitInfo.point;
+                    blueprint.floorStartPosition = previewController.isSnapped ? previewController.GetPosition() : hitInfo.point;
+                    blueprint.showGridPreview = true;
                 }
                 else if (Event.current.button == 0 && Event.current.type == EventType.MouseUp)
                 {
                     Event.current.Use();
-                    floorEndPosition = hitInfo.point;
+                    blueprint.floorEndPosition = hitInfo.point;
                     PlaceGrid();
+                    blueprint.showGridPreview = false;
                 }
             }
 
@@ -193,13 +192,11 @@ public class BlueprintEditor : Editor
         var activeGroup = prefabGroups[activePrefabGroupIndex];
         if (activeGroup != null)
         {
-            Undo.IncrementCurrentGroup();
-
-            
-            var currentPosition = floorStartPosition;
-            var direction = (floorEndPosition - floorStartPosition).normalized;
-            var totalX = Math.Abs(floorStartPosition.x - floorEndPosition.x) / 4;
-            var totalZ = Math.Abs(floorStartPosition.z - floorEndPosition.z) / 4;
+            //Undo.IncrementCurrentGroup();
+            var currentPosition = blueprint.floorStartPosition;
+            var direction = (blueprint.floorEndPosition - blueprint.floorStartPosition).normalized;
+            var totalX = Math.Abs(blueprint.floorStartPosition.x - blueprint.floorEndPosition.x) / 4;
+            var totalZ = Math.Abs(blueprint.floorStartPosition.z - blueprint.floorEndPosition.z) / 4;
 
             for (int x = 0; x < totalX; x++)
             {
@@ -210,7 +207,7 @@ public class BlueprintEditor : Editor
                     currentPosition = new Vector3(currentPosition.x, 0, currentPosition.z + 4 * fz);
                 }
                 var fx = (float)Math.Round(direction.x, 0);
-                currentPosition = new Vector3(currentPosition.x + 4 * fx, 0, floorStartPosition.z);
+                currentPosition = new Vector3(currentPosition.x + 4 * fx, 0, blueprint.floorStartPosition.z);
             }
             //var placedGO = blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], previewController.GetPosition(), previewController.GetRotation());
             //Undo.RegisterCreatedObjectUndo(placedGO, placedGO.name);

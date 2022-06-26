@@ -3,11 +3,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteAlways]
 public class Blueprint : MonoBehaviour
 {
     public float activeScale = 1;
     public float activeBaseHeight = 0;
     public float floorHeight = 6;
+    public bool showGridPreview;
+    public Vector3 floorStartPosition;
+    public Vector3 floorEndPosition;
+    public Vector3 activeMousePosition;
+    private LineRenderer lineRenderer;
+
+    private void OnEnable()
+    {
+        lineRenderer = GetComponent<LineRenderer>();
+    }
+
+    private void Update()
+    {
+        if (showGridPreview)
+        {
+            lineRenderer.positionCount = 4;
+            lineRenderer.SetPosition(0, floorStartPosition);
+            lineRenderer.SetPosition(1, new Vector3(floorStartPosition.x, 0, activeMousePosition.z));
+            lineRenderer.SetPosition(2, activeMousePosition);
+            lineRenderer.SetPosition(3, new Vector3(activeMousePosition.x, 0, floorStartPosition.z));
+        } 
+        else
+        {
+            lineRenderer.positionCount = 0;
+        }
+        
+    }
+
     public GameObject PlaceGameObject(GameObject activeObject, Vector3 position, Quaternion? rotation)
     {
         if (position == Vector3.zero)
