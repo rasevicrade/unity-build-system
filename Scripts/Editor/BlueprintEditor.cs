@@ -13,15 +13,15 @@ public class BlueprintEditor : Editor
     private int activePrefabGroupIndex = 0;
     private Blueprint blueprint;
     private PreviewController previewController;
-    private GameObject preview;    
+    private GameObject preview;
     private GUIStyle labelStyle;
 
     protected void OnEnable()
     {
         blueprint = (Blueprint)target;
         previewController = FindObjectOfType<PreviewController>();
-        
-        RefreshPrefabs();  
+
+        RefreshPrefabs();
     }
 
     public override void OnInspectorGUI()
@@ -35,7 +35,7 @@ public class BlueprintEditor : Editor
         {
             var prefabGroup = prefabGroups[i];
             labelStyle.normal.textColor = i == activePrefabGroupIndex ? Color.green : Color.white;
-            
+
             EditorGUILayout.BeginHorizontal();
 
             EditorGUILayout.LabelField(prefabGroup.Name, labelStyle);
@@ -75,9 +75,9 @@ public class BlueprintEditor : Editor
         }
         if (GUILayout.Button("Set all prefab defaults")) //TODO Cleanup 
         {
-            foreach(var group in prefabGroups)
+            foreach (var group in prefabGroups)
             {
-                foreach(var prefab in group.Prefabs)
+                foreach (var prefab in group.Prefabs)
                 {
                     var snapper = prefab.transform.GetComponent<Snapper>();
                     if (snapper != null)
@@ -86,7 +86,7 @@ public class BlueprintEditor : Editor
                     }
                 }
             }
-            
+
         }
         EditorGUILayout.EndVertical();
 
@@ -125,8 +125,8 @@ public class BlueprintEditor : Editor
                     Event.current.Use();
                     ChangeActiveGroupIndex();
                 }
-                
-            } 
+
+            }
             else if (Event.current.shift)
             {
                 if (Event.current.isScrollWheel)
@@ -167,7 +167,7 @@ public class BlueprintEditor : Editor
                         Undo.RegisterCreatedObjectUndo(placedGO, placedGO.name);
                         Undo.SetCurrentGroupName("Place blueprint GO");
                     }
-                       
+
                 }
                 if (Event.current.shift && IsRightMouseButtonClicked(Event.current))
                 {
@@ -180,7 +180,7 @@ public class BlueprintEditor : Editor
 
         if (Event.current.keyCode == KeyCode.Tab)
         {
-            if (!Event.current.shift) 
+            if (!Event.current.shift)
                 DestroyImmediate(preview);
             else
                 SetActivePreview();
@@ -189,29 +189,63 @@ public class BlueprintEditor : Editor
 
     private void PlaceGrid()
     {
+        Undo.IncrementCurrentGroup();
+        var roomGO = new GameObject("Room");
+        Undo.RegisterCreatedObjectUndo(roomGO, roomGO.name);
+        Undo.SetCurrentGroupName("Room placed");
+        roomGO.transform.parent = blueprint.transform;
+        var floorsGO = new GameObject("Floors");
+        floorsGO.transform.parent = roomGO.transform;
+        var wallsGO = new GameObject("Walls");
+        wallsGO.transform.parent = roomGO.transform;
         var activeGroup = prefabGroups[activePrefabGroupIndex];
         if (activeGroup != null)
         {
-            //Undo.IncrementCurrentGroup();
+            
             var currentPosition = blueprint.floorStartPosition;
             var direction = (blueprint.floorEndPosition - blueprint.floorStartPosition).normalized;
-            var totalX = Math.Abs(blueprint.floorStartPosition.x - blueprint.floorEndPosition.x) / 4;
-            var totalZ = Math.Abs(blueprint.floorStartPosition.z - blueprint.floorEndPosition.z) / 4;
+            var totalX = Math.Round(Math.Abs(blueprint.floorStartPosition.x - blueprint.floorEndPosition.x) / 4);
+            var totalZ = Math.Round(Math.Abs(blueprint.floorStartPosition.z - blueprint.floorEndPosition.z) / 4);
+            var fx = (float)Math.Round(direction.x, 0);
+            var fz = (float)Math.Round(direction.z, 0);
 
-            for (int x = 0; x < totalX; x++)
+            var wallPrefab = prefabGroups.FirstOrDefault(x => x.Name == "Walls").Prefabs.FirstOrDefault(x => x.name == "Wall");
+            for (int x = 0; x <= totalX; x++)
             {
-                for (int z = 0; z < totalZ; z++)
+                for (int z = 0; z <= totalZ; z++)
                 {
-                    blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], new Vector3(currentPosition.x, 0, currentPosition.z), previewController.GetRotation());
-                    var fz = (float)Math.Round(direction.z, 0);
-                    currentPosition = new Vector3(currentPosition.x, 0, currentPosition.z + 4 * fz);
+                    var floor = blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], new Vector3(currentPosition.x, blueprint.activeBaseHeight * blueprint.activeScale, currentPosition.z), previewController.GetRotation());
+                    floor.transform.parent = floorsGO.transform;
+                    if (x == 0)
+                    {
+                        var wall = blueprint.PlaceGameObject(wallPrefab, new Vector3(currentPosition.x - fx * 2, blueprint.activeBaseHeight * blueprint.activeScale, currentPosition.z), previewController.GetRotation() * Quaternion.Euler(0, -90, 0));
+                        wall.transform.parent = wallsGO.transform;
+                    }
+                    if (x == totalX)
+                    {
+                        var wall = blueprint.PlaceGameObject(wallPrefab, new Vector3(currentPosition.x + fx * 2, blueprint.activeBaseHeight * blueprint.activeScale, currentPosition.z), previewController.GetRotation() * Quaternion.Euler(0, -90, 0));
+                        wall.transform.parent = wallsGO.transform;
+                    }
+                        
+                    if (z == 0)
+                    {
+                        var wall = blueprint.PlaceGameObject(wallPrefab, new Vector3(currentPosition.x, blueprint.activeBaseHeight * blueprint.activeScale, currentPosition.z - fz * 2), previewController.GetRotation());
+                        wall.transform.parent = wallsGO.transform;
+                    }
+                        
+                    if (z == totalZ)
+                    {
+                        var wall = blueprint.PlaceGameObject(wallPrefab, new Vector3(currentPosition.x, blueprint.activeBaseHeight * blueprint.activeScale, currentPosition.z + fz * 2), previewController.GetRotation());
+                        wall.transform.parent = wallsGO.transform;
+                    }
+                        
+
+                    currentPosition = new Vector3(currentPosition.x, blueprint.activeBaseHeight * blueprint.activeScale, currentPosition.z + 4 * fz);
                 }
-                var fx = (float)Math.Round(direction.x, 0);
-                currentPosition = new Vector3(currentPosition.x + 4 * fx, 0, blueprint.floorStartPosition.z);
+
+                currentPosition = new Vector3(currentPosition.x + 4 * fx, blueprint.activeBaseHeight * blueprint.activeScale, blueprint.floorStartPosition.z);
             }
-            //var placedGO = blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], previewController.GetPosition(), previewController.GetRotation());
-            //Undo.RegisterCreatedObjectUndo(placedGO, placedGO.name);
-            Undo.SetCurrentGroupName("Place blueprint GO");
+            
         }
     }
 
@@ -341,6 +375,6 @@ public class BlueprintEditor : Editor
     {
         public string Name { get; set; }
         public GameObject[] Prefabs { get; set; }
-        public int activePrefabIndex { get; set; } = 0;       
+        public int activePrefabIndex { get; set; } = 0;
     }
 }
