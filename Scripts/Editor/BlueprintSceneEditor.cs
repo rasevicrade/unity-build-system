@@ -77,10 +77,15 @@ public partial class BlueprintEditor : Editor
                     var activeGroup = prefabGroups[activePrefabGroupIndex];
                     if (activeGroup != null)
                     {
-                        Undo.IncrementCurrentGroup();
+                        
                         var placedGO = blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], previewController.GetPosition(), previewController.GetRotation(), GetParent(activeGroup));
-                        Undo.RegisterCreatedObjectUndo(placedGO, placedGO.name);
-                        Undo.SetCurrentGroupName("Place blueprint GO");
+                        if (placedGO != null)
+                        {
+                            Undo.IncrementCurrentGroup();
+                            Undo.RegisterCreatedObjectUndo(placedGO, placedGO.name);
+                            Undo.SetCurrentGroupName("Place blueprint GO");
+                        }
+                        
                     }
 
                 }
@@ -148,6 +153,7 @@ public partial class BlueprintEditor : Editor
             if (blueprint.addWallsToRooms)
                 wallPrefab = prefabGroups.FirstOrDefault(x => x.Name == "Walls").Prefabs.FirstOrDefault(x => x.name == "Wall");
 
+            SetActivePreview();
             var activeGroup = prefabGroups[activePrefabGroupIndex];
             var roomGO = gridPlacer.PlaceGrid(blueprint, activeGroup.Prefabs[activeGroup.activePrefabIndex], wallPrefab);
             roomGO.transform.parent = blueprint.transform;

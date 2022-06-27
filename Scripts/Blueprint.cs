@@ -1,5 +1,4 @@
-using System;
-using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,12 +15,10 @@ public class Blueprint : MonoBehaviour
     public Vector3 activeMousePosition;
     public Snapper selectedObject;
     private LineRenderer lineRenderer;
-    private Dictionary<string, GameObject> prefabHolers;
 
     private void OnEnable()
     {
         lineRenderer = GetComponent<LineRenderer>();
-        prefabHolers = new Dictionary<string, GameObject>();
     }
 
     private void Update()
@@ -43,7 +40,7 @@ public class Blueprint : MonoBehaviour
 
     public GameObject PlaceGameObject(GameObject activeObject, Vector3 position, Quaternion? rotation, GameObject parent)
     {
-        if (position == Vector3.zero || PositionTakenByAnotherObjectOfSameType(activeObject, position))
+        if (position == Vector3.zero || PositionTakenByAnotherObjectOfSameType(activeObject, position, rotation))
             return null;
 
         var instantiatedGO = Instantiate(activeObject, position, rotation != null ? rotation.Value : Quaternion.Euler(0,0,0));
@@ -59,11 +56,32 @@ public class Blueprint : MonoBehaviour
         return instantiatedGO;
     }
 
-    private bool PositionTakenByAnotherObjectOfSameType(GameObject activeObject, Vector3 position)
+    private bool PositionTakenByAnotherObjectOfSameType(GameObject prefab, Vector3 position, Quaternion? rotation)
     {
-        return false;
-        //var test = Physics.OverlapBox(transform.position + Vector3.up * GetTransformBounds(transform).size.y / 2, GetTransformBounds(transform).extents, transform.rotation, LayerMask.GetMask("Snappable"))
+        // We create temp to get bounds, then delete it right away
+        var temp = Instantiate(prefab, position, rotation.HasValue ? rotation.Value : Quaternion.identity);
+        Vector3 bounds = new Vector3(temp.transform.GetBounds().extents.x, temp.transform.GetBounds().extents.y, temp.transform.GetBounds().extents.z);
+        DestroyImmediate(temp);
+
+        var a = LayerMask.GetMask("Default");
+        var b = LayerMask.GetMask("Ignore Raycast");
+        var overlappingList = Physics.OverlapBox(
+            position + Vector3.up * bounds.y,
+            bounds / 2,
+            rotation.HasValue ? rotation.Value : Quaternion.identity, LayerMask.GetMask("Default"))
+        .Where(x => x.GetComponent<Snapper>() != null && x.GetComponent<Snapper>().defaults.prefabType == prefab.GetComponent<Snapper>().defaults.prefabType).ToList();
+
+        if (overlappingList.Count > 0)
+        {
+            var tar = overlappingList[0];
+            //Debug.Log("Temp:" + temp.transform.position + " - " + bounds.extents);
+            //Debug.Log("Tar:" + tar.transform.position + " - " + tar.transform.GetBounds().extents);
+        }
+        
+        return overlappingList.Count > 0;
     }
+
+
 
     private void SetParent(GameObject instantiatedGO, GameObject parent)
     {

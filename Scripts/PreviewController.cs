@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using static BoundExtensions;
@@ -20,6 +21,7 @@ public class PreviewController : MonoBehaviour
     protected void OnEnable()
     {
         isSnapped = false;
+
     }
 
     public GameObject CreatePreview(Blueprint blueprint, Vector3 position, GameObject currentPrefab, float scale)
@@ -41,6 +43,7 @@ public class PreviewController : MonoBehaviour
                 if (t.gameObject.layer != LayerMask.NameToLayer("Colliders"))
                     t.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
             }
+            var renderer = currentPrefabPreview.gameObject.GetComponent<Renderer>();
             return currentPrefabPreview;
         }
         return null;
@@ -65,6 +68,7 @@ public class PreviewController : MonoBehaviour
             currentPrefabPreview.transform.position = position;
             isSnapped = snap;
         }
+
     }
 
     public void UpdateRotation(Quaternion updatedRotation)

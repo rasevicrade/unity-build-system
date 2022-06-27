@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityEngine;
 
 public class GridPlacer : MonoBehaviour
@@ -44,9 +45,10 @@ public class GridPlacer : MonoBehaviour
         {
             for (int z = 0; z <= totalZ; z++)
             {
+                var pos = new Vector3(_blueprint.floorStartPosition.x + floorWidth * x * fx, _blueprint.activeBaseHeight * _blueprint.activeScale, _blueprint.floorStartPosition.z + floorWidth * z * fz);
                 _blueprint.PlaceGameObject(
                     _currentPrefabPreview,
-                    new Vector3(_blueprint.floorStartPosition.x + floorWidth * x * fx , _blueprint.activeBaseHeight * _blueprint.activeScale, _blueprint.floorStartPosition.z + floorWidth * z * fz),
+                    pos,
                     _currentPrefabPreview.transform.rotation,
                     _floorsGO);
             }
@@ -58,8 +60,11 @@ public class GridPlacer : MonoBehaviour
         for (float x = 0; x <= totalX; x++)
         {
             var worldX = _blueprint.floorStartPosition.x + x * floorWidth * fx;
-            _blueprint.PlaceGameObject(_wallPrefab, new Vector3(worldX, _blueprint.activeBaseHeight * _blueprint.activeScale, _blueprint.floorStartPosition.z - fz * 2), _currentPrefabPreview.transform.rotation, _wallsGO);
-            _blueprint.PlaceGameObject(_wallPrefab, new Vector3(worldX, _blueprint.activeBaseHeight * _blueprint.activeScale, _blueprint.floorStartPosition.z + fz * totalZ * floorWidth + fz * 2), _currentPrefabPreview.transform.rotation, _wallsGO);
+            var posZero = new Vector3(worldX, _blueprint.activeBaseHeight * _blueprint.activeScale, _blueprint.floorStartPosition.z - fz * 2);
+            _blueprint.PlaceGameObject(_wallPrefab, posZero, _currentPrefabPreview.transform.rotation, _wallsGO);
+
+            var posLast = new Vector3(worldX, _blueprint.activeBaseHeight * _blueprint.activeScale, _blueprint.floorStartPosition.z + fz * totalZ * floorWidth + fz * 2);
+            _blueprint.PlaceGameObject(_wallPrefab, posLast, _currentPrefabPreview.transform.rotation, _wallsGO);
         }
         for (float z = 0; z <= totalZ; z++)
         {

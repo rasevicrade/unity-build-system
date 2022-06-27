@@ -19,12 +19,12 @@ public partial class Snapper : MonoBehaviour
     private Vector3 originalPrefabPosition;
 
     #region Debug
-    private Vector3 textLocation;
-    private string text;
+    public Vector3 textLocation;
+    public string text;
     private void OnDrawGizmos()
     {
         textLocation = transform.position;
-        Handles.Label(textLocation, text);
+        //Handles.Label(textLocation, text);
     }
     #endregion
 
@@ -43,7 +43,7 @@ public partial class Snapper : MonoBehaviour
 
     void Update()
     {
-        text = "";
+        //text = "";
         originalPrefabPosition = transform.position;
         // If I am a preview, find edges to snap to
         if (isPreview)
