@@ -43,7 +43,7 @@ public class Blueprint : MonoBehaviour
 
     public GameObject PlaceGameObject(GameObject activeObject, Vector3 position, Quaternion? rotation, GameObject parent)
     {
-        if (position == Vector3.zero)
+        if (position == Vector3.zero || PositionTakenByAnotherObjectOfSameType(activeObject, position))
             return null;
 
         var instantiatedGO = Instantiate(activeObject, position, rotation != null ? rotation.Value : Quaternion.Euler(0,0,0));
@@ -59,15 +59,14 @@ public class Blueprint : MonoBehaviour
         return instantiatedGO;
     }
 
+    private bool PositionTakenByAnotherObjectOfSameType(GameObject activeObject, Vector3 position)
+    {
+        return false;
+        //var test = Physics.OverlapBox(transform.position + Vector3.up * GetTransformBounds(transform).size.y / 2, GetTransformBounds(transform).extents, transform.rotation, LayerMask.GetMask("Snappable"))
+    }
+
     private void SetParent(GameObject instantiatedGO, GameObject parent)
     {
-        //if (!prefabHolers.ContainsKey(groupName))
-        //{
-        //    var holderObject = new GameObject(groupName);
-        //    holderObject.transform.parent = transform;
-        //    prefabHolers[groupName] = holderObject;
-        //}
-
         instantiatedGO.transform.parent = parent.transform;
     }
 

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEditor;
-using System;
 
 [ExecuteInEditMode]
 public partial class Snapper : MonoBehaviour
@@ -97,14 +96,14 @@ public partial class Snapper : MonoBehaviour
     {
         if (IsCurrentPrefabOfType(PrefabType.Door))
         {
-            return -edge.right * GetTransformBounds(transform).LongerSideLength() / 2;
+            return -edge.right * transform.GetBounds().LongerSideLength() / 2;
         }
         return (defaults.shiftSideways && IsTargetLongerThanCurrent(edge)) ? SideDirection(edge) * SideShitfDistance(edge) : Vector3.zero;
     }
 
     private bool IsTargetLongerThanCurrent(Transform edge)
     {
-        return GetTransformBounds(edge.parent).LongerSideLength() - GetTransformBounds(transform).ShorterSideLength() > 0.5f; // We use shorterside length for current because we need shorter side of bounrs for sstable support, maybe find a better way to solve this
+        return edge.parent.GetBounds().LongerSideLength() - transform.GetBounds().ShorterSideLength() > 0.5f; // We use shorterside length for current because we need shorter side of bounrs for sstable support, maybe find a better way to solve this
     }
 
     /// <summary>
@@ -120,8 +119,8 @@ public partial class Snapper : MonoBehaviour
         else if (defaults.horizontalFrontShiftDirection == HorizontalFrontShiftDirection.Backward)
             direction = -edge.forward;
 
-        targetHalfSize = GetTransformBounds(snappedTarget).ShorterSideLength() / 2; //TODO Temporary solution for walls, to get front facing size
-        currentPreviewHalfSize = GetTransformBounds(transform).size.x / 2;
+        targetHalfSize = snappedTarget.GetBounds().ShorterSideLength() / 2; //TODO Temporary solution for walls, to get front facing size
+        currentPreviewHalfSize = transform.GetBounds().size.x / 2;
 
         var shiftDistance = 0f;
         if (defaults.myFrontShiftDistance == HorizontalShiftDistance.Half)
@@ -129,7 +128,7 @@ public partial class Snapper : MonoBehaviour
         else if (defaults.myFrontShiftDistance == HorizontalShiftDistance.Full)
             shiftDistance += currentPreviewHalfSize * 2;
         else if (defaults.myFrontShiftDistance == HorizontalShiftDistance.ShorterHalf)
-            shiftDistance += GetTransformBounds(transform).ShorterSideLength() / 2;
+            shiftDistance += transform.GetBounds().ShorterSideLength() / 2;
 
         var targetShiftDistance = defaults.targetsWithShift.First(x => x.prefabType == snappedTargetSnapper.defaults.prefabType).targetsShiftDistance;
         if (targetShiftDistance == HorizontalShiftDistance.Half)
@@ -137,9 +136,9 @@ public partial class Snapper : MonoBehaviour
         else if (targetShiftDistance == HorizontalShiftDistance.Full)
             shiftDistance += targetHalfSize * 2;
         else if (targetShiftDistance == HorizontalShiftDistance.ShorterHalf)
-            shiftDistance += GetTransformBounds(snappedTarget).ShorterSideLength() / 2;
+            shiftDistance += snappedTarget.GetBounds().ShorterSideLength() / 2;
         else if (targetShiftDistance == HorizontalShiftDistance.NegativeShorterHalf)
-            shiftDistance -= GetTransformBounds(snappedTarget).ShorterSideLength() / 2;
+            shiftDistance -= snappedTarget.GetBounds().ShorterSideLength() / 2;
 
         return direction * shiftDistance;
     }
@@ -148,22 +147,22 @@ public partial class Snapper : MonoBehaviour
     {
         float sidewayShift = 0f;
         if (defaults.mySideWaysShiftDistance == HorizontalShiftDistance.Half)
-            sidewayShift += GetTransformBounds(transform).ShorterSideLength() / 2;
+            sidewayShift += transform.GetBounds().ShorterSideLength() / 2;
         else if (defaults.mySideWaysShiftDistance == HorizontalShiftDistance.Full)
-            sidewayShift += GetTransformBounds(transform).ShorterSideLength();
+            sidewayShift += transform.GetBounds().ShorterSideLength();
 
 
         if (defaults.targetSideWaysShiftDistance == HorizontalShiftDistance.Half)
-            sidewayShift += GetTransformBounds(edge).LongerSideLength() / 2;
+            sidewayShift += edge.GetBounds().LongerSideLength() / 2;
         else if (defaults.targetSideWaysShiftDistance == HorizontalShiftDistance.Full)
-            sidewayShift += GetTransformBounds(edge).LongerSideLength();
+            sidewayShift += edge.GetBounds().LongerSideLength();
 
         return sidewayShift;
     }
     private Vector3 SideDirection(Transform edge)
     {
-        var min = GetTransformBounds(edge).min.HeightIgnored();
-        var max = GetTransformBounds(edge).max.HeightIgnored();
+        var min = edge.GetBounds().min.HeightIgnored();
+        var max = edge.GetBounds().max.HeightIgnored();
 
         if (Mathf.Abs(min.x - max.x) > Mathf.Abs(max.z - min.z))
         {
@@ -176,41 +175,6 @@ public partial class Snapper : MonoBehaviour
     }
     private Vector3 SnapTargetPosition() => new Vector3(snappedTarget.position.x, transform.position.y, snappedTarget.position.z);
     private Transform SnapTarget() => snappedEdge.GetComponent<Snapper>() != null ? snappedEdge : snappedEdge.parent;
-
-    private Bounds GetTransformBounds(Transform t)
-    {
-        var boxCollider = t.GetComponent<BoxCollider>();
-        if (boxCollider != null)
-        {
-            return t.GetComponent<BoxCollider>().bounds;
-        }
-
-        else
-        {
-            var meshRenderer = t.GetComponent<MeshRenderer>();
-            if (meshRenderer != null)
-            {
-                return meshRenderer.bounds;
-            }
-            else
-            {
-                var renderers = t.GetComponentsInChildren<Renderer>();
-                if (renderers != null && renderers.Length > 0)
-                {
-                    var childBounds = renderers[0].bounds;
-                    foreach (Renderer r in renderers)
-                    {
-                        childBounds.Encapsulate(r.bounds);
-                    }
-                    return childBounds;
-                }
-                Debug.LogError("Couldn't find bounds for " + t.name);
-                return new Bounds(transform.position, Vector3.zero);
-
-            }
-
-        }
-    }
 
     private bool IsCurrentPrefabOfType(PrefabType type) => defaults.prefabType == type;
     #endregion
@@ -230,7 +194,7 @@ public partial class Snapper : MonoBehaviour
         return !IsGroundFloor() && defaults.shiftDown;
     }
     private bool IsGroundFloor() => transform.position.y == 0;
-    private Vector3 ShiftDownByHeight() => -Vector3.up * (defaults.shiftDownDistance != 0f ? defaults.shiftDownDistance : GetTransformBounds(transform).size.y) ;
+    private Vector3 ShiftDownByHeight() => -Vector3.up * (defaults.shiftDownDistance != 0f ? defaults.shiftDownDistance : transform.GetBounds().size.y) ;
     private Vector3 ShiftUpBySmallDelta() => Vector3.up * 0.005f;// In order to keep floor above wall
     #endregion
 
@@ -252,7 +216,7 @@ public partial class Snapper : MonoBehaviour
     #region Find edges to snap to
     private Transform FindClosestOverlappingEdge()
     {
-        var target = Physics.OverlapBox(transform.position + Vector3.up * GetTransformBounds(transform).size.y / 2, GetTransformBounds(transform).extents, transform.rotation, LayerMask.GetMask("Snappable"))
+        var target = Physics.OverlapBox(transform.position + Vector3.up * transform.GetBounds().size.y / 2, transform.GetBounds().extents, transform.rotation, LayerMask.GetMask("Snappable"))
             .Where(x => CanSnap(x.transform))
             .OrderBy(x => Vector3.Distance(x.transform.position, transform.position))
             .FirstOrDefault();

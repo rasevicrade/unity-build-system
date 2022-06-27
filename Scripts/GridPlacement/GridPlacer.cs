@@ -40,7 +40,6 @@ public class GridPlacer : MonoBehaviour
 
     private void PlaceBase(float totalX, float totalZ, float floorWidth, float fx, float fz)
     {
-        //var currentPosition = _blueprint.floorStartPosition;
         for (int x = 0; x <= totalX; x++)
         {
             for (int z = 0; z <= totalZ; z++)
