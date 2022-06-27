@@ -41,36 +41,34 @@ public class Blueprint : MonoBehaviour
         
     }
 
-    public GameObject PlaceGameObject(GameObject activeObject, Vector3 position, Quaternion? rotation)
+    public GameObject PlaceGameObject(GameObject activeObject, Vector3 position, Quaternion? rotation, GameObject parent)
     {
         if (position == Vector3.zero)
             return null;
 
         var instantiatedGO = Instantiate(activeObject, position, rotation != null ? rotation.Value : Quaternion.Euler(0,0,0));
-        //instantiatedGO.transform.parent = transform;
         instantiatedGO.transform.localScale = new Vector3(activeScale, activeScale, activeScale);
         instantiatedGO.gameObject.layer = LayerMask.NameToLayer("Default");
-        instantiatedGO.name = instantiatedGO.name.Replace("(Clone)", "") + "-Placed";      
+        instantiatedGO.name = activeObject.name + "-Placed";      
         
         if (!IsSnappable(instantiatedGO))
             Debug.LogWarning("Object cannot be snapped to, because it has no snappable edges: " + instantiatedGO.name);
 
-        SetParent(instantiatedGO, activeObject.name);
+        SetParent(instantiatedGO, parent);
         
         return instantiatedGO;
     }
 
-    private void SetParent(GameObject instantiatedGO, string prefabType)
+    private void SetParent(GameObject instantiatedGO, GameObject parent)
     {
-        var groupName = prefabType + " - Group";
-        if (!prefabHolers.ContainsKey(groupName))
-        {
-            var holderObject = new GameObject(groupName);
-            holderObject.transform.parent = transform;
-            prefabHolers[groupName] = holderObject;
-        }
+        //if (!prefabHolers.ContainsKey(groupName))
+        //{
+        //    var holderObject = new GameObject(groupName);
+        //    holderObject.transform.parent = transform;
+        //    prefabHolers[groupName] = holderObject;
+        //}
 
-        instantiatedGO.transform.parent = prefabHolers[groupName].transform;
+        instantiatedGO.transform.parent = parent.transform;
     }
 
     private bool IsSnappable(GameObject instantiatedGO)

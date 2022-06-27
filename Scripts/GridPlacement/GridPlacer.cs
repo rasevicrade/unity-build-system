@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class GridPlacer : MonoBehaviour
 {
-    private static GridPlacer instance;
     private Blueprint _blueprint;
     private GameObject _wallPrefab;
     private GameObject _currentPrefabPreview;
@@ -23,47 +22,56 @@ public class GridPlacer : MonoBehaviour
         _floorsGO.transform.parent = _roomGO.transform;
         _wallsGO.transform.parent = _roomGO.transform;
 
-        var currentPosition = blueprint.floorStartPosition;
+        var floorWidth = 4f;
+        
         var direction = (blueprint.floorEndPosition - blueprint.floorStartPosition).normalized;
-        var totalX = Math.Round(Math.Abs(blueprint.floorStartPosition.x - blueprint.floorEndPosition.x) / 4);
-        var totalZ = Math.Round(Math.Abs(blueprint.floorStartPosition.z - blueprint.floorEndPosition.z) / 4);
+        var totalX = (float)Math.Round(Math.Abs(blueprint.floorStartPosition.x - blueprint.floorEndPosition.x) / 4);
+        var totalZ = (float)Math.Round(Math.Abs(blueprint.floorStartPosition.z - blueprint.floorEndPosition.z) / 4);
         var fx = (float)Math.Round(direction.x, 0);
         var fz = (float)Math.Round(direction.z, 0);
 
 
+        PlaceBase(totalX, totalZ, floorWidth, fx, fz);
+
+        if (wallPrefab != null)
+        {
+            PlaceWallsAroundBase(totalX, totalZ, floorWidth, fx, fz);
+        }
+        return _roomGO;
+    }
+
+    private void PlaceBase(float totalX, float totalZ, float floorWidth, float fx, float fz)
+    {
+        var currentPosition = _blueprint.floorStartPosition;
         for (int x = 0; x <= totalX; x++)
         {
             for (int z = 0; z <= totalZ; z++)
             {
-                var floor = blueprint.PlaceGameObject(currentPrefabPreview, new Vector3(currentPosition.x, blueprint.activeBaseHeight * blueprint.activeScale, currentPosition.z), currentPrefabPreview.transform.rotation);
-                floor.transform.parent = _floorsGO.transform;
-
-                if (wallPrefab != null)
-                    AddWall(currentPosition, fx, fz, x, z, totalX, totalZ);
-                currentPosition = new Vector3(currentPosition.x, blueprint.activeBaseHeight * blueprint.activeScale, currentPosition.z + 4 * fz);
+                _blueprint.PlaceGameObject(
+                    _currentPrefabPreview,
+                    new Vector3(currentPosition.x, _blueprint.activeBaseHeight * _blueprint.activeScale, currentPosition.z),
+                    _currentPrefabPreview.transform.rotation,
+                    _floorsGO);
+                currentPosition = new Vector3(currentPosition.x, _blueprint.activeBaseHeight * _blueprint.activeScale, currentPosition.z + 4 * fz);
             }
-            currentPosition = new Vector3(currentPosition.x + 4 * fx, blueprint.activeBaseHeight * blueprint.activeScale, blueprint.floorStartPosition.z);
+            currentPosition = new Vector3(currentPosition.x + floorWidth * fx, _blueprint.activeBaseHeight * _blueprint.activeScale, _blueprint.floorStartPosition.z);
         }
-
-        return _roomGO;
     }
 
-    private void AddWall(Vector3 currentPosition, float fx, float fz, int x, int z, double totalX, double totalZ)
+    private void PlaceWallsAroundBase(float totalX, float totalZ, float floorWidth, float fx, float fz )
     {
-        GameObject wall = null;
-        if (x == 0)
-            wall = _blueprint.PlaceGameObject(_wallPrefab, new Vector3(currentPosition.x - fx * 2, _blueprint.activeBaseHeight * _blueprint.activeScale, currentPosition.z), _currentPrefabPreview.transform.rotation * Quaternion.Euler(0, -90, 0));
-        else if (x == totalX)
-            wall = _blueprint.PlaceGameObject(_wallPrefab, new Vector3(currentPosition.x + fx * 2, _blueprint.activeBaseHeight * _blueprint.activeScale, currentPosition.z), _currentPrefabPreview.transform.rotation * Quaternion.Euler(0, -90, 0));
+        for (float x = 0; x <= totalX; x++)
+        {
+            var worldX = _blueprint.floorStartPosition.x + x * floorWidth * fx;
+            _blueprint.PlaceGameObject(_wallPrefab, new Vector3(worldX, _blueprint.activeBaseHeight * _blueprint.activeScale, _blueprint.floorStartPosition.z - fz * 2), _currentPrefabPreview.transform.rotation, _wallsGO);
+            _blueprint.PlaceGameObject(_wallPrefab, new Vector3(worldX, _blueprint.activeBaseHeight * _blueprint.activeScale, _blueprint.floorStartPosition.z + fz * totalZ * floorWidth + fz * 2), _currentPrefabPreview.transform.rotation, _wallsGO);
+        }
+        for (float z = 0; z <= totalZ; z++)
+        {
+            var worldZ = _blueprint.floorStartPosition.z + z * floorWidth * fz;
+            _blueprint.PlaceGameObject(_wallPrefab, new Vector3(_blueprint.floorStartPosition.x - fx * 2, _blueprint.activeBaseHeight * _blueprint.activeScale, worldZ), _currentPrefabPreview.transform.rotation * Quaternion.Euler(0, -90, 0), _wallsGO);
+            _blueprint.PlaceGameObject(_wallPrefab, new Vector3(_blueprint.floorStartPosition.x + fx * totalX * floorWidth + fx * 2, _blueprint.activeBaseHeight * _blueprint.activeScale, worldZ), _currentPrefabPreview.transform.rotation * Quaternion.Euler(0, -90, 0), _wallsGO);
+        }
 
-        if (wall != null)
-            wall.transform.parent = _wallsGO.transform;
-        if (z == 0)
-            wall = _blueprint.PlaceGameObject(_wallPrefab, new Vector3(currentPosition.x, _blueprint.activeBaseHeight * _blueprint.activeScale, currentPosition.z - fz * 2), _currentPrefabPreview.transform.rotation);
-        else if (z == totalZ)
-            wall = _blueprint.PlaceGameObject(_wallPrefab, new Vector3(currentPosition.x, _blueprint.activeBaseHeight * _blueprint.activeScale, currentPosition.z + fz * 2), _currentPrefabPreview.transform.rotation);
-
-        if (wall != null)
-            wall.transform.parent = _wallsGO.transform;
     }
 }

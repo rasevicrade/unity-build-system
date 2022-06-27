@@ -78,7 +78,7 @@ public partial class BlueprintEditor : Editor
                     if (activeGroup != null)
                     {
                         Undo.IncrementCurrentGroup();
-                        var placedGO = blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], previewController.GetPosition(), previewController.GetRotation());
+                        var placedGO = blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], previewController.GetPosition(), previewController.GetRotation(), GetParent(activeGroup));
                         Undo.RegisterCreatedObjectUndo(placedGO, placedGO.name);
                         Undo.SetCurrentGroupName("Place blueprint GO");
                     }
@@ -99,6 +99,21 @@ public partial class BlueprintEditor : Editor
                 DestroyImmediate(preview);
             else
                 SetActivePreview();
+        }
+    }
+
+    private GameObject GetParent(PrefabGroup activeGroup)
+    {
+        var childGroup = blueprint.transform.Find(activeGroup.Name);
+        if (childGroup != null)
+        {
+            return childGroup.gameObject;
+        } 
+        else
+        {
+            var newGroup = new GameObject(activeGroup.Name);
+            newGroup.transform.parent = blueprint.transform;
+            return newGroup;
         }
     }
 
@@ -156,24 +171,6 @@ public partial class BlueprintEditor : Editor
             activePrefabGroupIndex = 0;
 
         SetActivePreview();
-    }
-
-    private void ReplaceTargetSnappedObject(Snapper snapper)
-    {
-        //var targetGroup = prefabGroups.FirstOrDefault(x => x.Prefabs.FirstOrDefault(p => p.name + "-Placed" == snapper.transform.name) != null);
-
-        //if (targetGroup != null)
-        //{
-        //    activePrefabGroupIndex = prefabGroups.IndexOf(targetGroup);
-        //    ChangeActivePrefabIndex();
-
-        //    var placedGO = blueprint.PlaceGameObject(targetGroup.Prefabs[prefabGroups[activePrefabGroupIndex].activePrefabIndex], snapper.transform.position, snapper.transform.rotation);
-        //    DestroyImmediate(snapper.gameObject);
-        //}
-
-        ChangeActivePrefabIndex();
-        var placedGO = blueprint.PlaceGameObject(prefabGroups[activePrefabGroupIndex].Prefabs[prefabGroups[activePrefabGroupIndex].activePrefabIndex], snapper.transform.position, snapper.transform.rotation);
-        DestroyImmediate(snapper.gameObject);
     }
 
     private void ChangeActivePrefabIndex()
