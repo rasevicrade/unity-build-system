@@ -11,19 +11,6 @@ public class GridPlacer : MonoBehaviour
     private GameObject _roomGO;
     private GameObject _floorsGO;
 
-    private GridPlacer() { }
-
-    public static GridPlacer Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = new GridPlacer();
-            }
-            return instance;
-        }
-    }
 
     public GameObject PlaceGrid(Blueprint blueprint, GameObject currentPrefabPreview, GameObject wallPrefab)
     {

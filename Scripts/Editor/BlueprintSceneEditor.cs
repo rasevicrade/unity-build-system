@@ -9,12 +9,20 @@ using UnityEngine;
 public partial class BlueprintEditor : Editor
 {
     private PreviewController previewController;
+    private GridPlacer gridPlacer;
     private bool isDrag;
-    private bool isGridPlacement;
+    private bool isLeftMouseClicked;
+    private Snapper targetObject;
+    private Material targetMaterial;
+    private Material originalTargetMaterial;
 
     void OnSceneGUI()
     {
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
+        if (targetObject != null && !previewController.isSnapped)
+        {
+            //targetObject.gameObject.SetActive(true);
+        }
         if (GetMousePosition(out RaycastHit hitInfo))
         {
             blueprint.activeMousePosition = hitInfo.point;
@@ -36,24 +44,27 @@ public partial class BlueprintEditor : Editor
             {
                 if (IsLeftMouseButtonClicked(Event.current))
                 {
-                    BeginGridPlacement(hitInfo);
-                    isDrag = false;
                     Event.current.Use();
+                    blueprint.floorStartPosition = previewController.isSnapped ? previewController.GetPosition() : hitInfo.point;
+                    isLeftMouseClicked = true;
+                    isDrag = false;
+
+                    SetTargetObject(hitInfo);
                 }    
                 else if (IsLeftMouseButtonReleased(Event.current) && isDrag)
                 {
+                    Event.current.Use();
                     FinishGridPlacement(hitInfo);
-                    isDrag = false;
-                    Event.current.Use();   
+                    isDrag = false;  
                 }
                 if (Event.current.type == EventType.MouseDrag)
                 {
-                    isDrag = true;
                     Event.current.Use();
+                    isDrag = true;    
                 }
             }
-            blueprint.showGridPreview = isGridPlacement && isDrag;
-           
+            blueprint.showGridPreview = isLeftMouseClicked && isDrag;
+
             if (previewController != null && preview != null)
             {
                 SetFloor();
@@ -91,12 +102,26 @@ public partial class BlueprintEditor : Editor
         }
     }
 
-  
-
-    private void BeginGridPlacement(RaycastHit hitInfo)
+    private void OnDestroy()
     {
-        blueprint.floorStartPosition = previewController.isSnapped ? previewController.GetPosition() : hitInfo.point;
-        isGridPlacement = true;
+        DestroyImmediate(targetMaterial);
+    }
+
+    private void SetTargetObject(RaycastHit hitInfo)
+    {
+        if (targetObject != null)
+        {
+            targetObject.gameObject.GetComponent<Renderer>().sharedMaterial = originalTargetMaterial;
+        }
+        targetObject = hitInfo.transform.GetComponent<Snapper>();
+        blueprint.selectedObject = targetObject;
+        if (targetObject != null)
+        {
+            targetMaterial.color = Color.green;
+            targetMaterial.SetColor("_BaseColor", Color.green);
+            originalTargetMaterial = targetObject.gameObject.GetComponent<Renderer>().sharedMaterial;
+            targetObject.gameObject.GetComponent<Renderer>().sharedMaterial = targetMaterial;
+        }
     }
 
     private void FinishGridPlacement(RaycastHit hitInfo)
@@ -108,7 +133,7 @@ public partial class BlueprintEditor : Editor
             if (blueprint.addWallsToRooms)
                 wallPrefab = prefabGroups.FirstOrDefault(x => x.Name == "Walls").Prefabs.FirstOrDefault(x => x.name == "Wall");
 
-            var roomGO = GridPlacer.Instance.PlaceGrid(blueprint, previewController.currentPrefabPreview, wallPrefab);
+            var roomGO = gridPlacer.PlaceGrid(blueprint, previewController.currentPrefabPreview, wallPrefab);
             roomGO.transform.parent = blueprint.transform;
             Undo.IncrementCurrentGroup();
             Undo.RegisterCreatedObjectUndo(roomGO, roomGO.name);
@@ -163,6 +188,17 @@ public partial class BlueprintEditor : Editor
             prefabGroups[activePrefabGroupIndex].activePrefabIndex = 0;
 
         SetActivePreview();
+        if (targetObject != null)
+        {
+            targetObject.gameObject.SetActive(false);
+            previewController.UpdatePosition(targetObject.transform.position, true);
+            previewController.UpdateRotation(targetObject.transform.rotation);
+        }
+    }
+
+    private void ReplaceActiveObject()
+    {
+        throw new NotImplementedException();
     }
 
     private void SetActivePreview()
@@ -171,6 +207,7 @@ public partial class BlueprintEditor : Editor
             DestroyImmediate(preview);
 
         preview = previewController.CreatePreview(blueprint, Vector3.zero, prefabGroups[activePrefabGroupIndex].Prefabs[prefabGroups[activePrefabGroupIndex].activePrefabIndex], blueprint.activeScale);
+       
     }
     #endregion
 

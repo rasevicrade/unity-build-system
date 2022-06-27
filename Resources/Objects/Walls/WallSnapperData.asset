@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: WallSnapperData
   m_EditorClassIdentifier: 
   prefabType: 1
-  snapDistance: 2
+  snapDistance: 4
   horizontalFrontShiftDirection: 0
   myFrontShiftDistance: 0
   targetsWithShift:
@@ -26,3 +26,4 @@ MonoBehaviour:
   mySideWaysShiftDistance: 0
   targetSideWaysShiftDistance: 0
   shiftDown: 0
+  shiftDownDistance: 0
