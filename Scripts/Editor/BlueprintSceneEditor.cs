@@ -148,7 +148,8 @@ public partial class BlueprintEditor : Editor
             if (blueprint.addWallsToRooms)
                 wallPrefab = prefabGroups.FirstOrDefault(x => x.Name == "Walls").Prefabs.FirstOrDefault(x => x.name == "Wall");
 
-            var roomGO = gridPlacer.PlaceGrid(blueprint, previewController.currentPrefabPreview, wallPrefab);
+            var activeGroup = prefabGroups[activePrefabGroupIndex];
+            var roomGO = gridPlacer.PlaceGrid(blueprint, activeGroup.Prefabs[activeGroup.activePrefabIndex], wallPrefab);
             roomGO.transform.parent = blueprint.transform;
             Undo.IncrementCurrentGroup();
             Undo.RegisterCreatedObjectUndo(roomGO, roomGO.name);

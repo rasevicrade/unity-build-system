@@ -30,31 +30,27 @@ public class GridPlacer : MonoBehaviour
         var fx = (float)Math.Round(direction.x, 0);
         var fz = (float)Math.Round(direction.z, 0);
 
-
         PlaceBase(totalX, totalZ, floorWidth, fx, fz);
 
         if (wallPrefab != null)
-        {
             PlaceWallsAroundBase(totalX, totalZ, floorWidth, fx, fz);
-        }
+
         return _roomGO;
     }
 
     private void PlaceBase(float totalX, float totalZ, float floorWidth, float fx, float fz)
     {
-        var currentPosition = _blueprint.floorStartPosition;
+        //var currentPosition = _blueprint.floorStartPosition;
         for (int x = 0; x <= totalX; x++)
         {
             for (int z = 0; z <= totalZ; z++)
             {
                 _blueprint.PlaceGameObject(
                     _currentPrefabPreview,
-                    new Vector3(currentPosition.x, _blueprint.activeBaseHeight * _blueprint.activeScale, currentPosition.z),
+                    new Vector3(_blueprint.floorStartPosition.x + floorWidth * x * fx , _blueprint.activeBaseHeight * _blueprint.activeScale, _blueprint.floorStartPosition.z + floorWidth * z * fz),
                     _currentPrefabPreview.transform.rotation,
                     _floorsGO);
-                currentPosition = new Vector3(currentPosition.x, _blueprint.activeBaseHeight * _blueprint.activeScale, currentPosition.z + 4 * fz);
             }
-            currentPosition = new Vector3(currentPosition.x + floorWidth * fx, _blueprint.activeBaseHeight * _blueprint.activeScale, _blueprint.floorStartPosition.z);
         }
     }
 
