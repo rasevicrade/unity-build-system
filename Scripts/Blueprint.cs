@@ -46,7 +46,7 @@ public class Blueprint : MonoBehaviour
         var instantiatedGO = Instantiate(activeObject, position, rotation != null ? rotation.Value : Quaternion.Euler(0,0,0));
         instantiatedGO.transform.localScale = new Vector3(activeScale, activeScale, activeScale);
         instantiatedGO.gameObject.layer = LayerMask.NameToLayer("Default");
-        instantiatedGO.name = activeObject.name + "-Placed";      
+        instantiatedGO.name = activeObject.name;      
         
         if (!IsSnappable(instantiatedGO))
             Debug.LogWarning("Object cannot be snapped to, because it has no snappable edges: " + instantiatedGO.name);

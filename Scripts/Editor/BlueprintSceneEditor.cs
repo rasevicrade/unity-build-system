@@ -19,57 +19,23 @@ public partial class BlueprintEditor : Editor
     void OnSceneGUI()
     {
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
-        if (targetObject != null && !previewController.isSnapped)
-        {
-            //targetObject.gameObject.SetActive(true);
-        }
+
         if (GetMousePosition(out RaycastHit hitInfo))
         {
             blueprint.activeMousePosition = hitInfo.point;
-            if (Event.current.isScrollWheel)
-            {
-                if (Event.current.control)
-                {
-                    ChangeActiveGroupIndex();
-                    Event.current.Use();
-                }
-                else if (Event.current.shift)
-                {
-                    ChangeActivePrefabIndex();
-                    Event.current.Use();
-                }
-            }
-
-            if (Event.current.shift)
-            {
-                if (IsLeftMouseButtonClicked(Event.current))
-                {
-                    Event.current.Use();
-                    blueprint.floorStartPosition = previewController.isSnapped ? previewController.GetPosition() : hitInfo.point;
-                    isLeftMouseClicked = true;
-                    isDrag = false;
-
-                    SetTargetObject(hitInfo);
-                }    
-                else if (IsLeftMouseButtonReleased(Event.current) && isDrag)
-                {
-                    Event.current.Use();
-                    FinishGridPlacement(hitInfo);
-                    isDrag = false;  
-                }
-                if (Event.current.type == EventType.MouseDrag)
-                {
-                    Event.current.Use();
-                    isDrag = true;    
-                }
-            }
+            OnCtrlHandling();
+            OnShiftHandling(hitInfo);
+            OnKeyUpHandling();
+                        
             blueprint.showGridPreview = isLeftMouseClicked && isDrag;
 
             if (previewController != null && preview != null)
             {
                 SetFloor();
-                previewController.UpdatePosition(new Vector3(hitInfo.point.x, blueprint.activeBaseHeight, hitInfo.point.z));
-
+                if (targetObject == null)
+                    previewController.UpdatePosition(new Vector3(hitInfo.point.x, blueprint.activeBaseHeight, hitInfo.point.z));
+                else
+                    previewController.UpdatePosition(targetObject.transform.position);
 
                 if (IsLeftMouseButtonClicked(Event.current))
                 {
@@ -98,6 +64,79 @@ public partial class BlueprintEditor : Editor
         }
 
 
+        OnTabHandling();
+    }
+
+    private void OnCtrlHandling()
+    {
+        if (Event.current.control)
+        {
+            if (Event.current.isScrollWheel)
+            {
+                ChangeActiveGroupIndex();
+                Event.current.Use();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Shift + Mouse scroll changes active preview prefab within group (if there's an active object, it will replace that object)
+    /// Shift + LMB drag starts a grid placement of selected prefab type, eg. floor
+    /// </summary>
+    /// <param name="hitInfo"></param>
+    private void OnShiftHandling(RaycastHit hitInfo)
+    {
+        if (Event.current.shift)
+        {
+            if (Event.current.isScrollWheel)
+            {
+                ChangeActivePrefabIndex();
+                Event.current.Use();
+            }
+            if (IsLeftMouseButtonClicked(Event.current))
+            {
+                Event.current.Use();
+                blueprint.floorStartPosition = previewController.isSnapped ? previewController.GetPosition() : hitInfo.point;
+                isLeftMouseClicked = true;
+                isDrag = false;
+
+
+                if (IsReplacementModeActive()) // If we already are replacing, we can't set another active object
+                {
+                    ReplaceActiveObject();
+                }
+                else
+                {
+                    SetTargetObject(hitInfo);
+                }
+            }
+            else if (IsLeftMouseButtonReleased(Event.current) && isDrag)
+            {
+                Event.current.Use();
+                FinishGridPlacement(hitInfo);
+                isDrag = false;
+            }
+            if (Event.current.type == EventType.MouseDrag)
+            {
+                Event.current.Use();
+                isDrag = true;
+            }
+
+        }
+    }
+
+
+    private void OnKeyUpHandling()
+    {
+        if (Event.current.type == EventType.KeyUp)
+        {
+            if (targetObject != null)
+                targetObject.gameObject.SetActive(true);
+        }
+    }
+
+    private void OnTabHandling()
+    {
         if (Event.current.keyCode == KeyCode.Tab)
         {
             if (!Event.current.shift)
@@ -105,6 +144,12 @@ public partial class BlueprintEditor : Editor
             else
                 SetActivePreview();
         }
+    }
+
+    private bool IsReplacementModeActive()
+    {
+        var activeGroup = prefabGroups[activePrefabGroupIndex];
+        return targetObject != null && activeGroup.Prefabs[activeGroup.activePrefabIndex] != null;
     }
 
     private GameObject GetParent(PrefabGroup activeGroup)
@@ -132,16 +177,29 @@ public partial class BlueprintEditor : Editor
         if (targetObject != null)
         {
             targetObject.gameObject.GetComponent<Renderer>().sharedMaterial = originalTargetMaterial;
-        }
-        targetObject = hitInfo.transform.GetComponent<Snapper>();
-        blueprint.selectedObject = targetObject;
-        if (targetObject != null)
+            targetObject = null;
+        } 
+        else
         {
-            targetMaterial.color = Color.green;
-            targetMaterial.SetColor("_BaseColor", Color.green);
-            originalTargetMaterial = targetObject.gameObject.GetComponent<Renderer>().sharedMaterial;
-            targetObject.gameObject.GetComponent<Renderer>().sharedMaterial = targetMaterial;
+            targetObject = hitInfo.transform.GetComponent<Snapper>();
+            blueprint.selectedObject = targetObject;
+            if (targetObject != null)
+            {
+                // Remember the original material and set color to green
+                targetMaterial.color = Color.green;
+                targetMaterial.SetColor("_BaseColor", Color.green);
+                originalTargetMaterial = targetObject.gameObject.GetComponent<Renderer>().sharedMaterial;
+                targetObject.gameObject.GetComponent<Renderer>().sharedMaterial = targetMaterial;
+
+                // Set active group to the group of target object
+                var group = prefabGroups.FirstOrDefault(x => x.Prefabs.Any(p => p.name == targetObject.name));
+                if (group != null)
+                {
+                    activePrefabGroupIndex = prefabGroups.IndexOf(group); 
+                }
+            }
         }
+        
     }
 
     private void FinishGridPlacement(RaycastHit hitInfo)
@@ -195,14 +253,16 @@ public partial class BlueprintEditor : Editor
         if (targetObject != null)
         {
             targetObject.gameObject.SetActive(false);
-            previewController.UpdatePosition(targetObject.transform.position, true);
-            previewController.UpdateRotation(targetObject.transform.rotation);
+            //previewController.UpdatePosition(targetObject.transform.position, true);
+            //previewController.UpdateRotation(targetObject.transform.rotation);
         }
     }
 
     private void ReplaceActiveObject()
     {
-        throw new NotImplementedException();
+        var activeGroup = prefabGroups[activePrefabGroupIndex];
+        blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], targetObject.transform.position, targetObject.transform.rotation, GetParent(activeGroup));
+        DestroyImmediate(targetObject); 
     }
 
     private void SetActivePreview()
