@@ -24,7 +24,7 @@ public partial class BlueprintEditor : Editor
         blueprint = (Blueprint)target;
         previewController = FindObjectOfType<PreviewController>();
         gridPlacer = FindObjectOfType<GridPlacer>();
-        targetMaterial = new Material(Shader.Find("HDRP/Lit"));
+        PrepareTargetMaterial();
 
         RefreshPrefabs();
     }
