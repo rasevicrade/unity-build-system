@@ -19,18 +19,26 @@ public partial class BlueprintEditor : Editor
 
         if (GetMousePosition(out RaycastHit hitInfo))
         {
-            blueprint.activeMousePosition = hitInfo.point;
+            blueprint.activeMousePosition = new Vector3(hitInfo.point.x, blueprint.activeBaseHeight, hitInfo.point.z);
+            ManageTarget(hitInfo);
             OnShiftHandling(hitInfo);
             OnCtrlHandling(); 
-            OnKeyUpHandling();
 
             if (previewController != null && preview != null)
             {
                 SetFloor();
-                if (targetObject == null)
-                    previewController.UpdatePosition(new Vector3(hitInfo.point.x, blueprint.activeBaseHeight, hitInfo.point.z));
-                else // If we have an active object, we show preview in place of it
-                    previewController.UpdatePosition(targetObject.transform.position);
+                if (activeTarget != null)
+                {
+                    previewController.UpdateRotation(activeTarget.target.transform.rotation);
+                    previewController.UpdatePosition(activeTarget.target.transform.position, true);                   
+                    
+                }
+                else
+                {
+                    previewController.UpdatePosition(blueprint.activeMousePosition);
+                }
+                    
+
 
                 if (IsLeftMouseButtonClicked(Event.current))
                 {
@@ -84,13 +92,13 @@ public partial class BlueprintEditor : Editor
     private void FinishGridPlacement(RaycastHit hitInfo)
     {
         blueprint.floorEndPosition = hitInfo.point;
-        if (previewController.currentPrefabPreview != null)
+        if (previewController.IsPreviewActive())
         {
             GameObject wallPrefab = null;
             if (blueprint.addWallsToRooms)
                 wallPrefab = prefabGroups.FirstOrDefault(x => x.Name == "Walls").Prefabs.FirstOrDefault(x => x.name == "Wall");
 
-            SetActivePreview();
+            CreatePreview();
             var activeGroup = prefabGroups[activePrefabGroupIndex];
             var roomGO = gridPlacer.PlaceGrid(blueprint, activeGroup.Prefabs[activeGroup.activePrefabIndex], wallPrefab);
             roomGO.transform.parent = blueprint.transform;
@@ -149,7 +157,7 @@ public partial class BlueprintEditor : Editor
         if (activePrefabGroupIndex >= prefabGroups.Count)
             activePrefabGroupIndex = 0;
 
-        SetActivePreview();
+        CreatePreview();
     }
 
     private void ChangeActivePrefabIndex()
@@ -163,24 +171,24 @@ public partial class BlueprintEditor : Editor
         if (prefabGroups[activePrefabGroupIndex].activePrefabIndex >= prefabGroups[activePrefabGroupIndex].Prefabs.Length)
             prefabGroups[activePrefabGroupIndex].activePrefabIndex = 0;
 
-        SetActivePreview();
-        if (targetObject != null)
-        {
-            targetObject.gameObject.SetActive(false);
-            //previewController.UpdatePosition(targetObject.transform.position, true);
-            //previewController.UpdateRotation(targetObject.transform.rotation);
-        }
+        if (activeTarget != null)
+            CreatePreview(activeTarget.target.transform.position, true);
+        else
+            CreatePreview();
     }
 
- 
-
-    private void SetActivePreview()
+    private void CreatePreview(Vector3? position = null, bool ignoreSnap = false)
     {
         if (preview != null)
             DestroyImmediate(preview);
 
-        preview = previewController.CreatePreview(blueprint, Vector3.zero, prefabGroups[activePrefabGroupIndex].Prefabs[prefabGroups[activePrefabGroupIndex].activePrefabIndex], blueprint.activeScale);
+        preview = previewController.CreatePreview(blueprint, position.HasValue ? position.Value : blueprint.activeMousePosition, prefabGroups[activePrefabGroupIndex].Prefabs[prefabGroups[activePrefabGroupIndex].activePrefabIndex], blueprint.activeScale, ignoreSnap);
        
+    }
+
+    private void DeletePreview()
+    {
+        DestroyImmediate(preview);
     }
     #endregion
 
@@ -235,30 +243,17 @@ public partial class BlueprintEditor : Editor
         
     }
 
-    private void OnKeyUpHandling()
-    {
-        if (Event.current.type == EventType.KeyUp)
-        {
-            if (targetObject != null)
-            {
-
-                //ClearTargetObject();
-            }
-
-        }
-    }
-
     private void OnTabHandling()
     {
         if (Event.current.keyCode == KeyCode.Tab)
         {
             if (!Event.current.shift)
             {
-                DestroyImmediate(preview);
+                DeletePreview();
             }
             else
             {
-                SetActivePreview();
+                CreatePreview();
             }
 
         }
@@ -267,7 +262,6 @@ public partial class BlueprintEditor : Editor
 
     #region Mouse handling
     private bool IsLeftMouseButtonClicked(Event current) => current.button == 0 && current.type == EventType.MouseDown;
-    private bool IsLeftMouseButtonReleased(Event current) => current.button == 0 && current.type == EventType.MouseUp;
 
     private bool IsRightMouseButtonClicked(Event current) => current.button == 1 && current.type == EventType.MouseDown;
 

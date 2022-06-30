@@ -24,8 +24,6 @@ public partial class BlueprintEditor : Editor
         blueprint = (Blueprint)target;
         previewController = FindObjectOfType<PreviewController>();
         gridPlacer = FindObjectOfType<GridPlacer>();
-        PrepareTargetMaterial();
-
         RefreshPrefabs();
     }
 
@@ -48,7 +46,7 @@ public partial class BlueprintEditor : Editor
             if (GUILayout.Button("+"))
             {
                 activePrefabGroupIndex = i;
-                SetActivePreview();
+                CreatePreview();
             }
             if (GUILayout.Button("*"))
             {

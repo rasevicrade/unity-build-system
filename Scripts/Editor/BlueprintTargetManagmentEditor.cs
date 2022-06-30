@@ -1,33 +1,52 @@
 ﻿using UnityEngine;
 using System.Linq;
+using System.Collections.Generic;
 
 public partial class BlueprintEditor
 {
-    public Snapper targetObject; 
-    private Material targetObjectOriginalMaterial;
-    private Material targetMaterial;
+    public TargetObjectInfo activeTarget;
 
+    
     private void ManageTarget(RaycastHit hitInfo)
     {
-        if (targetObject != null)
-            ClearTargetObject();
+        if (Event.current.type == EventType.MouseUp && Event.current.button == 0)// We try to set target object only if it is clicked
+        {
+            if (IsReplacementModeActive())
+            {
+                ReplaceActiveObject();
+                DeletePreview();
+                return;
+            }
+            var targetSnapper = hitInfo.transform.GetComponent<Snapper>();
+            if (targetSnapper == null)
+                return;
 
-        if (HitinfoIsBlueprintObject(hitInfo))
-            SetTargetObject(hitInfo);
-
-        if (IsReplacementModeActive()) // If replacement mode is active, and we clicked, replace the object
-            ReplaceActiveObject();
+            if (activeTarget != null)
+                ClearPreviousTarget();
+            SetTargetObject(targetSnapper);
+        }
+        if (Event.current.keyCode == KeyCode.Tab)
+        {
+            if (activeTarget != null)
+                ClearPreviousTarget();
+        }
     }
 
-    private void SetTargetObject(RaycastHit hitInfo)
+    private void SetTargetObject(Snapper targetSnapper)
     {
-        targetObject = hitInfo.transform.GetComponent<Snapper>();
-        SetTargetObjectColor();
-        SetActivePrefabGroupToTargetObjectGroup();
+        activeTarget = new TargetObjectInfo
+        {
+            target = targetSnapper.gameObject,
+            snapper = targetSnapper,
+            material = targetSnapper.gameObject.GetComponent<Renderer>().sharedMaterial
+        };
+        activeTarget.SetTargetObjectColor(blueprint.activeTargetMaterial);
+        activeTarget.target.layer = LayerMask.NameToLayer("Ignore Raycast");
+        SetActivePrefabGroupToTargetObjectGroup(targetSnapper);
     }
-    private void SetActivePrefabGroupToTargetObjectGroup()
+    private void SetActivePrefabGroupToTargetObjectGroup(Snapper target)
     {
-        var group = prefabGroups.FirstOrDefault(x => x.Prefabs.Any(p => p.name == targetObject.name));
+        var group = prefabGroups.FirstOrDefault(x => x.Prefabs.Any(p => p.name == target.gameObject.name));
         if (group != null)
         {
             activePrefabGroupIndex = prefabGroups.IndexOf(group);
@@ -37,37 +56,34 @@ public partial class BlueprintEditor
     private void ReplaceActiveObject()
     {
         var activeGroup = prefabGroups[activePrefabGroupIndex];
-        blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], targetObject.transform.position, targetObject.transform.rotation, GetParent(activeGroup));
-        DestroyImmediate(targetObject);
+        blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], activeTarget.target.transform.position, activeTarget.target.transform.rotation, GetParent(activeGroup));
+        DestroyImmediate(activeTarget.target);
+        activeTarget = null;
     }
 
-    private void SetTargetObjectColor()
-    {
-        targetObjectOriginalMaterial = targetObject.gameObject.GetComponent<Renderer>().sharedMaterial;
-        targetObject.gameObject.GetComponent<Renderer>().sharedMaterial = targetMaterial;
-    }
 
-    private void ClearTargetObject()
+    private void ClearPreviousTarget()
     {
-        targetObject.gameObject.SetActive(true);
-        targetObject.gameObject.GetComponent<Renderer>().sharedMaterial = targetObjectOriginalMaterial;
-        targetObject = null;
+        activeTarget.target.layer = LayerMask.NameToLayer("Default");
+        activeTarget.target.GetComponent<Renderer>().sharedMaterial = activeTarget.material;
+        activeTarget = null;
     }
 
     private bool IsReplacementModeActive()
     {
         var activeGroup = prefabGroups[activePrefabGroupIndex];
-        return targetObject != null && activeGroup.Prefabs[activeGroup.activePrefabIndex] != null;
+        return activeTarget != null && activeGroup.Prefabs[activeGroup.activePrefabIndex] != null;
     }
 
-    private bool HitinfoIsBlueprintObject(RaycastHit hitInfo)
+    public class TargetObjectInfo
     {
-        return hitInfo.transform.GetComponent<Snapper>();
-    }
-    private void PrepareTargetMaterial()
-    {
-        targetMaterial = new Material(Shader.Find("HDRP/Lit"));
-        targetMaterial.color = Color.green;
-        targetMaterial.SetColor("_BaseColor", Color.green);
+        public GameObject target;
+        public Snapper snapper;
+        public Material material;
+
+        public void SetTargetObjectColor(Material targetMaterial)
+        {
+            target.GetComponent<Renderer>().sharedMaterial = targetMaterial;
+        }
     }
 }

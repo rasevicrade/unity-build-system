@@ -12,8 +12,9 @@ public class PreviewController : MonoBehaviour
 {
     public bool isSnapped;
     public bool stack;
-    public GameObject currentPrefabPreview;
-    public Snapper currentPreviewSnapper;
+    private bool ignoreSnap;
+    private GameObject currentPrefabPreview;
+    private Snapper currentPreviewSnapper;
 
     private Blueprint blueprint;
     
@@ -24,9 +25,15 @@ public class PreviewController : MonoBehaviour
 
     }
 
-    public GameObject CreatePreview(Blueprint blueprint, Vector3 position, GameObject currentPrefab, float scale)
+    public bool IsPreviewActive()
+    {
+        return currentPrefabPreview != null;
+    }
+
+    public GameObject CreatePreview(Blueprint blueprint, Vector3 position, GameObject currentPrefab, float scale, bool ignoreSnap)
     {
         this.blueprint = blueprint;
+        this.ignoreSnap = ignoreSnap;
         if (currentPrefab != null && currentPrefabPreview == null)
         {
             currentPrefabPreview = Instantiate(currentPrefab, position, Quaternion.identity);
@@ -51,7 +58,7 @@ public class PreviewController : MonoBehaviour
 
     public void UpdatePosition(Vector3 position, bool snap = false)
     {
-        if (currentPrefabPreview == null || (snap && isSnapped)) // Can't snap again if already snapped
+        if (currentPrefabPreview == null || (snap && isSnapped) || (snap && ignoreSnap)) // Can't snap again if already snapped
             return;
 
         var unsnapDistance = currentPreviewSnapper.defaults.snapDistance * blueprint.activeScale;

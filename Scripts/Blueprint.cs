@@ -5,6 +5,7 @@ using UnityEngine;
 [ExecuteAlways]
 public class Blueprint : MonoBehaviour
 {
+    public Material activeTargetMaterial;
     public float activeScale = 1;
     public float activeBaseHeight = 0;
     public float floorHeight = 6;
@@ -63,8 +64,6 @@ public class Blueprint : MonoBehaviour
         Vector3 bounds = new Vector3(temp.transform.GetBounds().extents.x, temp.transform.GetBounds().extents.y, temp.transform.GetBounds().extents.z);
         DestroyImmediate(temp);
 
-        var a = LayerMask.GetMask("Default");
-        var b = LayerMask.GetMask("Ignore Raycast");
         var overlappingList = Physics.OverlapBox(
             position + Vector3.up * bounds.y,
             bounds / 2,
@@ -74,8 +73,6 @@ public class Blueprint : MonoBehaviour
         if (overlappingList.Count > 0)
         {
             var tar = overlappingList[0];
-            //Debug.Log("Temp:" + temp.transform.position + " - " + bounds.extents);
-            //Debug.Log("Tar:" + tar.transform.position + " - " + tar.transform.GetBounds().extents);
         }
         
         return overlappingList.Count > 0;

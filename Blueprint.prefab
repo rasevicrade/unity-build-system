@@ -46,13 +46,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37b89b958edd62340a6df7ccc1cd5325, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  activeTargetMaterial: {fileID: 2100000, guid: 4abd0520234a5814ab825d060659394a,
+    type: 2}
   activeScale: 1
   activeBaseHeight: 0
   floorHeight: 6
   showGridPreview: 0
+  addWallsToRooms: 1
   floorStartPosition: {x: 0, y: 0, z: 0}
   floorEndPosition: {x: 0, y: 0, z: 0}
-  activeMousePosition: {x: 0, y: 0, z: 0}
+  activeMousePosition: {x: 0.18921168, y: 0, z: 8.658759}
+  selectedObject: {fileID: 0}
 --- !u!114 &8376761036002619773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67,7 +71,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isSnapped: 0
   stack: 0
-  currentPreviewSnapper: {fileID: 0}
 --- !u!114 &2290282063603005581
 MonoBehaviour:
   m_ObjectHideFlags: 0
