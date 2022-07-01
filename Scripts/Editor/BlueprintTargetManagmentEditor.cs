@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
+using System;
 
 public partial class BlueprintEditor
 {
@@ -11,9 +12,12 @@ public partial class BlueprintEditor
     {
         if (Event.current.type == EventType.MouseUp && Event.current.button == 0)// We try to set target object only if it is clicked
         {
-            if (IsReplacementModeActive())
+            if (IsPreviewMode())
             {
-                ReplaceActiveObject();
+                if (PreviewReplacesActiveTarget())
+                    ReplaceActiveObject();
+                else
+                    AppendToActiveObject();
                 DeletePreview();
                 return;
             }
@@ -32,31 +36,37 @@ public partial class BlueprintEditor
         }
     }
 
+    private void AppendToActiveObject()
+    {
+        blueprint.PlaceGameObject(blueprint.ActivePrefab, activeTarget.target.transform.position, activeTarget.target.transform.rotation, GetParent(blueprint.ActivePrefabGroup));
+        ClearPreviousTarget();
+
+    }
+
+    private bool PreviewReplacesActiveTarget()
+    {
+        return blueprint.ActivePrefab.GetComponent<Snapper>().defaults.replacesActiveTarget;
+    }
+
     private void SetTargetObject(Snapper targetSnapper)
     {
-        activeTarget = new TargetObjectInfo
-        {
-            target = targetSnapper.gameObject,
-            snapper = targetSnapper,
-            material = targetSnapper.gameObject.GetComponent<Renderer>().sharedMaterial
-        };
+        activeTarget = new TargetObjectInfo(targetSnapper);
         activeTarget.SetTargetObjectColor(blueprint.activeTargetMaterial);
         activeTarget.target.layer = LayerMask.NameToLayer("Ignore Raycast");
         SetActivePrefabGroupToTargetObjectGroup(targetSnapper);
     }
     private void SetActivePrefabGroupToTargetObjectGroup(Snapper target)
     {
-        var group = prefabGroups.FirstOrDefault(x => x.Prefabs.Any(p => p.name == target.gameObject.name));
+        var group = blueprint.prefabGroups.FirstOrDefault(x => x.Prefabs.Any(p => p.name == target.gameObject.name));
         if (group != null)
         {
-            activePrefabGroupIndex = prefabGroups.IndexOf(group);
+            blueprint.activePrefabGroupIndex = blueprint.prefabGroups.IndexOf(group);
         }
     }
 
     private void ReplaceActiveObject()
     {
-        var activeGroup = prefabGroups[activePrefabGroupIndex];
-        blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], activeTarget.target.transform.position, activeTarget.target.transform.rotation, GetParent(activeGroup));
+        blueprint.PlaceGameObject(blueprint.ActivePrefab, activeTarget.target.transform.position, activeTarget.target.transform.rotation, GetParent(blueprint.ActivePrefabGroup));
         DestroyImmediate(activeTarget.target);
         activeTarget = null;
     }
@@ -69,10 +79,9 @@ public partial class BlueprintEditor
         activeTarget = null;
     }
 
-    private bool IsReplacementModeActive()
+    private bool IsPreviewMode()
     {
-        var activeGroup = prefabGroups[activePrefabGroupIndex];
-        return activeTarget != null && activeGroup.Prefabs[activeGroup.activePrefabIndex] != null;
+        return activeTarget != null && previewController.ActivePreview != null;
     }
 
     public class TargetObjectInfo
@@ -80,6 +89,15 @@ public partial class BlueprintEditor
         public GameObject target;
         public Snapper snapper;
         public Material material;
+        public string group { get; private set; }
+
+        public TargetObjectInfo(Snapper targetSnapper)
+        {
+            target = targetSnapper.gameObject;
+            snapper = targetSnapper;
+            material = targetSnapper.gameObject.GetComponent<Renderer>().sharedMaterial;
+            group = snapper.GetGroup();
+        }
 
         public void SetTargetObjectColor(Material targetMaterial)
         {

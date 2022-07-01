@@ -232,5 +232,11 @@ public partial class Snapper : MonoBehaviour
     }
     #endregion
 
-    
+    #region Public helpers
+    public string GetGroup()
+    {
+        var group = blueprint.prefabGroups.FirstOrDefault(x => x.Prefabs.Any(p => p.name == gameObject.name));
+        return group.Name;
+    }
+    #endregion
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,12 +8,27 @@ public partial class Snapper
     public void SetDefaults()
     {
         SetAllowedTargets();
+        SetReplacesActiveTarget();
         SetHorizontalFrontShiftDirection();
         SetMyFrontShiftDistance();
         SetRotationType();
         SetShiftSideways();
         SetTargetSideWaysShiftDistance();
         SetShiftDown();
+    }
+
+    private void SetReplacesActiveTarget()
+    {
+        switch (defaults.prefabType) {
+            case PrefabType.Window:
+            case PrefabType.WallDecoration:
+                defaults.replacesActiveTarget = false;
+                break;
+            default:
+                defaults.replacesActiveTarget = true;
+                break;
+        }
+
     }
 
     private void SetAllowedTargets()

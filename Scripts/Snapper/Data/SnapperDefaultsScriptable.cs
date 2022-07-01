@@ -6,6 +6,7 @@ using UnityEngine;
 public class SnapperDefaultsScriptable : ScriptableObject
 {
     public PrefabType prefabType;
+    public bool replacesActiveTarget;
     public float snapDistance = 2f;
 
     public HorizontalFrontShiftDirection horizontalFrontShiftDirection;

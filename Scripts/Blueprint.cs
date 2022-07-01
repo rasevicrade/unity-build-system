@@ -6,6 +6,8 @@ using UnityEngine;
 public class Blueprint : MonoBehaviour
 {
     public Material activeTargetMaterial;
+    public List<PrefabGroup> prefabGroups = new List<PrefabGroup>();
+    public int activePrefabGroupIndex = 0;
     public float activeScale = 1;
     public float activeBaseHeight = 0;
     public float floorHeight = 6;
@@ -35,8 +37,38 @@ public class Blueprint : MonoBehaviour
         else
         {
             lineRenderer.positionCount = 0;
+        } 
+    }
+
+    public PrefabGroup ActivePrefabGroup
+    {
+        get
+        {
+            try
+            {
+                return prefabGroups[activePrefabGroupIndex];
+            }
+            catch
+            {
+                return null;
+            }
+
         }
-        
+    }
+    public GameObject ActivePrefab
+    {
+        get
+        {
+            try
+            {
+                return prefabGroups[activePrefabGroupIndex].Prefabs[prefabGroups[activePrefabGroupIndex].activePrefabIndex];
+            }
+            catch
+            {
+                return null;
+            }
+            
+        }
     }
 
     public GameObject PlaceGameObject(GameObject activeObject, Vector3 position, Quaternion? rotation, GameObject parent)

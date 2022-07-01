@@ -43,7 +43,7 @@ public partial class BlueprintEditor : Editor
                 if (IsLeftMouseButtonClicked(Event.current))
                 {
                     Event.current.Use();
-                    var activeGroup = prefabGroups[activePrefabGroupIndex];
+                    var activeGroup = blueprint.prefabGroups[blueprint.activePrefabGroupIndex];
                     if (activeGroup != null)
                     { 
                         var placedGO = blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], previewController.GetPosition(), previewController.GetRotation(), GetParent(activeGroup));
@@ -96,10 +96,10 @@ public partial class BlueprintEditor : Editor
         {
             GameObject wallPrefab = null;
             if (blueprint.addWallsToRooms)
-                wallPrefab = prefabGroups.FirstOrDefault(x => x.Name == "Walls").Prefabs.FirstOrDefault(x => x.name == "Wall");
+                wallPrefab = blueprint.prefabGroups.FirstOrDefault(x => x.Name == "Walls").Prefabs.FirstOrDefault(x => x.name == "Wall");
 
             CreatePreview();
-            var activeGroup = prefabGroups[activePrefabGroupIndex];
+            var activeGroup = blueprint.prefabGroups[blueprint.activePrefabGroupIndex];
             var roomGO = gridPlacer.PlaceGrid(blueprint, activeGroup.Prefabs[activeGroup.activePrefabIndex], wallPrefab);
             roomGO.transform.parent = blueprint.transform;
             Undo.IncrementCurrentGroup();
@@ -149,13 +149,13 @@ public partial class BlueprintEditor : Editor
     private void ChangeActiveGroupIndex()
     {
         if (Event.current.delta.y < 0)
-            activePrefabGroupIndex -= 1;
+            blueprint.activePrefabGroupIndex -= 1;
         else if (Event.current.delta.y > 0)
-            activePrefabGroupIndex += 1;
-        if (activePrefabGroupIndex < 0)
-            activePrefabGroupIndex = 0;
-        if (activePrefabGroupIndex >= prefabGroups.Count)
-            activePrefabGroupIndex = 0;
+            blueprint.activePrefabGroupIndex += 1;
+        if (blueprint.activePrefabGroupIndex < 0)
+            blueprint.activePrefabGroupIndex = 0;
+        if (blueprint.activePrefabGroupIndex >= blueprint.prefabGroups.Count)
+            blueprint.activePrefabGroupIndex = 0;
 
         CreatePreview();
     }
@@ -163,13 +163,13 @@ public partial class BlueprintEditor : Editor
     private void ChangeActivePrefabIndex()
     {
         if (Event.current.delta.y < 0)
-            prefabGroups[activePrefabGroupIndex].activePrefabIndex -= 1;
+            blueprint.prefabGroups[blueprint.activePrefabGroupIndex].activePrefabIndex -= 1;
         else if (Event.current.delta.y > 0)
-            prefabGroups[activePrefabGroupIndex].activePrefabIndex += 1;
-        if (prefabGroups[activePrefabGroupIndex].activePrefabIndex < 0)
-            prefabGroups[activePrefabGroupIndex].activePrefabIndex = 0;
-        if (prefabGroups[activePrefabGroupIndex].activePrefabIndex >= prefabGroups[activePrefabGroupIndex].Prefabs.Length)
-            prefabGroups[activePrefabGroupIndex].activePrefabIndex = 0;
+            blueprint.prefabGroups[blueprint.activePrefabGroupIndex].activePrefabIndex += 1;
+        if (blueprint.prefabGroups[blueprint.activePrefabGroupIndex].activePrefabIndex < 0)
+            blueprint.prefabGroups[blueprint.activePrefabGroupIndex].activePrefabIndex = 0;
+        if (blueprint.prefabGroups[blueprint.activePrefabGroupIndex].activePrefabIndex >= blueprint.prefabGroups[blueprint.activePrefabGroupIndex].Prefabs.Length)
+            blueprint.prefabGroups[blueprint.activePrefabGroupIndex].activePrefabIndex = 0;
 
         if (activeTarget != null)
             CreatePreview(activeTarget.target.transform.position, true);
@@ -182,7 +182,7 @@ public partial class BlueprintEditor : Editor
         if (preview != null)
             DestroyImmediate(preview);
 
-        preview = previewController.CreatePreview(blueprint, position.HasValue ? position.Value : blueprint.activeMousePosition, prefabGroups[activePrefabGroupIndex].Prefabs[prefabGroups[activePrefabGroupIndex].activePrefabIndex], blueprint.activeScale, ignoreSnap);
+        preview = previewController.CreatePreview(blueprint, position.HasValue ? position.Value : blueprint.activeMousePosition, blueprint.prefabGroups[blueprint.activePrefabGroupIndex].Prefabs[blueprint.prefabGroups[blueprint.activePrefabGroupIndex].activePrefabIndex], blueprint.activeScale, ignoreSnap);
        
     }
 

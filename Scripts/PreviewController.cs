@@ -30,6 +30,14 @@ public class PreviewController : MonoBehaviour
         return currentPrefabPreview != null;
     }
 
+    public GameObject ActivePreview
+    {
+        get
+        {
+            return currentPrefabPreview;
+        }
+    }
+
     public GameObject CreatePreview(Blueprint blueprint, Vector3 position, GameObject currentPrefab, float scale, bool ignoreSnap)
     {
         this.blueprint = blueprint;

@@ -12,8 +12,6 @@ using UnityEngine;
 [CustomEditor(typeof(Blueprint))]
 public partial class BlueprintEditor : Editor
 {
-    private List<PrefabGroup> prefabGroups = new List<PrefabGroup>();
-    private int activePrefabGroupIndex = 0;
     private Blueprint blueprint;
     
     private GameObject preview;
@@ -34,10 +32,10 @@ public partial class BlueprintEditor : Editor
 
         EditorGUILayout.BeginVertical();
         labelStyle = new GUIStyle(EditorStyles.label);
-        for (int i = 0; i < prefabGroups.Count; i++)
+        for (int i = 0; i < blueprint.prefabGroups.Count; i++)
         {
-            var prefabGroup = prefabGroups[i];
-            labelStyle.normal.textColor = i == activePrefabGroupIndex ? Color.green : Color.white;
+            var prefabGroup = blueprint.prefabGroups[i];
+            labelStyle.normal.textColor = i == blueprint.activePrefabGroupIndex ? Color.green : Color.white;
 
             EditorGUILayout.BeginHorizontal();
 
@@ -45,7 +43,7 @@ public partial class BlueprintEditor : Editor
             prefabGroup.activePrefabIndex = EditorGUILayout.Popup(prefabGroup.activePrefabIndex, Array.ConvertAll(prefabGroup.Prefabs, x => x.name));
             if (GUILayout.Button("+"))
             {
-                activePrefabGroupIndex = i;
+                blueprint.activePrefabGroupIndex = i;
                 CreatePreview();
             }
             if (GUILayout.Button("*"))
@@ -78,7 +76,7 @@ public partial class BlueprintEditor : Editor
         }
         if (GUILayout.Button("Set all prefab defaults")) //TODO Cleanup 
         {
-            foreach (var group in prefabGroups)
+            foreach (var group in blueprint.prefabGroups)
             {
                 foreach (var prefab in group.Prefabs)
                 {
@@ -121,11 +119,11 @@ public partial class BlueprintEditor : Editor
     {
         var objectsPath = Application.dataPath + "/BuildSystem/Resources/Objects/";
         var dirInfo = new DirectoryInfo(objectsPath);
-        prefabGroups = new List<PrefabGroup>();
+        blueprint.prefabGroups = new List<PrefabGroup>();
         int i = 0;
         foreach (var dir in dirInfo.GetDirectories())
         {
-            prefabGroups.Add(new PrefabGroup
+            blueprint.prefabGroups.Add(new PrefabGroup
             {
                 Name = dir.Name,
                 Prefabs = Resources.LoadAll<GameObject>("Objects/" + dir.Name).Where(x => x.GetComponent<Snapper>() != null).OrderBy(x => x.name).ToArray()
