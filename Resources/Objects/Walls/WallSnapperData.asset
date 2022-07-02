@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: WallSnapperData
   m_EditorClassIdentifier: 
   prefabType: 1
+  replacesActiveTarget: 1
   snapDistance: 4
   horizontalFrontShiftDirection: 0
   myFrontShiftDistance: 0
