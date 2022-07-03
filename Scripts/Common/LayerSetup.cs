@@ -6,8 +6,6 @@ public class LayerSetup
 {
     private static int maxLayers = 31;
 
-    /////////////////////////////////////////////////////////////////////
-
     public void AddNewLayer(string name)
     {
         CreateLayer(name);
@@ -17,9 +15,6 @@ public class LayerSetup
     {
         RemoveLayer(name);
     }
-
-
-    ////////////////////////////////////////////////////////////////////
 
 
     /// <summary>
