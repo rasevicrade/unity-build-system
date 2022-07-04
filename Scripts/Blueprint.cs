@@ -81,7 +81,7 @@ public class Blueprint : MonoBehaviour
         instantiatedGO.gameObject.layer = LayerMask.NameToLayer("Default");
         instantiatedGO.name = activeObject.name;      
         
-        if (!IsSnappable(instantiatedGO))
+        if (!instantiatedGO.transform.IsSnappable())
             Debug.LogWarning("Object cannot be snapped to, because it has no snappable edges: " + instantiatedGO.name);
 
         SetParent(instantiatedGO, parent);
@@ -115,18 +115,5 @@ public class Blueprint : MonoBehaviour
     private void SetParent(GameObject instantiatedGO, GameObject parent)
     {
         instantiatedGO.transform.parent = parent.transform;
-    }
-
-    private bool IsSnappable(GameObject instantiatedGO)
-    {
-        bool isSnappable = false;
-        foreach(Transform t in instantiatedGO.transform)
-        {
-            if (t.gameObject.layer == LayerMask.NameToLayer("Snappable"))
-            {
-                isSnappable = true;
-            }
-        }
-        return isSnappable;
     }
 }

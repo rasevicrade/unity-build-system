@@ -37,4 +37,17 @@ public static class TransformExtensions
 
         }
     }
+
+    public static bool IsSnappable(this Transform t)
+    {
+        bool isSnappable = false;
+        foreach (Transform c in t.transform)
+        {
+            if (c.gameObject.layer == LayerMask.NameToLayer("Snappable"))
+            {
+                isSnappable = true;
+            }
+        }
+        return isSnappable;
+    }
 }
