@@ -10,7 +10,7 @@ public partial class BlueprintEditor
     
     private void ManageTarget(RaycastHit hitInfo)
     {
-        if (Event.current.type == EventType.MouseUp && Event.current.button == 0)// We try to set target object only if it is clicked
+        if (Event.current.shift && Event.current.type == EventType.MouseUp && Event.current.button == 0)// We try to set target object only if it is clicked
         {
             if (IsPreviewMode())
             {
