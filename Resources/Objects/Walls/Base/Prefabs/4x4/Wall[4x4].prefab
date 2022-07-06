@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7660945460886247726}
   - component: {fileID: 5599612640517484004}
   - component: {fileID: 8469408802930248005}
+  - component: {fileID: -7583794435015346724}
   m_Layer: 0
   m_Name: Wall[4x4]
   m_TagString: Untagged
@@ -100,6 +101,19 @@ MonoBehaviour:
   isPreview: 0
   textLocation: {x: 148, y: 0, z: 105.768524}
   text: 
+--- !u!65 &-7583794435015346724
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6247951148754095153}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 4.000003, y: 4, z: 0.40000045}
+  m_Center: {x: 0, y: 2, z: 0}
 --- !u!1001 &3055222593347607220
 PrefabInstance:
   m_ObjectHideFlags: 0

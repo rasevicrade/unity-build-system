@@ -96,7 +96,11 @@ public partial class BlueprintEditor : Editor
         {
             GameObject wallPrefab = null;
             if (blueprint.addWallsToRooms)
-                wallPrefab = blueprint.prefabGroups.FirstOrDefault(x => x.Name == "Walls").Prefabs.FirstOrDefault(x => x.name == "Wall");
+            {
+                var wallGroup = blueprint.prefabGroups.FirstOrDefault(x => x.Name == "Walls");
+                wallPrefab = wallGroup.Prefabs[wallGroup.activePrefabIndex];
+            }
+                
 
             CreatePreview();
             var activeGroup = blueprint.prefabGroups[blueprint.activePrefabGroupIndex];

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5571567812640425109}
   - component: {fileID: 7689571106138501215}
   - component: {fileID: 4782555012486219506}
+  - component: {fileID: 6655641854946090864}
   m_Layer: 0
   m_Name: Wall-Window[4x4]
   m_TagString: Untagged
@@ -100,6 +101,19 @@ MonoBehaviour:
   isPreview: 0
   textLocation: {x: 156, y: 0, z: 105.7685}
   text: 
+--- !u!65 &6655641854946090864
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8193776558843990410}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 4.000003, y: 4, z: 0.40000045}
+  m_Center: {x: 0, y: 2, z: 0}
 --- !u!1001 &1800433056974946102
 PrefabInstance:
   m_ObjectHideFlags: 0
