@@ -7,6 +7,11 @@ public partial class Snapper
 {
     public void SetDefaults()
     {
+        if (defaults == null)
+        {
+            Debug.LogError("Defaults not set for " + gameObject.name);
+            return;
+        }
         SetAllowedTargets();
         SetReplacesActiveTarget();
         SetHorizontalFrontShiftDirection();
@@ -19,6 +24,7 @@ public partial class Snapper
 
     private void SetReplacesActiveTarget()
     {
+        
         switch (defaults.prefabType) {
             case PrefabType.Window:
             case PrefabType.WallDecoration:

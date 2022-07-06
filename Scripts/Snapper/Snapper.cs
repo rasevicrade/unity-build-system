@@ -43,7 +43,8 @@ public partial class Snapper : MonoBehaviour
 
     void Update()
     {
-        //text = "";
+        if (defaults == null)
+            return;
         originalPrefabPosition = transform.position;
         // If I am a preview, find edges to snap to
         if (isPreview)

@@ -66,7 +66,7 @@ public class PreviewController : MonoBehaviour
 
     public void UpdatePosition(Vector3 position, bool snap = false)
     {
-        if (currentPrefabPreview == null || (snap && isSnapped) || (snap && ignoreSnap)) // Can't snap again if already snapped
+        if (currentPrefabPreview == null || (snap && isSnapped) || (snap && ignoreSnap) || currentPreviewSnapper.defaults == null) // Can't snap again if already snapped
             return;
 
         var unsnapDistance = currentPreviewSnapper.defaults.snapDistance * blueprint.activeScale;
