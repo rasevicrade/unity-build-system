@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 [ExecuteAlways]
 public class Blueprint : MonoBehaviour
@@ -71,7 +72,7 @@ public class Blueprint : MonoBehaviour
         }
     }
 
-    public GameObject PlaceGameObject(GameObject activeObject, Vector3 position, Quaternion? rotation, GameObject parent)
+    public GameObject PlaceGameObject(GameObject activeObject, Vector3 position, Quaternion? rotation, GameObject parent, Material customMaterial = null)
     {
         if (position == Vector3.zero || PositionTakenByAnotherObjectOfSameType(activeObject, position, rotation))
             return null;
@@ -79,14 +80,29 @@ public class Blueprint : MonoBehaviour
         var instantiatedGO = Instantiate(activeObject, position, rotation != null ? rotation.Value : Quaternion.Euler(0,0,0));
         instantiatedGO.transform.localScale = new Vector3(activeScale, activeScale, activeScale);
         instantiatedGO.gameObject.layer = LayerMask.NameToLayer("Default");
-        instantiatedGO.name = activeObject.name;      
-        
+        instantiatedGO.name = activeObject.name;
+
+        if (IsCustomMaterial(instantiatedGO, customMaterial))
+            SetCustomMaterialToGO(instantiatedGO, customMaterial);
+
         if (!instantiatedGO.transform.IsSnappable())
             Debug.LogWarning("Object cannot be snapped to, because it has no snappable edges: " + instantiatedGO.name);
 
         SetParent(instantiatedGO, parent);
         
         return instantiatedGO;
+    }
+
+    private void SetCustomMaterialToGO(GameObject instantiatedGO, Material customMaterial)
+    {
+        instantiatedGO.GetComponent<Renderer>().sharedMaterial = prefabGroups[activePrefabGroupIndex].Material;
+    }
+
+    private bool IsCustomMaterial(GameObject instantiatedGO, Material customMaterial)
+    {
+        var renderer = instantiatedGO.GetComponent<Renderer>();
+        return renderer != null && customMaterial != null;
+            
     }
 
     private bool PositionTakenByAnotherObjectOfSameType(GameObject prefab, Vector3 position, Quaternion? rotation)

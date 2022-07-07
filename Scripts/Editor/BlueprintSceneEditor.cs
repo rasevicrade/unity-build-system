@@ -46,7 +46,7 @@ public partial class BlueprintEditor : Editor
                     var activeGroup = blueprint.prefabGroups[blueprint.activePrefabGroupIndex];
                     if (activeGroup != null)
                     { 
-                        var placedGO = blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], previewController.GetPosition(), previewController.GetRotation(), GetParent(activeGroup));
+                        var placedGO = blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], previewController.GetPosition(), previewController.GetRotation(), GetParent(activeGroup), activeGroup.Material);
                         if (placedGO != null)
                         {
                             Undo.IncrementCurrentGroup();
@@ -94,17 +94,20 @@ public partial class BlueprintEditor : Editor
         blueprint.floorEndPosition = hitInfo.point;
         if (previewController.IsPreviewActive())
         {
+            var activeGroup = blueprint.prefabGroups[blueprint.activePrefabGroupIndex];
+            gridPlacer.SetBaseObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], activeGroup.Material);
+
             GameObject wallPrefab = null;
             if (blueprint.addWallsToRooms)
             {
                 var wallGroup = blueprint.prefabGroups.FirstOrDefault(x => x.Name == "Walls");
                 wallPrefab = wallGroup.Prefabs[wallGroup.activePrefabIndex];
+                if (wallPrefab != null)
+                    gridPlacer.SetSurroundingObject(wallPrefab, wallGroup.Material);
             }
-                
-
+               
             CreatePreview();
-            var activeGroup = blueprint.prefabGroups[blueprint.activePrefabGroupIndex];
-            var roomGO = gridPlacer.PlaceGrid(blueprint, activeGroup.Prefabs[activeGroup.activePrefabIndex], wallPrefab);
+            var roomGO = gridPlacer.PlaceGrid(blueprint);
             roomGO.transform.parent = blueprint.transform;
             Undo.IncrementCurrentGroup();
             Undo.RegisterCreatedObjectUndo(roomGO, roomGO.name);
@@ -187,7 +190,10 @@ public partial class BlueprintEditor : Editor
             DestroyImmediate(preview);
 
         preview = previewController.CreatePreview(blueprint, position.HasValue ? position.Value : blueprint.activeMousePosition, blueprint.prefabGroups[blueprint.activePrefabGroupIndex].Prefabs[blueprint.prefabGroups[blueprint.activePrefabGroupIndex].activePrefabIndex], blueprint.activeScale, ignoreSnap);
-       
+        var renderer = preview.GetComponent<Renderer>();
+        var customMaterial = blueprint.prefabGroups[blueprint.activePrefabGroupIndex].Material;
+        if (renderer != null && customMaterial != null)
+            preview.GetComponent<Renderer>().sharedMaterial = blueprint.prefabGroups[blueprint.activePrefabGroupIndex].Material;
     }
 
     private void DeletePreview()

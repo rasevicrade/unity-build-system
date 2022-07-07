@@ -42,7 +42,9 @@ public class PreviewController : MonoBehaviour
     {
         this.blueprint = blueprint;
         this.ignoreSnap = ignoreSnap;
-        if (currentPrefab != null && currentPrefabPreview == null)
+        if (currentPrefabPreview != null)
+            DestroyImmediate(currentPrefabPreview);
+        if (currentPrefab != null)
         {
             currentPrefabPreview = Instantiate(currentPrefab, position, Quaternion.identity);
             currentPrefabPreview.name = currentPrefabPreview.name + "-Preview";

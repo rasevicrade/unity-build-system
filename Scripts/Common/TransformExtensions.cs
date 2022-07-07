@@ -50,4 +50,5 @@ public static class TransformExtensions
         }
         return isSnappable;
     }
+
 }

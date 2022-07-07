@@ -38,7 +38,7 @@ public partial class BlueprintEditor
 
     private void AppendToActiveObject()
     {
-        blueprint.PlaceGameObject(blueprint.ActivePrefab, activeTarget.target.transform.position, activeTarget.target.transform.rotation, GetParent(blueprint.ActivePrefabGroup));
+        blueprint.PlaceGameObject(blueprint.ActivePrefab, activeTarget.target.transform.position, activeTarget.target.transform.rotation, GetParent(blueprint.ActivePrefabGroup), blueprint.ActivePrefabGroup.Material);
         ClearPreviousTarget();
 
     }
@@ -66,7 +66,7 @@ public partial class BlueprintEditor
 
     private void ReplaceActiveObject()
     {
-        blueprint.PlaceGameObject(blueprint.ActivePrefab, activeTarget.target.transform.position, activeTarget.target.transform.rotation, GetParent(blueprint.ActivePrefabGroup));
+        blueprint.PlaceGameObject(blueprint.ActivePrefab, activeTarget.target.transform.position, activeTarget.target.transform.rotation, GetParent(blueprint.ActivePrefabGroup), blueprint.ActivePrefabGroup.Material);
         DestroyImmediate(activeTarget.target);
         activeTarget = null;
     }
