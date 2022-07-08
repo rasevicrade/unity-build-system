@@ -120,7 +120,7 @@ public partial class BlueprintEditor : Editor
 
     private bool IsMaterialEditorSet(int groupIndex)
     {
-        return materialEditors[groupIndex] != null && selectedRenderer != null;
+        return materialEditors[groupIndex] != null;
     }
 
     private bool IsActiveGroup(int groupIndex)
