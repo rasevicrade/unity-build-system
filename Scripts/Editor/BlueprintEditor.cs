@@ -12,97 +12,130 @@ using UnityEngine;
 [CustomEditor(typeof(Blueprint))]
 public partial class BlueprintEditor : Editor
 {
-    private Blueprint blueprint;
-    
+    private Blueprint blueprint;  
     private GameObject preview;
-    private GUIStyle labelStyle;
-    private int toolbarInt = 0;
-    private string[] toolbarStrings = { "Prefabs", "Settings"  };
+    
     private MaterialEditor[] materialEditors;
-    private Dictionary<string, Material> groupMaterials;
     private Renderer selectedRenderer;
 
+    #region Lifecycle
     protected void OnEnable()
     {
         blueprint = (Blueprint)target;
         materialEditors = new MaterialEditor[blueprint.prefabGroups.Count];
-        groupMaterials = new Dictionary<string, Material>();
         previewController = FindObjectOfType<PreviewController>();
         gridPlacer = FindObjectOfType<GridPlacer>();
-        
+
         RefreshPrefabs();
         RefreshMaterials();
     }
 
     public override void OnInspectorGUI()
     {
-        //base.OnInspectorGUI();
         Handles.BeginGUI();
+        SetTab();  
+    }
+    #endregion
 
-        toolbarInt = GUILayout.Toolbar(toolbarInt, toolbarStrings);
-        if (toolbarInt == 1)
-        {
-            ShowSettings();
-        } else
-        {
-            ShowPrefabs();
-        }
+    #region Tab selection
+    private string[] tabNames = { "Prefabs", "Settings" };
+    private int activeTab = 0;
+    private void SetTab()
+    {
+        activeTab = GUILayout.Toolbar(activeTab, tabNames);
+        if (activeTab == 0)
+            PrefabsTab();
+        else
+            SettingsTab();
+    }
+    #endregion
 
+    #region Prefabs tab and methods
+    private void PrefabsTab()
+    {
+        if (!MaterialEditorArrayLongEnough())
+            InitMaterialEditorArray();
         
+        for (int groupIndex = 0; groupIndex < blueprint.prefabGroups.Count; groupIndex++)
+            AddPrefabGroupMenu(groupIndex);
     }
 
-    private void ShowPrefabs()
+    private void AddPrefabGroupMenu(int groupIndex)
     {
-        if (blueprint.prefabGroups.Count != materialEditors.Length)
+        var prefabGroup = blueprint.prefabGroups[groupIndex];
+
+        EditorGUILayout.BeginVertical();
+        EditorGUILayout.LabelField(prefabGroup.Name, GroupLabelStyle(groupIndex));
+
+        EditorGUI.BeginChangeCheck();
+        AddActivePrefabSelector(blueprint.prefabGroups[groupIndex], groupIndex);
+        AddCustomMaterialSelector(blueprint.prefabGroups[groupIndex], groupIndex);
+   
+        DrawUILine(Color.gray);
+        EditorGUILayout.EndVertical();
+    }
+
+    private void AddCustomMaterialSelector(PrefabGroup prefabGroup, int groupIndex)
+    {
+        // Active custom material row
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Set custom material: ");
+        prefabGroup.Material = (Material)EditorGUILayout.ObjectField(prefabGroup.Material, typeof(Material), true);
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+
+        if (EditorGUI.EndChangeCheck())
+            SetMaterialEditor(groupIndex);
+
+        if (IsMaterialEditorSet(groupIndex))
+            ShowMaterialEditor(groupIndex);
+
+        EditorGUILayout.EndHorizontal();
+    }
+
+    private void AddActivePrefabSelector(PrefabGroup prefabGroup, int groupIndex)
+    {
+        // Active prefab row
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Active prefab: ");
+        prefabGroup.activePrefabIndex = EditorGUILayout.Popup(prefabGroup.activePrefabIndex, Array.ConvertAll(prefabGroup.Prefabs, x => x.name));
+        if (GUILayout.Button("+"))
         {
-            materialEditors = new MaterialEditor[blueprint.prefabGroups.Count];
+            blueprint.activePrefabGroupIndex = groupIndex;
+            CreatePreview();
         }
-
-        labelStyle = new GUIStyle(EditorStyles.label);
-        for (int i = 0; i < blueprint.prefabGroups.Count; i++)
+        if (GUILayout.Button("*"))
         {
-            var prefabGroup = blueprint.prefabGroups[i];
-            labelStyle.normal.textColor = i == blueprint.activePrefabGroupIndex ? Color.green : Color.white;
-
-            EditorGUILayout.BeginVertical();
-            EditorGUILayout.LabelField(prefabGroup.Name, labelStyle);
-
-            EditorGUILayout.BeginHorizontal();
-
-            EditorGUILayout.Space();
-            EditorGUI.BeginChangeCheck();
-            prefabGroup.activePrefabIndex = EditorGUILayout.Popup(prefabGroup.activePrefabIndex, Array.ConvertAll(prefabGroup.Prefabs, x => x.name));
-            prefabGroup.Material = (Material)EditorGUILayout.ObjectField(prefabGroup.Material, typeof(Material), true);
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                SetMaterialEditor(i);
-            }
-
-            if (materialEditors[i] != null && selectedRenderer != null)
-            {
-                materialEditors[i].DrawHeader();
-            }
-
-            
-
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("+"))
-            {
-                blueprint.activePrefabGroupIndex = i;
-                CreatePreview();
-            }
-            if (GUILayout.Button("*"))
-            {
-                AssetDatabase.OpenAsset(AssetDatabase.LoadAssetAtPath<GameObject>(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(prefabGroup.Prefabs[prefabGroup.activePrefabIndex])));
-            }
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.EndVertical();
-           
+            AssetDatabase.OpenAsset(AssetDatabase.LoadAssetAtPath<GameObject>(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(prefabGroup.Prefabs[prefabGroup.activePrefabIndex])));
         }
+        EditorGUILayout.EndHorizontal();
+    }
 
+    private void ShowMaterialEditor(int groupIndex)
+    {
+        EditorGUILayout.LabelField("Active prefab material: ");
+        materialEditors[groupIndex].DrawHeader();
+    }
+
+    private bool IsMaterialEditorSet(int groupIndex)
+    {
+        return materialEditors[groupIndex] != null && selectedRenderer != null;
+    }
+
+    private bool IsActiveGroup(int groupIndex)
+    {
+        return groupIndex == blueprint.activePrefabGroupIndex;
+    }
+
+    private bool MaterialEditorArrayLongEnough()
+    {
+        return blueprint.prefabGroups.Count <= materialEditors.Length;
+    }
+   
+    private void InitMaterialEditorArray()
+    {
+        materialEditors = new MaterialEditor[blueprint.prefabGroups.Count];
     }
 
     private void SetMaterialEditor(int prefabGroupIndex)
@@ -135,8 +168,10 @@ public partial class BlueprintEditor : Editor
 
         materialEditors[prefabGroupIndex] = (MaterialEditor)tmpEditor;
     }
-
-    private void ShowSettings()
+    #endregion
+    
+    #region Settings tab and methods
+    private void SettingsTab()
     {
         EditorGUILayout.BeginVertical();
         
@@ -232,4 +267,27 @@ public partial class BlueprintEditor : Editor
             i++;
         }
     }
+    #endregion
+
+    #region UI Helpers
+    private GUIStyle labelStyle;
+    private GUIStyle GroupLabelStyle(int groupIndex)
+    {
+        if (labelStyle == null)
+            labelStyle = new GUIStyle(EditorStyles.label);
+        labelStyle.normal.textColor = IsActiveGroup(groupIndex) ? Color.green : Color.white;
+        labelStyle.alignment = TextAnchor.MiddleCenter;
+        return labelStyle;
+    }
+
+    private static void DrawUILine(Color color, int thickness = 2, int padding = 10)
+    {
+        Rect r = EditorGUILayout.GetControlRect(GUILayout.Height(padding + thickness));
+        r.height = thickness;
+        r.y += padding / 2;
+        r.x -= 2;
+        r.width += 6;
+        EditorGUI.DrawRect(r, color);
+    }
+    #endregion
 }
