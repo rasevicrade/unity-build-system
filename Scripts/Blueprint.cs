@@ -8,6 +8,7 @@ public class Blueprint : MonoBehaviour
 {
     public Material activeTargetMaterial;
     public List<PrefabGroup> prefabGroups = new List<PrefabGroup>();
+    public List<Material> availableMaterials = new List<Material>();
     public int activePrefabGroupIndex = 0;
     public float activeScale = 1;
     public float activeBaseHeight = 0;
@@ -95,7 +96,7 @@ public class Blueprint : MonoBehaviour
 
     private void SetCustomMaterialToGO(GameObject instantiatedGO, Material customMaterial)
     {
-        instantiatedGO.GetComponent<Renderer>().sharedMaterial = prefabGroups[activePrefabGroupIndex].Material;
+        instantiatedGO.GetComponent<Renderer>().sharedMaterial = customMaterial;
     }
 
     private bool IsCustomMaterial(GameObject instantiatedGO, Material customMaterial)

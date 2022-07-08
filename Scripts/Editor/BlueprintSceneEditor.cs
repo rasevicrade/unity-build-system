@@ -182,6 +182,8 @@ public partial class BlueprintEditor : Editor
             CreatePreview(activeTarget.target.transform.position, true);
         else
             CreatePreview();
+
+        SetMaterialEditor(blueprint.activePrefabGroupIndex);
     }
 
     private void CreatePreview(Vector3? position = null, bool ignoreSnap = false)
