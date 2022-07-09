@@ -17,11 +17,13 @@ public partial class BlueprintEditor : Editor
     
     private MaterialEditor[] materialEditors;
     private Renderer selectedRenderer;
+    private SerializedProperty activePrefabGroupIndex;
 
     #region Lifecycle
     protected void OnEnable()
     {
         blueprint = (Blueprint)target;
+        activePrefabGroupIndex = serializedObject.FindProperty("activePrefabGroupIndex");
         materialEditors = new MaterialEditor[blueprint.prefabGroups.Count];
         previewController = FindObjectOfType<PreviewController>();
         gridPlacer = FindObjectOfType<GridPlacer>();
@@ -123,10 +125,6 @@ public partial class BlueprintEditor : Editor
         return materialEditors[groupIndex] != null;
     }
 
-    private bool IsActiveGroup(int groupIndex)
-    {
-        return groupIndex == blueprint.activePrefabGroupIndex;
-    }
 
     private bool MaterialEditorArrayLongEnough()
     {
@@ -278,6 +276,10 @@ public partial class BlueprintEditor : Editor
         labelStyle.normal.textColor = IsActiveGroup(groupIndex) ? Color.green : Color.white;
         labelStyle.alignment = TextAnchor.MiddleCenter;
         return labelStyle;
+    }
+    private bool IsActiveGroup(int groupIndex)
+    {
+        return groupIndex == blueprint.activePrefabGroupIndex;
     }
 
     private static void DrawUILine(Color color, int thickness = 2, int padding = 10)

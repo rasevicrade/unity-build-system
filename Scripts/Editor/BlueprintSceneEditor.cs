@@ -46,7 +46,7 @@ public partial class BlueprintEditor : Editor
                     var activeGroup = blueprint.prefabGroups[blueprint.activePrefabGroupIndex];
                     if (activeGroup != null)
                     { 
-                        var placedGO = blueprint.PlaceGameObject(activeGroup.Prefabs[activeGroup.activePrefabIndex], previewController.GetPosition(), previewController.GetRotation(), GetParent(activeGroup), activeGroup.Material);
+                        var placedGO = PlacePrefab(activeGroup.Prefabs[activeGroup.activePrefabIndex], previewController.GetPosition(), previewController.GetRotation(), GetParent(activeGroup), activeGroup.Material);
                         if (placedGO != null)
                         {
                             Undo.IncrementCurrentGroup();

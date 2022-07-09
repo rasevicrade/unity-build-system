@@ -35,7 +35,7 @@ public class GridPlacer : MonoBehaviour
         _wallsGO.transform.parent = _roomGO.transform;
 
         var floorWidth = 4f;
-        
+
         var direction = (blueprint.floorEndPosition - blueprint.floorStartPosition).normalized;
         var totalX = (float)Math.Round(Math.Abs(blueprint.floorStartPosition.x - blueprint.floorEndPosition.x) / 4);
         var totalZ = (float)Math.Round(Math.Abs(blueprint.floorStartPosition.z - blueprint.floorEndPosition.z) / 4);
@@ -57,7 +57,7 @@ public class GridPlacer : MonoBehaviour
             for (int z = 0; z <= totalZ; z++)
             {
                 var pos = new Vector3(_blueprint.floorStartPosition.x + floorWidth * x * fx, _blueprint.activeBaseHeight * _blueprint.activeScale, _blueprint.floorStartPosition.z + floorWidth * z * fz);
-                _blueprint.PlaceGameObject(
+                PlacePrefab(
                     _gridBasePreview,
                     pos,
                     _gridBasePreview.transform.rotation,
@@ -67,23 +67,33 @@ public class GridPlacer : MonoBehaviour
         }
     }
 
-    private void PlaceSurroundAroundBase(float totalX, float totalZ, float floorWidth, float fx, float fz )
+    private void PlaceSurroundAroundBase(float totalX, float totalZ, float floorWidth, float fx, float fz)
     {
         for (float x = 0; x <= totalX; x++)
         {
             var worldX = _blueprint.floorStartPosition.x + x * floorWidth * fx;
             var posZero = new Vector3(worldX, _blueprint.activeBaseHeight * _blueprint.activeScale, _blueprint.floorStartPosition.z - fz * 2);
-            _blueprint.PlaceGameObject(_gridSurroundPreview, posZero, _gridBasePreview.transform.rotation, _wallsGO, _gridSurroundMaterial);
+            PlacePrefab(_gridSurroundPreview, posZero, _gridBasePreview.transform.rotation, _wallsGO, _gridSurroundMaterial);
 
             var posLast = new Vector3(worldX, _blueprint.activeBaseHeight * _blueprint.activeScale, _blueprint.floorStartPosition.z + fz * totalZ * floorWidth + fz * 2);
-            _blueprint.PlaceGameObject(_gridSurroundPreview, posLast, _gridBasePreview.transform.rotation, _wallsGO, _gridSurroundMaterial);
+            PlacePrefab(_gridSurroundPreview, posLast, _gridBasePreview.transform.rotation, _wallsGO, _gridSurroundMaterial);
         }
         for (float z = 0; z <= totalZ; z++)
         {
             var worldZ = _blueprint.floorStartPosition.z + z * floorWidth * fz;
-            _blueprint.PlaceGameObject(_gridSurroundPreview, new Vector3(_blueprint.floorStartPosition.x - fx * 2, _blueprint.activeBaseHeight * _blueprint.activeScale, worldZ), _gridBasePreview.transform.rotation * Quaternion.Euler(0, -90, 0), _wallsGO, _gridSurroundMaterial);
-            _blueprint.PlaceGameObject(_gridSurroundPreview, new Vector3(_blueprint.floorStartPosition.x + fx * totalX * floorWidth + fx * 2, _blueprint.activeBaseHeight * _blueprint.activeScale, worldZ), _gridBasePreview.transform.rotation * Quaternion.Euler(0, -90, 0), _wallsGO, _gridSurroundMaterial);
+            PlacePrefab(_gridSurroundPreview, new Vector3(_blueprint.floorStartPosition.x - fx * 2, _blueprint.activeBaseHeight * _blueprint.activeScale, worldZ), _gridBasePreview.transform.rotation * Quaternion.Euler(0, -90, 0), _wallsGO, _gridSurroundMaterial);
+            PlacePrefab(_gridSurroundPreview, new Vector3(_blueprint.floorStartPosition.x + fx * totalX * floorWidth + fx * 2, _blueprint.activeBaseHeight * _blueprint.activeScale, worldZ), _gridBasePreview.transform.rotation * Quaternion.Euler(0, -90, 0), _wallsGO, _gridSurroundMaterial);
         }
 
+    }
+
+    private void PlacePrefab(GameObject prefab, Vector3 position, Quaternion rotation, GameObject parent, Material customMaterial)
+    {
+        _blueprint.PlaceGameObject(
+                    prefab,
+                    position,
+                    rotation,
+                    parent,
+                    customMaterial);
     }
 }
